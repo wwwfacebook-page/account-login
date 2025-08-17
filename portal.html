@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Example</title>
+    <!-- Add Google Fonts link for Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* Set all text to use the Poppins font */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-image: url('portal.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            margin: 0;
+            height: 100vh;
+            position: relative;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            color: white;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            margin-top: -30px; /* Adjust this value to move the title higher */
+        }
+
+        .transparent-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.3); /* Transparent white background */
+            color: white;
+            border: 2px solid white;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .transparent-btn:hover {
+            background-color: rgba(58, 108, 214, 0.5); /* Slightly darker when hovered */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>OFFICE OF CURRICULAR REFORMS, QULAITY<br>ASSURANCE & MANAGEMENT SERVICES (CRQAMS)</h1>
+    </div>
+    <!-- Transparent button that redirects to admin.html -->
+    <button class="transparent-btn" onclick="redirectToAdmin()">>></button>
+
+    <script>
+        // Function to redirect to admin.html
+        function redirectToAdmin() {
+            window.location.href = "admin.html"; // Redirects to admin.html when clicked
+        }
+    </script>
+</body>
+</html>
