@@ -36,57 +36,42 @@
             margin-top: -30px;
         }
 
-        /* Logout Button */
-        .logout-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 1.5em;
-            color: white;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            z-index: 10; /* Ensure it appears on top */
-        }
-
-        .logout-btn:hover {
-            color: #f44336; /* Red color on hover */
-        }
-
         /* Responsive Styling */
-        @media only screen and (max-width: 768px) {
-            body {
-                font-size: 14px;
-            }
+@media only screen and (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
 
-            .sidebar {
-                width: 100%;
-                position: relative;
-                height: auto;
-                background-color: rgba(73, 70, 70, 0.8);
-            }
+    /* Sidebar Styles for Mobile */
+    .sidebar {
+        width: 100%;
+        position: relative;
+        height: auto;
+        background-color: rgba(73, 70, 70, 0.8); /* Adjust transparency for better visibility */
+    }
 
-            .container {
-                padding: 10px;
-                font-size: 16px;
-            }
+    .container {
+        padding: 10px;
+        font-size: 16px;
+    }
 
-            h1 {
-                font-size: 1.8em;
-            }
+    h1 {
+        font-size: 1.8em;
+        line-height: 1.2;
+    }
 
-            /* Image container */
-            #image-content img {
-                max-width: 90%;
-                height: auto;
-            }
+    /* Image container */
+    #image-content img {
+        max-width: 90%; /* Ensure the image doesn't overflow on smaller screens */
+        height: auto;
+    }
 
-            /* Button styling for the close button */
-            #image-content button {
-                padding: 8px 12px;
-                font-size: 14px;
-            }
-        }
+    /* Button styling for the close button */
+    #image-content button {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+}
 
         /* Sidebar Styles */
         .sidebar {
@@ -110,6 +95,7 @@
             display: flex;
             align-items: center;
             margin-bottom: 20px;
+            flex-direction: row;
         }
 
         .profile img {
@@ -199,14 +185,29 @@
         button:hover {
             background-color: #357ae8;
         }
+        .logout-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            z-index: 1001; /* On top of sidebar */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            transition: background-color 0.3s ease;
+        }
 
+        .logout-button:hover {
+            background-color: rgba(30, 0, 200, 0.658);
+        }
     </style>
 </head>
+    <div class="logout-button" onclick="Logout()">Logout</div>    
 <body>
-
-    <!-- Logout Button -->
-    <button class="logout-btn" onclick="logout()">Logout</button>
-
     <div class="sidebar">
         <div class="profile">
             <img id="profile-image" src="428939261_3643726402621072_2130113521005400366_n.jpg" alt="Profile Icon">
@@ -223,21 +224,11 @@
             <div class="option" onclick="navigate('SurveyManagement')">Survey Management</div>
             <div class="option" onclick="navigate('AddSQDQuestion')">Add SQD Question</div>
             <div class="option" onclick="navigate('AddCCQuestion')">Add CC Question</div>
-        </div>
-    </div>
+        </div></div>
 
     <div class="container">
         <h1>OFFICE OF CURRICULAR REFORMS, QUALITY<br>ASSURANCE & MANAGEMENT SERVICES (CRQAMS)</h1>
     </div>
-
-    <script>
-        // Function to log out the user
-        function logout() {
-            // You can add any logout logic here (e.g., clearing session data or tokens)
-            alert("You have been logged out.");
-            window.location.href = "CSS.html";  // Redirect to login page
-        }
-    </script>
 
     <!-- Profile Content -->
     <div id="profile-content">
@@ -255,7 +246,263 @@
         </div>
     </div>
 
-    <!-- Other profile, settings, and content sections here (same as previous) -->
+    <!-- Edit Profile Content -->
+    <div id="edit-profile-content">
+        <h2>Edit Profile</h2>
+        <div class="profile-edit">
+            <label for="edit-name">Name:</label>
+            <input type="text" id="edit-name" value="John Ariel S. Pana">
+        </div>
+        <div class="profile-edit">
+            <label for="edit-contact">Contact Number:</label>
+            <input type="text" id="edit-contact" value="09932389942">
+        </div>
+        <div class="profile-edit">
+            <label for="edit-email">Email:</label>
+            <input type="email" id="edit-email" value="johpana@my.cspc.edu.ph">
+        </div>
+        <div class="profile-edit">
+            <label for="edit-position">Position:</label>
+            <input type="text" id="edit-position" value="System Designer">
+        </div>
+        <div class="profile-edit">
+            <label for="edit-birthdate">Birthdate:</label>
+            <input type="date" id="edit-birthdate" value="2000-11-24">
+        </div>
+        <div class="profile-edit">
+            <label for="edit-status">Status:</label>
+            <input type="text" id="edit-status" value="Single">
+        </div>
+        <div class="profile-edit">
+            <label for="edit-gender">Gender:</label>
+            <input type="text" id="edit-gender" value="Male">
+        </div>
+            <div class="profile-edit">
+            <label for="edit-profile-image">Profile Picture:</label>
+            <input type="file" id="edit-profile-image" accept="image/*">
+        </div>
+        <button onclick="saveProfileChanges()">Save Changes</button>
+        <button onclick="closeEditProfile()">Cancel</button>
+    </div>
 
+    <!-- Settings Content -->
+    <div id="settings-content">
+        <h2>Settings</h2>
+        <div class="settings-edit">
+            <label for="current-email">Current Email:</label>
+            <input type="email" id="current-email" placeholder="Enter current email" value="johpana@my.cspc.edu.ph">
+        </div>
+        <div class="settings-edit">
+            <label for="new-email">New Email:</label>
+            <input type="email" id="new-email" placeholder="Enter new email">
+        </div>
+        <div class="settings-edit">
+            <label for="current-password">Current Password:</label>
+            <input type="password" id="current-password" placeholder="Enter current password">
+        </div>
+        <div class="settings-edit">
+            <label for="new-password">New Password:</label>
+            <input type="password" id="new-password" placeholder="Enter new password">
+        </div>
+        <div class="settings-edit">
+            <label for="confirm-password">Confirm New Password:</label>
+            <input type="password" id="confirm-password" placeholder="Confirm new password">
+        </div>
+        <button onclick="saveSettings()">Save Changes</button>
+        <button onclick="closeSettings()">Cancel</button>
+    </div>
+
+    <!-- Image Content (initially hidden) -->
+<div id="image-content" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+    <img src="Screenshot 2025-08-17 190144.png" alt="Summary Report Image" style="max-width: 80%; height: auto; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);">
+    <button onclick="closeImageContent()" style="position: absolute; nav-down: 10px; right: 10px; padding: 10px 15px; background-color: rgba(255, 0, 0, 0.8); color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>
+</div>
+
+<script>
+    // Function to display the image content when triggered
+    function showImageContent() {
+        document.getElementById("image-content").style.display = "flex";  // Makes the image container visible
+    }
+
+    // Function to hide the image content when the close button is clicked
+    function closeImageContent() {
+        document.getElementById("image-content").style.display = "none";  // Hides the image container
+    }
+
+</script>
+
+    <script>
+        // Show the profile content when the button is clicked
+        document.getElementById("my-profile-btn").addEventListener("click", function() {
+            document.getElementById("profile-content").style.display = "block";
+        });
+
+        document.getElementById("edit-profile-btn").addEventListener("click", function() {
+            document.getElementById("edit-profile-content").style.display = "block";
+        });
+
+        document.getElementById("settings-btn").addEventListener("click", function() {
+            document.getElementById("settings-content").style.display = "block";
+        });
+
+        function closeProfileContent() {
+            document.getElementById("profile-content").style.display = "none";
+        }
+
+        function closeEditProfile() {
+            document.getElementById("edit-profile-content").style.display = "none";
+        }
+
+        function closeSettings() {
+            document.getElementById("settings-content").style.display = "none";
+        }
+
+        function Logout() {
+            // Clear saved data (optional, depends on your app needs)
+            localStorage.removeItem("savedEmail");
+            localStorage.removeItem("savedPassword");
+            localStorage.removeItem("profileImage");
+
+            // Optional: clear all localStorage
+            // localStorage.clear();
+
+            // Confirm logout
+            if (confirm("Are you sure you want to log out?")) {
+            // Redirect to login page (you can change the path)
+            window.location.href = "CSS.html";
+            }
+        }
+
+        function saveProfileChanges() {
+            const name = document.getElementById("edit-name").value;
+            const contact = document.getElementById("edit-contact").value;
+            const email = document.getElementById("edit-email").value;
+            const position = document.getElementById("edit-position").value;
+            const birthdate = document.getElementById("edit-birthdate").value;
+            const status = document.getElementById("edit-status").value;
+            const gender = document.getElementById("edit-gender").value;
+            // Handle profile picture change
+        const imageInput = document.getElementById("edit-profile-image");
+        if (imageInput.files && imageInput.files[0]) {
+            const reader = new FileReader();
+                reader.onload = function(e) {
+                const newImageSrc = e.target.result;
+                document.getElementById("profile-image").src = newImageSrc;
+                localStorage.setItem("profileImage", newImageSrc); // Optional persistence
+            };
+            reader.readAsDataURL(imageInput.files[0]);
+        }
+
+            // Add profile saving logic here (e.g., validation or saving to a database)
+
+            alert("Profile updated successfully!");
+            closeEditProfile();
+        }
+
+        function saveProfileChanges() {
+            const name = document.getElementById("edit-name").value;
+            const contact = document.getElementById("edit-contact").value;
+            const email = document.getElementById("edit-email").value;
+            const position = document.getElementById("edit-position").value;
+            const birthdate = document.getElementById("edit-birthdate").value;
+            const status = document.getElementById("edit-status").value;
+            const gender = document.getElementById("edit-gender").value;
+
+            // Update text values
+            document.querySelector(".profile-name").textContent = name;
+            const profileInfo = document.querySelectorAll("#profile-view .profile-info");
+            profileInfo[0].innerHTML = `<span>Name:</span> ${name}`;
+            profileInfo[1].innerHTML = `<span>Contact Number:</span> ${contact}`;
+            profileInfo[2].innerHTML = `<span>Email:</span> ${email}`;
+            profileInfo[3].innerHTML = `<span>Position:</span> ${position}`;
+            profileInfo[4].innerHTML = `<span>Birthdate:</span> ${formatDate(birthdate)}`;
+            profileInfo[5].innerHTML = `<span>Status:</span> ${status}`;
+            profileInfo[6].innerHTML = `<span>Age:</span> ${calculateAge(birthdate)}`;
+            profileInfo[7].innerHTML = `<span>Gender:</span> ${gender}`;
+
+            // Handle profile image change
+            const imageInput = document.getElementById("edit-profile-image");
+        const profileImage = document.getElementById("profile-image");
+        if  (imageInput.files && imageInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                profileImage.src = e.target.result; // Show new image
+                localStorage.setItem("profileImage", e.target.result); // Optional: persist image
+            };
+            reader.readAsDataURL(imageInput.files[0]);
+            }
+
+            alert("Profile updated successfully!");
+            closeEditProfile();
+        }
+
+        function calculateAge(birthdate) {
+            const birth = new Date(birthdate);
+            const today = new Date();
+            let age = today.getFullYear() - birth.getFullYear();
+            const m = today.getMonth() - birth.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+            age--;
+            }
+            return age;
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        function saveSettings() {
+            const currentEmail = document.getElementById("current-email").value.trim();
+            const newEmail = document.getElementById("new-email").value.trim();
+            const currentPassword = document.getElementById("current-password").value;
+            const newPassword = document.getElementById("new-password").value;
+            const confirmPassword = document.getElementById("confirm-password").value;
+            const savedEmail = localStorage.getItem("savedEmail");
+            const savedPassword = localStorage.getItem("savedPassword");
+
+            // Validate current credentials
+        if (currentEmail !== savedEmail || currentPassword !== savedPassword) {
+            alert("Incorrect current email or password.");
+            return;
+        }
+
+            // Optional: Check if new password and confirmation match
+        if (newPassword && newPassword !== confirmPassword) {
+            alert("New passwords do not match.");
+            return;
+        }
+
+            // Update email if a new one is provided
+        if (newEmail && newEmail !== savedEmail) {
+            localStorage.setItem("savedEmail", newEmail);
+        }
+
+            // Update password if provided
+        if (newPassword) {
+            localStorage.setItem("savedPassword", newPassword);
+        }
+
+            alert("Login credentials updated successfully.");
+            closeSettings();
+        }
+            // Function to display the image content when triggered
+            document.getElementById("summaryReport-btn").addEventListener("click", function() {
+            document.getElementById("image-content").style.display = "block";  // Makes the image container visible
+        }); 
+
+            // Function to hide the image content when the close button is clicked
+        function closeImageContent() {
+            document.getElementById("image-content").style.display = "none";  // Hides the image container
+        }
+            // Load saved profile image on page load
+        window.addEventListener("DOMContentLoaded", () => {
+            const savedImage = localStorage.getItem("profileImage");
+            if (savedImage) {
+            document.getElementById("profile-image").src = savedImage;
+            }
+        });
+
+    </script>
 </body>
 </html>

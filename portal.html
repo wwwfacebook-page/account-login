@@ -37,7 +37,6 @@
             margin-top: -30px; /* Adjust this value to move the title higher */
         }
 
-        /* Transparent Login button */
         .transparent-btn {
             position: absolute;
             bottom: 20px;
@@ -55,36 +54,12 @@
         .transparent-btn:hover {
             background-color: rgba(58, 108, 214, 0.5); /* Slightly darker when hovered */
         }
-
-        /* Logout button at the top-right */
-        .logout-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            background-color: rgba(255, 255, 255, 0.3); /* Transparent white background */
-            color: white;
-            border: 2px solid white;
-            border-radius: 5px;
-            font-size: 1.2em;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background-color: rgba(31, 8, 133, 0.836); /* Red color when hovered */
-        }
     </style>
 </head>
 <body>
-
-    <!-- Logout Button -->
-    <button class="logout-btn" onclick="logout()">Logout</button>
-
     <div class="container">
         <h1>OFFICE OF CURRICULAR REFORMS, QULAITY<br>ASSURANCE & MANAGEMENT SERVICES (CRQAMS)</h1>
     </div>
-
     <!-- Transparent button that redirects to admin.html -->
     <button class="transparent-btn" onclick="redirectToAdmin()">>></button>
 
@@ -93,13 +68,6 @@
         function redirectToAdmin() {
             window.location.href = "admin.html"; // Redirects to admin.html when clicked
         }
-
-        // Function for logout
-        function logout() {
-            alert("You have been logged out.");
-            window.location.href = "CSS.html"; // Redirect to login page
-        }
     </script>
-
 </body>
 </html>

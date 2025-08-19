@@ -108,31 +108,48 @@
     </div>
 
     <script>
-        function showLoginForm() {
-            // Reveal the login form with animation
-            const loginForm = document.getElementById('login-form');
-            loginForm.style.opacity = 1;
-            loginForm.style.transform = 'translateY(0)';
-            document.getElementById('show-login-btn').style.display = 'none';
+    function showLoginForm() {
+        const loginForm = document.getElementById('login-form');
+        loginForm.style.opacity = 1;
+        loginForm.style.transform = 'translateY(0)';
+        document.getElementById('show-login-btn').style.display = 'none';
+    }
+
+    function login() {
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        if (email === "" || password === "") {
+            alert("Please fill in both the email and password fields.");
+            return;
         }
 
-        function login() {
-            // Get the values of the email and password fields
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        // Check if a saved password already exists
+        const savedEmail = localStorage.getItem("savedEmail");
+        const savedPassword = localStorage.getItem("savedPassword");
 
-            // Basic validation
-            if (email === "" || password === "") {
-                alert("Please fill in both the email and password fields.");
-                return;
+        if (!savedEmail || !savedPassword) {
+            // First-time login: save email and password
+            localStorage.setItem("savedEmail", email);
+            localStorage.setItem("savedPassword", password);
+            alert("Login successful and password saved!");
+            window.location.href = "portal.html";
+        } else {
+            // Validate entered credentials
+            if (email === savedEmail && password === savedPassword) {
+                alert("Login successful!");
+                window.location.href = "portal.html";
+            } else {
+                alert("Incorrect email or password.");
             }
-
-            // Simulate login success
-            alert("Login successful!");
-
-            // Redirect to the portal.html after login
-            window.location.href = "portal.html"; // This will redirect to the portal page
         }
-    </script>
+    }
+
+    // Optional: Autofocus email field when form is shown
+    document.getElementById("show-login-btn").addEventListener("click", () => {
+        setTimeout(() => document.getElementById("email").focus(), 200);
+    });
+</script>
+
 </body>
 </html>
