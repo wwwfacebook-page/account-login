@@ -182,7 +182,7 @@
 </head>
 <body>
 
-  <h1>Product Price</h1>
+  <h1>Product Price List</h1>
 
   <div id="search-container">
     <input
@@ -219,7 +219,27 @@
     <button type="submit">Add Product</button>
   </form>
 
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
   <script>
+    // Firebase configuration (replace with your own project config)
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const dbRef = db.ref("products");
+
   // Key for localStorage
   const STORAGE_KEY = 'panaStoreProducts';
 
@@ -233,7 +253,13 @@
   ];
 
   // Load products from localStorage or use default
-  let products = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultProducts;
+  let products = [];
+
+dbRef.on("value", snapshot => {
+  const data = snapshot.val();
+  products = data ? Object.entries(data).map(([id, value]) => ({ id, ...value })) : [];
+  renderAll(products);
+});
 
   const tbody = document.querySelector("#product-table tbody");
 
@@ -252,10 +278,8 @@
 
     // Delete button removes product from array and updates localStorage & table
     row.querySelector(".delete-btn").addEventListener("click", () => {
-      products.splice(index, 1);        // remove from array
-      saveProducts();                   // save updated array
-      renderAll(products);              // re-render table
-    });
+  deleteProductFromFirebase(product.id); // Remove from Firebase
+});
 
     tbody.appendChild(row);
   }
@@ -267,25 +291,35 @@
   }
 
   // Save current products array to localStorage
-  function saveProducts() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-  }
+  function saveProductToFirebase(product) {
+  const newRef = dbRef.push();
+  newRef.set(product);
+}
+
+function deleteProductFromFirebase(id) {
+  dbRef.child(id).remove();
+}
 
   // Initial render
   renderAll(products);
 
   // Add new product form submit handler
   document.getElementById("add-product-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    const name = document.getElementById("product-name").value.trim();
-    const description = document.getElementById("product-description").value.trim();
-    const price = document.getElementById("product-price").value.trim();
+  const name = document.getElementById("product-name").value.trim();
+  const description = document.getElementById("product-description").value.trim();
+  const price = document.getElementById("product-price").value.trim();
 
-    if (!name || !description || !price) {
-      alert("Please fill in all fields.");
-      return;
-    }
+  if (!name || !description || !price) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  const newProduct = { name, description, price };
+  saveProductToFirebase(newProduct); // Send to Firebase
+  this.reset();
+});
 
     const newProduct = { name, description, price };
     products.push(newProduct);
@@ -306,4 +340,5 @@
 </script>
 </body>
 </html>
+
 
