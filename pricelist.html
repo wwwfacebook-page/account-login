@@ -285,23 +285,50 @@ dbRef.on("value", snapshot => {
   }
 
   // Render all products in the table
-  function renderAll(productsList) {
-    tbody.innerHTML = ""; // Clear all rows
-    productsList.forEach(renderProduct);
-  }
+  row.querySelector(".delete-btn").addEventListener("click", () => {
+  deleteProductFromFirebase(product.id);
+});
 
   // Save current products array to localStorage
   function saveProductToFirebase(product) {
-  const newRef = dbRef.push();
-  newRef.set(product);
+  dbRef.push(product); // adds product to Firebase
 }
 
 function deleteProductFromFirebase(id) {
   dbRef.child(id).remove();
 }
+    // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBeyKlZ3a0I-3uApVYa7OAG-VK2lHkyDcg",
+  authDomain: "web-pricelist.firebaseapp.com",
+  databaseURL: "https://web-pricelist-default-rtdb.firebaseio.com",
+  projectId: "web-pricelist",
+  storageBucket: "web-pricelist.firebasestorage.app",
+  messagingSenderId: "649791610425",
+  appId: "1:649791610425:web:0d5847a54d27525b7cb7e8",
+  measurementId: "G-3VQEBZKBQJ"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
   // Initial render
+  dbRef.on("value", snapshot => {
+  const data = snapshot.val();
+  const productArray = data
+    ? Object.entries(data).map(([id, value]) => ({ id, ...value }))
+    : [];
+  products = productArray;
   renderAll(products);
+});
 
   // Add new product form submit handler
   document.getElementById("add-product-form").addEventListener("submit", function (e) {
@@ -317,7 +344,7 @@ function deleteProductFromFirebase(id) {
   }
 
   const newProduct = { name, description, price };
-  saveProductToFirebase(newProduct); // Send to Firebase
+  saveProductToFirebase(newProduct);
   this.reset();
 });
 
@@ -340,5 +367,6 @@ function deleteProductFromFirebase(id) {
 </script>
 </body>
 </html>
+
 
 
