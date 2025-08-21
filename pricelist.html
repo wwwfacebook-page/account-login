@@ -265,9 +265,10 @@
 
   // Save product to Firebase
   function saveProductToFirebase(product) {
-    const newRef = dbRef.push();
-    newRef.set(product);
-  }
+  const newRef = dbRef.push();
+  const productWithId = { ...product, id: newRef.key }; // Include the generated ID
+  newRef.set(productWithId); // Save with ID in the object
+}
 
   // Delete product from Firebase
   function deleteProductFromFirebase(id) {
@@ -313,4 +314,5 @@
 </script>
 </body>
 </html>
+
 
