@@ -6,18 +6,15 @@
   <title>Product Prices - Pana's Store</title>
   <style>
     body {
-  font-family: 'Segoe UI', sans-serif;
-  margin: 0;
-  padding: 20px;
-
-  /* Background with a warm sari-sari store vibe */
-  background: 
-    linear-gradient(rgba(255, 240, 210, 0.8), rgba(255, 240, 210, 0.8)),
-    url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
-  background-size: cover;
-
-  color: #333;
-}
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background:
+        linear-gradient(rgba(255, 240, 210, 0.8), rgba(255, 240, 210, 0.8)),
+        url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+    }
 
     h1 {
       text-align: center;
@@ -25,7 +22,6 @@
       margin-bottom: 10px;
     }
 
-    /* Search input container */
     #search-container {
       max-width: 500px;
       margin: 15px auto 30px auto;
@@ -51,7 +47,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 600px; /* ensures table has a baseline width for scrolling */
+      min-width: 600px;
     }
 
     th, td {
@@ -121,7 +117,6 @@
       outline: none;
     }
 
-    /* Responsive Styles */
     @media (max-width: 768px) {
       h1 {
         font-size: 1.5rem;
@@ -140,7 +135,6 @@
         padding: 12px 14px;
       }
 
-      /* Responsive table: transform table rows to blocks */
       td {
         display: block;
         position: relative;
@@ -172,11 +166,10 @@
       }
 
       .table-container {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
     }
   </style>
 </head>
@@ -195,131 +188,126 @@
   </div>
 
   <div class="table-container">
-  <table id="product-table" role="table" aria-label="Product price list">
+    <table id="product-table" role="table" aria-label="Product price list">
+      <thead>
+        <tr>
+          <th scope="col">Product</th>
+          <th scope="col">Description</th>
+          <th scope="col">Price</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- JS will populate rows here -->
+      </tbody>
+    </table>
   </div>
-
-    <thead>
-      <tr>
-        <th scope="col">Product</th>
-        <th scope="col">Description</th>
-        <th scope="col">Price</th>
-        <th scope="col">Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- JS will populate rows here -->
-    </tbody>
-  </table>
 
   <form id="add-product-form" aria-label="Add new product form">
     <h2>Add New Product</h2>
-    <input type="text" id="product-name" placeholder="Product Name" required aria-required="true" />
-    <input type="text" id="product-description" placeholder="Description" required aria-required="true" />
-    <input type="text" id="product-price" placeholder="Price (e.g. $12.99)" required aria-required="true" />
+    <input type="text" id="product-name" placeholder="Product Name" required />
+    <input type="text" id="product-description" placeholder="Description" required />
+    <input type="text" id="product-price" placeholder="Price (e.g. $12.99)" required />
     <button type="submit">Add Product</button>
   </form>
 
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 
   <script>
-  // Your Firebase Config
-  const firebaseConfig = {
-    apiKey: "AIzaSyBeyKlZ3a0I-3uApVYa7OAG-VK2lHkyDcg",
-    authDomain: "web-pricelist.firebaseapp.com",
-    databaseURL: "https://web-pricelist-default-rtdb.firebaseio.com",
-    projectId: "web-pricelist",
-    storageBucket: "web-pricelist.firebasestorage.app",
-    messagingSenderId: "649791610425",
-    appId: "1:649791610425:web:0d5847a54d27525b7cb7e8",
-    measurementId: "G-3VQEBZKBQJ"
-  };
+    // Your Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBeyKlZ3a0I-3uApVYa7OAG-VK2lHkyDcg",
+      authDomain: "web-pricelist.firebaseapp.com",
+      databaseURL: "https://web-pricelist-default-rtdb.firebaseio.com",
+      projectId: "web-pricelist",
+      storageBucket: "web-pricelist.appspot.com",
+      messagingSenderId: "649791610425",
+      appId: "1:649791610425:web:0d5847a54d27525b7cb7e8",
+      measurementId: "G-3VQEBZKBQJ"
+    };
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-  const dbRef = db.ref("products");
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const dbRef = db.ref("products");
 
-  const tbody = document.querySelector("#product-table tbody");
-  let products = [];
+    const tbody = document.querySelector("#product-table tbody");
+    let products = [];
 
-  // Render a single product row
-  function renderProduct(product) {
-    const row = document.createElement("tr");
+    // Render a single product row
+    function renderProduct(product) {
+      const row = document.createElement("tr");
 
-    row.innerHTML = `
-      <td data-label="Product">${product.name}</td>
-      <td data-label="Description">${product.description}</td>
-      <td data-label="Price">${product.price}</td>
-      <td data-label="Action">
-        <button class="delete-btn" style="background-color: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">Delete</button>
-      </td>
-    `;
+      row.innerHTML = `
+        <td data-label="Product">${product.name}</td>
+        <td data-label="Description">${product.description}</td>
+        <td data-label="Price">${product.price}</td>
+        <td data-label="Action">
+          <button class="delete-btn" style="background-color: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">Delete</button>
+        </td>
+      `;
 
-    row.querySelector(".delete-btn").addEventListener("click", () => {
-      deleteProductFromFirebase(product.id);
-    });
+      row.querySelector(".delete-btn").addEventListener("click", () => {
+        deleteProductFromFirebase(product.id);
+      });
 
-    tbody.appendChild(row);
-  }
-
-  // Render all products in the table
-  function renderAll(productList) {
-    tbody.innerHTML = "";
-    productList.forEach(renderProduct);
-  }
-
-  // Save a product to Firebase
-  function saveProductToFirebase(product) {
-    dbRef.push(product);
-  }
-
-  // Delete a product from Firebase
-  function deleteProductFromFirebase(id) {
-    dbRef.child(id).remove();
-  }
-
-  // Listen for changes in Firebase and update table in real-time
-  dbRef.on("value", (snapshot) => {
-    const data = snapshot.val();
-    products = data
-      ? Object.entries(data).map(([id, value]) => ({ id, ...value }))
-      : [];
-    renderAll(products);
-  });
-
-  // Handle form submission
-  document.getElementById("add-product-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    const name = document.getElementById("product-name").value.trim();
-    const description = document.getElementById("product-description").value.trim();
-    const price = document.getElementById("product-price").value.trim();
-
-    if (!name || !description || !price) {
-      alert("Please fill in all fields.");
-      return;
+      tbody.appendChild(row);
     }
 
-    const newProduct = { name, description, price };
-    saveProductToFirebase(newProduct);
-    this.reset();
-  });
+    // Render all products
+    function renderAll(productList) {
+      tbody.innerHTML = "";
+      productList.forEach(renderProduct);
+    }
 
-  // Search functionality
-  document.getElementById("search-input").addEventListener("input", function () {
-    const query = this.value.toLowerCase();
-    const filteredProducts = products.filter(p =>
-      p.name.toLowerCase().includes(query) ||
-      p.description.toLowerCase().includes(query)
-    );
-    renderAll(filteredProducts);
-  });
-</script>
+    // Save product to Firebase
+    function saveProductToFirebase(product) {
+      dbRef.push(product);
+    }
+
+    // Delete product from Firebase
+    function deleteProductFromFirebase(id) {
+      dbRef.child(id).remove();
+    }
+
+    // Realtime data listener
+    dbRef.on("value", (snapshot) => {
+      const data = snapshot.val();
+      products = data
+        ? Object.entries(data).map(([id, value]) => ({ id, ...value }))
+        : [];
+      renderAll(products);
+    });
+
+    // Handle form submission
+    document.getElementById("add-product-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById("product-name").value.trim();
+      const description = document.getElementById("product-description").value.trim();
+      const price = document.getElementById("product-price").value.trim();
+
+      if (!name || !description || !price) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const newProduct = { name, description, price };
+      saveProductToFirebase(newProduct);
+      this.reset();
+    });
+
+    // Search filter
+    document.getElementById("search-input").addEventListener("input", function () {
+      const query = this.value.toLowerCase();
+      const filteredProducts = products.filter(p =>
+        p.name.toLowerCase().includes(query) ||
+        p.description.toLowerCase().includes(query)
+      );
+      renderAll(filteredProducts);
+    });
+  </script>
 </body>
 </html>
-
-
-
-
