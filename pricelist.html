@@ -224,47 +224,28 @@
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 
   <script>
-    // Firebase configuration (replace with your own project config)
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
+  // Your Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyBeyKlZ3a0I-3uApVYa7OAG-VK2lHkyDcg",
+    authDomain: "web-pricelist.firebaseapp.com",
+    databaseURL: "https://web-pricelist-default-rtdb.firebaseio.com",
+    projectId: "web-pricelist",
+    storageBucket: "web-pricelist.firebasestorage.app",
+    messagingSenderId: "649791610425",
+    appId: "1:649791610425:web:0d5847a54d27525b7cb7e8",
+    measurementId: "G-3VQEBZKBQJ"
+  };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const dbRef = db.ref("products");
-
-  // Key for localStorage
-  const STORAGE_KEY = 'panaStoreProducts';
-
-  // Default products if nothing in storage yet
-  const defaultProducts = [
-    { name: "Product A", description: "High-quality item A", price: "$19.99" },
-    { name: "Product B", description: "Useful item B", price: "$29.99" },
-    { name: "Product C", description: "Popular item C", price: "$9.99" },
-    { name: "Product D", description: "Durable item D", price: "$14.99" },
-    { name: "Product E", description: "Eco-friendly item E", price: "$24.99" },
-  ];
-
-  // Load products from localStorage or use default
-  let products = [];
-
-dbRef.on("value", snapshot => {
-  const data = snapshot.val();
-  products = data ? Object.entries(data).map(([id, value]) => ({ id, ...value })) : [];
-  renderAll(products);
-});
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const dbRef = db.ref("products");
 
   const tbody = document.querySelector("#product-table tbody");
+  let products = [];
 
   // Render a single product row
-  function renderProduct(product, index) {
+  function renderProduct(product) {
     const row = document.createElement("tr");
 
     row.innerHTML = `
@@ -276,86 +257,57 @@ dbRef.on("value", snapshot => {
       </td>
     `;
 
-    // Delete button removes product from array and updates localStorage & table
     row.querySelector(".delete-btn").addEventListener("click", () => {
-  deleteProductFromFirebase(product.id); // Remove from Firebase
-});
+      deleteProductFromFirebase(product.id);
+    });
 
     tbody.appendChild(row);
   }
 
   // Render all products in the table
-  row.querySelector(".delete-btn").addEventListener("click", () => {
-  deleteProductFromFirebase(product.id);
-});
-
-  // Save current products array to localStorage
-  function saveProductToFirebase(product) {
-  dbRef.push(product); // adds product to Firebase
-}
-
-function deleteProductFromFirebase(id) {
-  dbRef.child(id).remove();
-}
-    // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBeyKlZ3a0I-3uApVYa7OAG-VK2lHkyDcg",
-  authDomain: "web-pricelist.firebaseapp.com",
-  databaseURL: "https://web-pricelist-default-rtdb.firebaseio.com",
-  projectId: "web-pricelist",
-  storageBucket: "web-pricelist.firebasestorage.app",
-  messagingSenderId: "649791610425",
-  appId: "1:649791610425:web:0d5847a54d27525b7cb7e8",
-  measurementId: "G-3VQEBZKBQJ"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-  // Initial render
-  dbRef.on("value", snapshot => {
-  const data = snapshot.val();
-  const productArray = data
-    ? Object.entries(data).map(([id, value]) => ({ id, ...value }))
-    : [];
-  products = productArray;
-  renderAll(products);
-});
-
-  // Add new product form submit handler
-  document.getElementById("add-product-form").addEventListener("submit", function (e) {
-  e.preventDefault();
-
-  const name = document.getElementById("product-name").value.trim();
-  const description = document.getElementById("product-description").value.trim();
-  const price = document.getElementById("product-price").value.trim();
-
-  if (!name || !description || !price) {
-    alert("Please fill in all fields.");
-    return;
+  function renderAll(productList) {
+    tbody.innerHTML = "";
+    productList.forEach(renderProduct);
   }
 
-  const newProduct = { name, description, price };
-  saveProductToFirebase(newProduct);
-  this.reset();
-});
+  // Save a product to Firebase
+  function saveProductToFirebase(product) {
+    dbRef.push(product);
+  }
+
+  // Delete a product from Firebase
+  function deleteProductFromFirebase(id) {
+    dbRef.child(id).remove();
+  }
+
+  // Listen for changes in Firebase and update table in real-time
+  dbRef.on("value", (snapshot) => {
+    const data = snapshot.val();
+    products = data
+      ? Object.entries(data).map(([id, value]) => ({ id, ...value }))
+      : [];
+    renderAll(products);
+  });
+
+  // Handle form submission
+  document.getElementById("add-product-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById("product-name").value.trim();
+    const description = document.getElementById("product-description").value.trim();
+    const price = document.getElementById("product-price").value.trim();
+
+    if (!name || !description || !price) {
+      alert("Please fill in all fields.");
+      return;
+    }
 
     const newProduct = { name, description, price };
-    products.push(newProduct);
-    saveProducts();        // Save after adding
-    renderAll(products);
+    saveProductToFirebase(newProduct);
     this.reset();
   });
 
-  // Search input event - filters displayed products but doesn't alter storage
+  // Search functionality
   document.getElementById("search-input").addEventListener("input", function () {
     const query = this.value.toLowerCase();
     const filteredProducts = products.filter(p =>
@@ -367,6 +319,7 @@ const analytics = getAnalytics(app);
 </script>
 </body>
 </html>
+
 
 
 
