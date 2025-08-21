@@ -215,8 +215,10 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 
-  <script>
-  // Your Firebase configuration
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+  import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
   const firebaseConfig = {
     apiKey: "AIzaSyBeyKlZ3a0I-3uApVYa7OAG-VK2lHkyDcg",
     authDomain: "web-pricelist.firebaseapp.com",
@@ -228,19 +230,17 @@
     measurementId: "G-3VQEBZKBQJ"
   };
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-  const dbRef = db.ref("products");
+  // ✅ Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const dbRef = ref(db, "products");
 
   const tbody = document.querySelector("#product-table tbody");
   let products = [];
 
-  // Render a single product row
   function renderProduct(product) {
     const row = document.createElement("tr");
-    row.setAttribute("data-id", product.id); // for deletion reference
-
+    row.setAttribute("data-id", product.id);
     row.innerHTML = `
       <td data-label="Product">${product.name}</td>
       <td data-label="Description">${product.description}</td>
@@ -249,34 +249,29 @@
         <button class="delete-btn" style="background-color: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">Delete</button>
       </td>
     `;
-
     row.querySelector(".delete-btn").addEventListener("click", () => {
       deleteProductFromFirebase(product.id);
     });
-
     tbody.appendChild(row);
   }
 
-  // Render all products
   function renderAll(productList) {
-    tbody.innerHTML = ""; // clear table before rendering
+    tbody.innerHTML = "";
     productList.forEach(renderProduct);
   }
 
-  // Save product to Firebase
   function saveProductToFirebase(product) {
-  const newRef = dbRef.push();
-  const productWithId = { ...product, id: newRef.key }; // Include the generated ID
-  newRef.set(productWithId); // Save with ID in the object
-}
-
-  // Delete product from Firebase
-  function deleteProductFromFirebase(id) {
-    dbRef.child(id).remove();
+    const newRef = push(dbRef);
+    const productWithId = { ...product, id: newRef.key };
+    set(newRef, productWithId);
   }
 
-  // Realtime listener
-  dbRef.on("value", (snapshot) => {
+  function deleteProductFromFirebase(id) {
+    const itemRef = ref(db, `products/${id}`);
+    remove(itemRef);
+  }
+
+  onValue(dbRef, (snapshot) => {
     const data = snapshot.val();
     products = data
       ? Object.entries(data).map(([id, value]) => ({ id, ...value }))
@@ -284,25 +279,20 @@
     renderAll(products);
   });
 
-  // Handle form submission
   document.getElementById("add-product-form").addEventListener("submit", function (e) {
     e.preventDefault();
-
     const name = document.getElementById("product-name").value.trim();
     const description = document.getElementById("product-description").value.trim();
     const price = document.getElementById("product-price").value.trim();
-
     if (!name || !description || !price) {
       alert("Please fill in all fields.");
       return;
     }
-
     const newProduct = { name, description, price };
     saveProductToFirebase(newProduct);
     this.reset();
   });
 
-  // Search filter
   document.getElementById("search-input").addEventListener("input", function () {
     const query = this.value.toLowerCase();
     const filteredProducts = products.filter(p =>
@@ -314,5 +304,6 @@
 </script>
 </body>
 </html>
+
 
 
