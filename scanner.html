@@ -148,7 +148,6 @@
       h1 {
         font-size: 1.8rem;
       }
-
       button {
         font-size: 1rem;
       }
@@ -192,21 +191,23 @@
 
       if (isValidUrl(decodedText)) {
         resultDiv.className = 'success';
-        resultDiv.textContent = `Opening URL:\n${decodedText}`;
-        window.open(decodedText, '_blank');
+        resultDiv.textContent = `Opening URL: ${decodedText}`;
+        setTimeout(() => {
+          window.open(decodedText, '_blank');
+        }, 500); // Delay slightly for better UX
       } else {
         resultDiv.className = 'error';
-        resultDiv.textContent = `Scanned data is not a valid URL:\n${decodedText}`;
+        resultDiv.textContent = `Scanned data is not a valid URL: ${decodedText}`;
       }
     }
 
     function onScanFailure(error) {
-      // Ignored
+      // silent fail
     }
 
     startBtn.addEventListener('click', () => {
       html5QrCode.start(
-        { facingMode: { exact: "environment" } }, // 👈 back camera
+        { facingMode: { exact: "environment" } }, // Use back camera
         { fps: 10, qrbox: { width: 250, height: 250 } },
         onScanSuccess,
         onScanFailure
@@ -233,5 +234,6 @@
       });
     });
   </script>
+
 </body>
 </html>
