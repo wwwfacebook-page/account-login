@@ -2,185 +2,214 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>QR Code Generator with Center Name</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR Code Generator</title>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary: #007bff;
-      --primary-dark: #0056b3;
-      --background: #f0f8ff;
-      --text: #333;
+    * {
+      box-sizing: border-box;
     }
 
     body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--background);
-      color: var(--text);
+      padding: 20px;
       display: flex;
       justify-content: center;
       align-items: center;
-      flex-direction: column;
-      padding: 2rem 1rem;
       min-height: 100vh;
-    }
-
-    h1 {
-      font-size: 1.6rem;
-      text-align: center;
-      margin-bottom: 1rem;
-      color: var(--primary-dark);
+      color: #333;
     }
 
     .container {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      padding: 30px 20px;
       width: 100%;
-      max-width: 400px;
-      background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 420px;
+      text-align: center;
+      animation: fadeIn 0.8s ease-in-out;
     }
 
-    input, button, label {
+    h1 {
+      margin: 0 0 10px;
+      font-size: 1.8em;
+      color: #0072ff;
+    }
+
+    p {
+      font-size: 1em;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"],
+    input[type="color"] {
       width: 100%;
-      padding: 0.9rem;
-      font-size: 1rem;
-      margin-bottom: 1rem;
-      border: 1px solid #ccc;
+      padding: 14px;
+      font-size: 1em;
+      border: 2px solid #0072ff;
       border-radius: 8px;
-    }
-
-    input:focus {
-      border-color: var(--primary);
       outline: none;
-      box-shadow: 0 0 6px rgba(0,123,255,0.2);
+      transition: 0.3s;
+      margin-bottom: 20px;
     }
 
-    button {
-      background-color: var(--primary);
-      color: white;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
+    input[type="text"]:focus {
+      border-color: #00c6ff;
+      box-shadow: 0 0 5px rgba(0, 198, 255, 0.3);
     }
 
-    button:hover {
-      background-color: var(--primary-dark);
+    label {
+      display: block;
+      text-align: left;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #0072ff;
+    }
+
+    .qr-wrapper {
+      background: #f0f0f0;
+      padding: 16px;
+      border-radius: 12px;
+      display: inline-block;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+      margin-bottom: 20px;
+    }
+
+    .qr-wrapper:hover {
+      transform: scale(1.05);
     }
 
     canvas {
-      display: block;
-      margin: 1rem auto;
-      background: white;
+      width: 220px;
+      height: 220px;
+    }
+
+    button {
+      background-color: #0072ff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
       border-radius: 8px;
-      border: 1px solid #ddd;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #005ed8;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     @media (max-width: 480px) {
       h1 {
-        font-size: 1.4rem;
+        font-size: 1.5em;
       }
-      input, button {
-        font-size: 0.95rem;
+
+      canvas {
+        width: 180px;
+        height: 180px;
       }
     }
   </style>
 </head>
 <body>
-
-  <h1>QR Code Generator</h1>
-
   <div class="container">
-    <input id="text-input" type="text" placeholder="Enter text or URL for QR" />
-    <input id="name-input" type="text" placeholder="Enter name to show in center" />
-    <label for="bg-color">Choose QR Background Color:</label>
-    <input id="bg-color" type="color" value="#ffffff" />
-    <button id="generate">Generate QR Code</button>
-    <canvas id="qrcode-canvas" width="200" height="200"></canvas>
-    <button id="download">Download PNG</button>
+    <h1>QR Code Generator</h1>
+    <p>Enter a link, name, and background color for your QR code</p>
+
+    <label for="linkInput">QR Code URL/Text</label>
+    <input type="text" id="linkInput" placeholder="https://example.com">
+
+    <label for="nameInput">Center Name</label>
+    <input type="text" id="nameInput" placeholder="Enter name in center">
+
+    <label for="bgColor">QR Background Color</label>
+    <input type="color" id="bgColor" value="#ffffff">
+
+    <div class="qr-wrapper">
+      <canvas id="qrcode" width="220" height="220"></canvas>
+    </div>
+
+    <button id="downloadBtn">Download QR</button>
   </div>
 
+  <!-- QRious Library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
   <script>
-    const canvas = document.getElementById("qrcode-canvas");
-    const ctx = canvas.getContext("2d");
-    const generateBtn = document.getElementById("generate");
-    const downloadBtn = document.getElementById("download");
+    const linkInput = document.getElementById('linkInput');
+    const nameInput = document.getElementById('nameInput');
+    const bgColorInput = document.getElementById('bgColor');
+    const canvas = document.getElementById('qrcode');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const ctx = canvas.getContext('2d');
 
-    function generateQRCode(text) {
-      const tempDiv = document.createElement("div");
-      document.body.appendChild(tempDiv);
-
-      const qr = new QRCode(tempDiv, {
-        text: text,
-        width: 200,
-        height: 200,
-        correctLevel: QRCode.CorrectLevel.H
-      });
-
-      return new Promise(resolve => {
-        setTimeout(() => {
-          const img = tempDiv.querySelector("img");
-          const qrImage = new Image();
-          qrImage.crossOrigin = "anonymous";
-          qrImage.src = img.src;
-          qrImage.onload = () => {
-            tempDiv.remove();
-            resolve(qrImage);
-          };
-        }, 100);
-      });
-    }
-
-    async function drawQRCodeWithCenterText(text, name, bgColor) {
-      const qrImg = await generateQRCode(text);
-
-      // Draw background color
-      ctx.fillStyle = bgColor;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Draw QR image
-      ctx.drawImage(qrImg, 0, 0, 200, 200);
-
-      // White circle background
-      ctx.fillStyle = "#ffffff";
-      ctx.beginPath();
-      ctx.arc(100, 100, 38, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Draw name text
-      if (name) {
-        ctx.fillStyle = "#000000";
-        ctx.font = "bold 14px 'Segoe UI', sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(name, 100, 100);
-      }
-    }
-
-    generateBtn.addEventListener("click", () => {
-      const text = document.getElementById("text-input").value.trim();
-      const name = document.getElementById("name-input").value.trim();
-      const bgColor = document.getElementById("bg-color").value;
-
-      if (!text) {
-        alert("Please enter text to generate QR code.");
-        return;
-      }
-
-      drawQRCodeWithCenterText(text, name, bgColor);
+    const qr = new QRious({
+      element: canvas,
+      size: 220,
+      value: ''
     });
 
-    downloadBtn.addEventListener("click", () => {
-      const dataUrl = canvas.toDataURL("image/png");
-      const a = document.createElement("a");
-      a.href = dataUrl;
-      a.download = "qr-code.png";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+    function updateQR() {
+      const link = linkInput.value.trim();
+      const name = nameInput.value.trim();
+      const bgColor = bgColorInput.value;
+
+      // Set the value of the QR
+      qr.set({
+        value: link || ' ',
+        background: bgColor
+      });
+
+      const image = new Image();
+      image.src = canvas.toDataURL('image/png');
+
+      image.onload = () => {
+        // Clear canvas and draw QR code
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+        // Draw name in the center if provided
+        if (name) {
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(canvas.width / 2, canvas.height / 2, 40, 0, 2 * Math.PI);
+          ctx.fill();
+
+          ctx.fillStyle = "#000000";
+          ctx.font = 'bold 16px Poppins, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(name, canvas.width / 2, canvas.height / 2);
+        }
+      };
+    }
+
+    // Update QR code on input
+    linkInput.addEventListener('input', updateQR);
+    nameInput.addEventListener('input', updateQR);
+    bgColorInput.addEventListener('input', updateQR);
+
+    downloadBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = 'qr-code.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
     });
+
+    // Initialize with default values
+    updateQR();
   </script>
-
 </body>
 </html>
