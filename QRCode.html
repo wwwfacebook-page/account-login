@@ -3,16 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>QR Code Generator with Centered Name (PNG Export)</title>
+  <title>Mobile QR Code Generator</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     :root {
       --primary: #007bff;
       --primary-dark: #0056b3;
-      --background: #f4f9ff;
+      --background: #f0f8ff;
       --text: #333;
-      --input-bg: #fff;
-      --shadow: rgba(0, 0, 0, 0.1);
+      --white: #fff;
     }
 
     body {
@@ -29,39 +28,38 @@
     }
 
     h1 {
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       text-align: center;
-      color: var(--primary-dark);
       margin-bottom: 1rem;
+      color: var(--primary-dark);
     }
 
     .container {
       width: 100%;
       max-width: 400px;
-      background: var(--input-bg);
+      background: var(--white);
       padding: 1.5rem;
       border-radius: 12px;
-      box-shadow: 0 8px 20px var(--shadow);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
-    input, button {
+    input, button, select {
       width: 100%;
-      padding: 1rem;
+      padding: 0.9rem;
       font-size: 1rem;
       margin-bottom: 1rem;
       border: 1px solid #ccc;
       border-radius: 8px;
-      transition: all 0.3s ease;
     }
 
-    input:focus {
+    input:focus, select:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
       outline: none;
+      box-shadow: 0 0 6px rgba(0,123,255,0.2);
     }
 
     button {
-      background: var(--primary);
+      background-color: var(--primary);
       color: white;
       font-weight: bold;
       border: none;
@@ -69,7 +67,7 @@
     }
 
     button:hover {
-      background: var(--primary-dark);
+      background-color: var(--primary-dark);
     }
 
     canvas {
@@ -82,7 +80,10 @@
 
     @media (max-width: 480px) {
       h1 {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
+      }
+      input, button, select {
+        font-size: 0.95rem;
       }
     }
   </style>
@@ -90,12 +91,19 @@
 <body>
 
   <h1>QR Code Generator</h1>
+
   <div class="container">
     <input id="text-input" type="text" placeholder="Enter text or URL for QR" />
-    <input id="name-input" type="text" placeholder="Enter name to center on QR" />
-    <button id="generate">Generate QR</button>
+    <input id="name-input" type="text" placeholder="Name to show in center" />
+    
+    <label for="bg-color">QR Background Color</label>
+    <input type="color" id="bg-color" value="#ffffff" />
+
+    <button id="generate">Generate QR Code</button>
+
     <canvas id="qrcode-canvas" width="200" height="200"></canvas>
-    <button id="download">Download as PNG</button>
+
+    <button id="download">Download PNG</button>
   </div>
 
   <script>
@@ -104,8 +112,7 @@
     const generateBtn = document.getElementById("generate");
     const downloadBtn = document.getElementById("download");
 
-    function generateQRCodeWithName(text, name) {
-      // Create a hidden container to render QR with QRCode.js
+    function generateQRCodeWithName(text, name, bgColor) {
       const tempDiv = document.createElement("div");
       tempDiv.style.position = "absolute";
       tempDiv.style.left = "-9999px";
@@ -118,7 +125,6 @@
         correctLevel: QRCode.CorrectLevel.H
       });
 
-      // Wait for QR image to be generated
       setTimeout(() => {
         const img = tempDiv.querySelector("img");
         if (!img) {
@@ -128,23 +134,26 @@
         }
 
         const image = new Image();
-        image.crossOrigin = "Anonymous";
+        image.crossOrigin = "anonymous";
         image.src = img.src;
 
         image.onload = () => {
-          // Clear and draw QR code
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          // Fill canvas with selected background color
+          ctx.fillStyle = bgColor;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          // Draw QR image
           ctx.drawImage(image, 0, 0, 200, 200);
 
-          // Optional: draw white circle and name in center
+          // White circle in center
           if (name) {
             ctx.beginPath();
             ctx.arc(100, 100, 40, 0, Math.PI * 2);
-            ctx.fillStyle = "white";
+            ctx.fillStyle = "#ffffff";
             ctx.fill();
 
             ctx.font = "bold 14px 'Segoe UI', sans-serif";
-            ctx.fillStyle = "black";
+            ctx.fillStyle = "#000000";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillText(name, 100, 100);
@@ -152,26 +161,30 @@
 
           tempDiv.remove();
         };
-      }, 100); // Wait slightly for QR image to render
+      }, 100);
     }
 
     generateBtn.addEventListener("click", () => {
       const text = document.getElementById("text-input").value.trim();
       const name = document.getElementById("name-input").value.trim();
+      const bgColor = document.getElementById("bg-color").value;
 
       if (!text) {
-        alert("Please enter text or a URL.");
+        alert("Please enter text for QR code.");
         return;
       }
 
-      generateQRCodeWithName(text, name);
+      generateQRCodeWithName(text, name, bgColor);
     });
 
     downloadBtn.addEventListener("click", () => {
-      const link = document.createElement("a");
-      link.download = "qr-code.png";
-      link.href = canvas.toDataURL("image/png");
-      link.click();
+      const dataUrl = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = "qr-code.png";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     });
   </script>
 
