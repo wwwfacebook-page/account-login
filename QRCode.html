@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mobile QR Code Generator</title>
+  <title>QR Code Generator with Center Name</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     :root {
@@ -11,7 +11,6 @@
       --primary-dark: #0056b3;
       --background: #f0f8ff;
       --text: #333;
-      --white: #fff;
     }
 
     body {
@@ -37,13 +36,13 @@
     .container {
       width: 100%;
       max-width: 400px;
-      background: var(--white);
+      background: white;
       padding: 1.5rem;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
-    input, button, select {
+    input, button, label {
       width: 100%;
       padding: 0.9rem;
       font-size: 1rem;
@@ -52,7 +51,7 @@
       border-radius: 8px;
     }
 
-    input:focus, select:focus {
+    input:focus {
       border-color: var(--primary);
       outline: none;
       box-shadow: 0 0 6px rgba(0,123,255,0.2);
@@ -82,7 +81,7 @@
       h1 {
         font-size: 1.4rem;
       }
-      input, button, select {
+      input, button {
         font-size: 0.95rem;
       }
     }
@@ -94,15 +93,11 @@
 
   <div class="container">
     <input id="text-input" type="text" placeholder="Enter text or URL for QR" />
-    <input id="name-input" type="text" placeholder="Name to show in center" />
-    
-    <label for="bg-color">QR Background Color</label>
-    <input type="color" id="bg-color" value="#ffffff" />
-
+    <input id="name-input" type="text" placeholder="Enter name to show in center" />
+    <label for="bg-color">Choose QR Background Color:</label>
+    <input id="bg-color" type="color" value="#ffffff" />
     <button id="generate">Generate QR Code</button>
-
     <canvas id="qrcode-canvas" width="200" height="200"></canvas>
-
     <button id="download">Download PNG</button>
   </div>
 
@@ -112,56 +107,55 @@
     const generateBtn = document.getElementById("generate");
     const downloadBtn = document.getElementById("download");
 
-    function generateQRCodeWithName(text, name, bgColor) {
+    function generateQRCode(text) {
       const tempDiv = document.createElement("div");
-      tempDiv.style.position = "absolute";
-      tempDiv.style.left = "-9999px";
       document.body.appendChild(tempDiv);
 
-      new QRCode(tempDiv, {
+      const qr = new QRCode(tempDiv, {
         text: text,
         width: 200,
         height: 200,
         correctLevel: QRCode.CorrectLevel.H
       });
 
-      setTimeout(() => {
-        const img = tempDiv.querySelector("img");
-        if (!img) {
-          alert("QR code failed to generate.");
-          tempDiv.remove();
-          return;
-        }
+      return new Promise(resolve => {
+        setTimeout(() => {
+          const img = tempDiv.querySelector("img");
+          const qrImage = new Image();
+          qrImage.crossOrigin = "anonymous";
+          qrImage.src = img.src;
+          qrImage.onload = () => {
+            tempDiv.remove();
+            resolve(qrImage);
+          };
+        }, 100);
+      });
+    }
 
-        const image = new Image();
-        image.crossOrigin = "anonymous";
-        image.src = img.src;
+    async function drawQRCodeWithCenterText(text, name, bgColor) {
+      const qrImg = await generateQRCode(text);
 
-        image.onload = () => {
-          // Fill canvas with selected background color
-          ctx.fillStyle = bgColor;
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Draw background color
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-          // Draw QR image
-          ctx.drawImage(image, 0, 0, 200, 200);
+      // Draw QR image
+      ctx.drawImage(qrImg, 0, 0, 200, 200);
 
-          // White circle in center
-          if (name) {
-            ctx.beginPath();
-            ctx.arc(100, 100, 40, 0, Math.PI * 2);
-            ctx.fillStyle = "#ffffff";
-            ctx.fill();
+      // White circle background
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(100, 100, 38, 0, Math.PI * 2);
+      ctx.fill();
 
-            ctx.font = "bold 14px 'Segoe UI', sans-serif";
-            ctx.fillStyle = "#000000";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(name, 100, 100);
-          }
-
-          tempDiv.remove();
-        };
-      }, 100);
+      // Draw name text
+      if (name) {
+        ctx.fillStyle = "#000000";
+        ctx.font = "bold 14px 'Segoe UI', sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(name, 100, 100);
+      }
     }
 
     generateBtn.addEventListener("click", () => {
@@ -170,11 +164,11 @@
       const bgColor = document.getElementById("bg-color").value;
 
       if (!text) {
-        alert("Please enter text for QR code.");
+        alert("Please enter text to generate QR code.");
         return;
       }
 
-      generateQRCodeWithName(text, name, bgColor);
+      drawQRCodeWithCenterText(text, name, bgColor);
     });
 
     downloadBtn.addEventListener("click", () => {
