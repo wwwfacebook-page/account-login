@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>📱 Stylish QR Scanner</title>
+  <title>📱 QR Code Scanner</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
 
@@ -148,6 +148,7 @@
       h1 {
         font-size: 1.8rem;
       }
+
       button {
         font-size: 1rem;
       }
@@ -157,12 +158,12 @@
 </head>
 <body>
 
-  <h1>📱 Stylish QR Scanner</h1>
+  <h1>📱 QR Code Scanner</h1>
 
   <div id="reader"></div>
 
   <div id="result">Scan a QR code to open the URL</div>
-  <div id="tip">Using the front camera. Works best on mobile devices.</div>
+  <div id="tip">Back camera is active. Works best on mobile.</div>
 
   <div class="buttons">
     <button id="start-button">Start Scanning</button>
@@ -195,47 +196,28 @@
         window.open(decodedText, '_blank');
       } else {
         resultDiv.className = 'error';
-        resultDiv.textContent = `Not a valid URL:\n${decodedText}`;
-        alert("Scanned data is not a valid URL.");
+        resultDiv.textContent = `Scanned data is not a valid URL:\n${decodedText}`;
       }
     }
 
     function onScanFailure(error) {
-      // Optional: console.warn(`Scan failed: ${error}`);
+      // Ignored
     }
 
     startBtn.addEventListener('click', () => {
-      Html5Qrcode.getCameras().then(cameras => {
-        if (cameras && cameras.length) {
-          // Try to find the front camera
-          const frontCam = cameras.find(cam =>
-            cam.label.toLowerCase().includes('front') ||
-            cam.label.toLowerCase().includes('user') ||
-            cam.label.toLowerCase().includes('facing')
-          );
-          const cameraId = frontCam ? frontCam.id : cameras[0].id;
-
-          html5QrCode.start(
-            cameraId,
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            onScanSuccess,
-            onScanFailure
-          ).then(() => {
-            startBtn.disabled = true;
-            stopBtn.disabled = false;
-            resultDiv.className = '';
-            resultDiv.textContent = "Scanning... Point camera at QR code.";
-          }).catch(err => {
-            resultDiv.className = 'error';
-            resultDiv.textContent = `Error starting camera: ${err}`;
-          });
-        } else {
-          resultDiv.className = 'error';
-          resultDiv.textContent = "No camera found on this device.";
-        }
+      html5QrCode.start(
+        { facingMode: { exact: "environment" } }, // 👈 back camera
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        onScanSuccess,
+        onScanFailure
+      ).then(() => {
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        resultDiv.className = '';
+        resultDiv.textContent = "Scanning... Point the back camera at a QR code.";
       }).catch(err => {
         resultDiv.className = 'error';
-        resultDiv.textContent = `Error accessing cameras: ${err}`;
+        resultDiv.textContent = `Failed to start camera: ${err}`;
       });
     });
 
@@ -247,7 +229,7 @@
         resultDiv.textContent = "Scanning stopped.";
       }).catch(err => {
         resultDiv.className = 'error';
-        resultDiv.textContent = `Error stopping camera: ${err}`;
+        resultDiv.textContent = `Failed to stop camera: ${err}`;
       });
     });
   </script>
