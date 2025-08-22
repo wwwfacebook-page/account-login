@@ -229,8 +229,8 @@
         return;
       }
 
-      if (!navigator.canShare || !navigator.canShare({ files: [] })) {
-        alert("Sharing is not supported on this device or browser. Try mobile or a newer browser.");
+      if (!navigator.canShare || !navigator.canShare({ files: [new File([], '')] })) {
+        alert("Sharing is not supported on this device or browser. Try using a mobile browser.");
         return;
       }
 
@@ -246,7 +246,7 @@
           files: [file]
         });
       } catch (err) {
-        console.error("Share failed:", err);
+        console.error("Sharing failed:", err);
       }
     });
   </script>
