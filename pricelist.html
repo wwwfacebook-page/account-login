@@ -315,13 +315,19 @@
   document.querySelector("#add-product-form h2").textContent = "Update Product";
 }
 
-function exitEditMode() {
-  isEditMode = false;
-  editingProductId = null;
-  form.reset();
-  submitBtn.textContent = "Add Product";
-  document.querySelector("#add-product-form h2").textContent = "Add New Product";
+function enterEditMode(product) {
+  isEditMode = true;
+  editingProductId = product.id;
+  nameInput.value = product.name;
+  descInput.value = product.description;
+  priceInput.value = product.price;
+  submitBtn.textContent = "Update Product";
+  document.querySelector("#add-product-form h2").textContent = "Update Product";
+
+  // ✅ Scroll to the form
+  form.scrollIntoView({ behavior: "smooth", block: "start" });
 }
+
 
     onValue(dbRef, (snapshot) => {
       const data = snapshot.val();
@@ -365,4 +371,5 @@ function exitEditMode() {
   </script>
 </body>
 </html>
+
 
