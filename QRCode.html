@@ -2,155 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QR Code Generator</title>
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QR Code with Centered Name</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to right, #00c6ff, #0072ff);
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      color: #333;
-    }
-
-    .container {
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-      padding: 30px 20px;
-      width: 100%;
-      max-width: 420px;
+      font-family: sans-serif;
       text-align: center;
-      animation: fadeIn 0.8s ease-in-out;
+      padding: 2rem;
     }
-
-    h1 {
-      margin: 0 0 10px;
-      font-size: 1.8em;
-      color: #0072ff;
-    }
-
-    p {
-      font-size: 1em;
-      color: #555;
-      margin-bottom: 20px;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 14px;
-      font-size: 1em;
-      border: 2px solid #0072ff;
-      border-radius: 8px;
-      outline: none;
-      transition: 0.3s;
-      margin-bottom: 20px;
-    }
-
-    input[type="text"]:focus {
-      border-color: #00c6ff;
-      box-shadow: 0 0 5px rgba(0, 198, 255, 0.3);
-    }
-
-    .qr-wrapper {
-      background: #f0f0f0;
-      padding: 16px;
-      border-radius: 12px;
-      display: inline-block;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      transition: transform 0.3s;
-      margin-bottom: 20px;
-    }
-
-    .qr-wrapper:hover {
-      transform: scale(1.05);
-    }
-
-    canvas {
-      width: 220px;
-      height: 220px;
-    }
-
-    button {
-      background-color: #0072ff;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-size: 1em;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    button:hover {
-      background-color: #005ed8;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 1.5em;
-      }
-
-      canvas {
-        width: 180px;
-        height: 180px;
-      }
+    #qrcode { margin: 1rem auto; }
+    input, button {
+      padding: 0.8rem;
+      font-size: 1rem;
+      margin: 0.5rem;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>QR Code Generator</h1>
-    <p>Sabi ni John Paul Berja na nag developed kaning Web-App, Paki laag nlng daa ang link para sa pag-gibo kan saindong Quick Response Code O QR code. <br>Salamat Pong Maray Ta Tatao kamo mag basa!</p>
-    <input type="text" id="linkInput" placeholder="https://example.com" autofocus>
 
-    <div class="qr-wrapper">
-      <canvas id="qrcode"></canvas>
-    </div>
+  <h1>QR Code Generator with Central Name</h1>
+  <input id="text-input" type="text" placeholder="Enter text for QR" />
+  <input id="name-input" type="text" placeholder="Enter name to overlay" />
+  <button id="generate">Generate & Download PDF</button>
 
-    <button id="downloadBtn">Download QR</button>        
-  </div>
+  <div id="qrcode"></div>
 
-  <!-- QRious Library -->
-  <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
-  <script>
-    const input = document.getElementById('linkInput');
-    const qrCanvas = document.getElementById('qrcode');
-    const downloadBtn = document.getElementById('downloadBtn');
+<script>
+  const qrContainer = document.getElementById('qrcode');
+  const generateBtn = document.getElementById('generate');
 
-    const qr = new QRious({
-      element: qrCanvas,
-      size: 220,
-      value: ''
+  generateBtn.addEventListener('click', async () => {
+    const text = document.getElementById('text-input').value.trim();
+    const name = document.getElementById('name-input').value.trim();
+    if (!text) return alert('Enter text for QR');
+
+    qrContainer.innerHTML = ''; // clear previous
+    const qr = new QRCode(qrContainer, {
+      text,
+      width: 200,
+      height: 200,
+      correctLevel: QRCode.CorrectLevel.H
     });
 
-    input.addEventListener('input', () => {
-      qr.value = input.value;
-    });
+    // Wait for QR code to be drawn
+    await new Promise(resolve => setTimeout(resolve, 100));
 
-    downloadBtn.addEventListener('click', () => {
-      const link = document.createElement('a');
-      link.download = 'qr-code.png';
-      link.href = qrCanvas.toDataURL("image/png");
-      link.click();
-    });
-  </script>
+    const imgTag = qrContainer.querySelector('img');
+    if (!imgTag) return alert('QR image not ready');
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Draw QR into PDF
+    const imgData = imgTag.src;
+    const x = 20, y = 40, size = 100;
+    doc.addImage(imgData, 'PNG', x, y, size, size);
+
+    // Overlay center name
+    if (name) {
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const centerX = x + size / 2;
+      const centerY = y + size / 2 + 2; // slight vertical adjustment
+      doc.setFontSize(14);
+      doc.text(name, centerX, centerY, { align: 'center' });
+    }
+
+    doc.save('qrcode.pdf');
+  });
+</script>
+
 </body>
 </html>
-
-
