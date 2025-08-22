@@ -147,7 +147,7 @@
 
   <div class="actions">
     <button id="download-pdf">📄 Download PDF</button>
-    <button id="save-json">💾 Save as JSON</button>
+    <button id="share-pdf">📤 Share PDF</button>
   </div>
 
   <script>
@@ -161,7 +161,7 @@
     const prodPrice = document.getElementById('product-price');
     const inventoryList = document.getElementById('inventory-list');
     const downloadBtn = document.getElementById('download-pdf');
-    const saveJsonBtn = document.getElementById('save-json');
+    const shareBtn = document.getElementById('share-pdf');
 
     let inventory = [];
 
@@ -201,12 +201,7 @@
       renderInventory();
     });
 
-    downloadBtn.addEventListener('click', () => {
-      if (inventory.length === 0) {
-        alert("Please add at least one product.");
-        return;
-      }
-
+    function generatePDFDoc() {
       const doc = new jsPDF();
       doc.setFontSize(16);
       doc.text("Inventory Report", 14, 20);
@@ -222,28 +217,47 @@
         headStyles: { fillColor: [45, 137, 239] },
       });
 
+      return doc;
+    }
+
+    function generatePDFBlob() {
+      return generatePDFDoc().output("blob");
+    }
+
+    downloadBtn.addEventListener('click', () => {
+      if (inventory.length === 0) {
+        alert("Please add at least one product.");
+        return;
+      }
+      const doc = generatePDFDoc();
       doc.save(`Inventory_${dateInput.value || 'Report'}.pdf`);
     });
 
-    saveJsonBtn.addEventListener('click', () => {
+    shareBtn.addEventListener('click', async () => {
       if (inventory.length === 0) {
-        alert("No inventory to save.");
+        alert("Please add at least one product.");
         return;
       }
 
-      const data = {
-        distributor: distInput.value,
-        date: dateInput.value,
-        inventory: inventory
-      };
+      if (!navigator.canShare || !navigator.canShare({ files: [] })) {
+        alert("Sharing is not supported on this device or browser.");
+        return;
+      }
 
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Inventory_${dateInput.value || 'data'}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
+      const pdfBlob = generatePDFBlob();
+      const file = new File([pdfBlob], `Inventory_${dateInput.value || "Report"}.pdf`, {
+        type: "application/pdf"
+      });
+
+      try {
+        await navigator.share({
+          title: "Inventory Report",
+          text: "Please find the attached inventory report.",
+          files: [file]
+        });
+      } catch (err) {
+        console.error("Sharing failed:", err);
+      }
     });
   </script>
 </body>
