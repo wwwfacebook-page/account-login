@@ -3,45 +3,61 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Web-Based Price List</title>
+  <title>Pana's Store - Web Price List</title>
   <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f9f9f9;
-      color: #333;
-      line-height: 1.6;
+    :root {
+      --primary-color: #2d89ef;
+      --accent-color: #1b6ec2;
+      --text-color: #333;
+      --light-bg: #f9f9f9;
+      --highlight-bg: #eef3fb;
+      --font-main: 'Segoe UI', sans-serif;
     }
 
-    header, section, footer {
-      padding: 60px 20px;
-      max-width: 1000px;
-      margin: auto;
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-main);
+      background-color: var(--light-bg);
+      color: var(--text-color);
+      line-height: 1.6;
+      font-size: 1rem;
     }
 
     header {
-      background: #2d89ef;
-      color: white;
+      background: var(--primary-color);
+      color: #fff;
       text-align: center;
+      padding: 2.5rem 1rem;
     }
 
     header h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
     }
 
     header p {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
+      margin: 0 auto 1rem;
+      max-width: 500px;
+    }
+
+    .cta-buttons {
+      margin-top: 1rem;
     }
 
     .cta-buttons a {
       display: inline-block;
-      margin: 10px 10px 0;
-      padding: 12px 24px;
+      padding: 0.75rem 1.5rem;
       text-decoration: none;
       color: white;
-      background-color: #1b6ec2;
-      border-radius: 5px;
+      background-color: var(--accent-color);
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 1rem;
       transition: background 0.3s ease;
     }
 
@@ -49,73 +65,84 @@
       background-color: #155a99;
     }
 
+    section {
+      padding: 2rem 1rem;
+      max-width: 960px;
+      margin: auto;
+    }
+
     section h2 {
-      color: #2d89ef;
-      margin-bottom: 20px;
+      font-size: 1.5rem;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+
+    section p, section ul {
+      font-size: 1rem;
     }
 
     ul {
-      padding-left: 20px;
+      padding-left: 1.25rem;
+      margin: 0;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
     }
 
     .testimonials {
-      background-color: #eef3fb;
-      border-left: 4px solid #2d89ef;
-      margin: 20px 0;
-      padding: 20px;
+      background-color: var(--highlight-bg);
+      border-left: 4px solid var(--primary-color);
+      padding: 1rem;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
     }
 
     footer {
       text-align: center;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #777;
-      padding: 40px 20px;
+      padding: 2rem 1rem;
+      background-color: #f0f0f0;
     }
 
-    @media (max-width: 768px) {
-  header h1 {
-    font-size: 1.5rem;
-  }
+    /* Mobile-first - default is already mobile optimized */
+    @media (min-width: 600px) {
+      header h1 {
+        font-size: 2.5rem;
+      }
 
-  header p {
-    font-size: 1rem;
-  }
+      header p {
+        font-size: 1.2rem;
+      }
 
-  .cta-buttons a {
-    display: block;
-    width: 100%;
-    margin: 10px 0;
-    font-size: 1rem;
-    text-align: center;
-  }
+      .cta-buttons a {
+        font-size: 1.1rem;
+      }
 
-  section h2 {
-    font-size: 1.4rem;
-  }
+      section h2 {
+        font-size: 1.7rem;
+      }
+    }
 
-  ul {
-    padding-left: 16px;
-    font-size: 1rem;
-  }
+    @media (min-width: 900px) {
+      section {
+        padding: 3rem 2rem;
+      }
 
-  .testimonials {
-    font-size: 0.95rem;
-    padding: 15px;
-  }
-
-  footer {
-    font-size: 0.8rem;
-  }
-}
+      header p {
+        font-size: 1.25rem;
+      }
+    }
   </style>
 </head>
 <body>
 
   <header>
     <h1>Pana's Store Price List</h1>
-    <p>Instantly share our latest product or service prices with customers using our web-based price list.</p>
+    <p>Instantly share our latest product or service prices with customers using our mobile-friendly web-based price list.</p>
     <div class="cta-buttons">
-      <a href="#" id="view-prices-btn">View Prices</a>
+      <a href="#" id="view-prices-btn" role="button" aria-label="View price list">📋 View Prices</a>
     </div>
   </header>
 
@@ -125,13 +152,13 @@
   </section>
 
   <section>
-    <h2>Powerful Features to Keep You in Control</h2>
+    <h2>Powerful Features</h2>
     <ul>
       <li>✅ Real-Time Updates</li>
       <li>✅ Mobile-Friendly Design</li>
       <li>✅ Private or Public Access</li>
       <li>✅ Search & Filter</li>
-      <li>✅ Excel Import</li>
+      <li>✅ Excel Import Support</li>
     </ul>
   </section>
 
@@ -144,15 +171,17 @@
       <li>Retailers managing seasonal changes</li>
     </ul>
   </section>
+
   <footer>
     &copy; 2025 WebPriceList Inc. All rights reserved.
   </footer>
-<script>
-  document.getElementById("view-prices-btn").addEventListener("click", function (e) {
-    e.preventDefault();
-    window.location.href = "pricelist.html"; // Change this to your actual price list page
-  });
-</script>
+
+  <script>
+    document.getElementById("view-prices-btn").addEventListener("click", function (e) {
+      e.preventDefault();
+      window.location.href = "pricelist.html"; // 🔗 Change to your actual price list page
+    });
+  </script>
+
 </body>
 </html>
-
