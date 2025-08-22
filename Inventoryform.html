@@ -8,17 +8,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <style>
     :root {
-      --blue-light: #e6f0ff;
       --blue: #2d89ef;
       --blue-dark: #1b6ec2;
       --danger: #e74c3c;
       --white: #ffffff;
       --shadow: rgba(0, 0, 0, 0.1);
       --font: 'Segoe UI', sans-serif;
-    }
-
-    * {
-      box-sizing: border-box;
     }
 
     body {
@@ -53,7 +48,6 @@
       font-size: 1rem;
       border-radius: 8px;
       border: 1px solid #ccc;
-      transition: all 0.2s ease-in-out;
     }
 
     input:focus {
@@ -89,11 +83,6 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1rem;
-      transition: transform 0.2s ease;
-    }
-
-    .item:hover {
-      transform: translateY(-3px);
     }
 
     .item-name {
@@ -229,6 +218,7 @@
         alert("Please add at least one product.");
         return;
       }
+
       const doc = generatePDFDoc();
       doc.save(`Inventory_${dateInput.value || 'Report'}.pdf`);
     });
@@ -240,7 +230,7 @@
       }
 
       if (!navigator.canShare || !navigator.canShare({ files: [] })) {
-        alert("Sharing is not supported on this device or browser.");
+        alert("Sharing is not supported on this device or browser. Try mobile or a newer browser.");
         return;
       }
 
@@ -252,11 +242,11 @@
       try {
         await navigator.share({
           title: "Inventory Report",
-          text: "Please find the attached inventory report.",
+          text: "Please find the attached inventory report from Pana's Store.",
           files: [file]
         });
       } catch (err) {
-        console.error("Sharing failed:", err);
+        console.error("Share failed:", err);
       }
     });
   </script>
