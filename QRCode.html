@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>QR Code with Centered Name</title>
+  <title>QR Code Generator with Centered Name (PNG Export)</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root {
       --primary: #007bff;
@@ -14,10 +13,6 @@
       --text: #333;
       --input-bg: #fff;
       --shadow: rgba(0, 0, 0, 0.1);
-    }
-
-    * {
-      box-sizing: border-box;
     }
 
     body {
@@ -78,14 +73,12 @@
       background: var(--primary-dark);
     }
 
-    #qrcode {
-      text-align: center;
-      margin-top: 1rem;
-    }
-
-    img {
-      max-width: 100%;
-      height: auto;
+    #qrcode-canvas {
+      display: block;
+      margin: 1rem auto;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 8px;
     }
 
     @media (max-width: 480px) {
@@ -100,54 +93,84 @@
   <h1>QR Code Generator</h1>
   <div class="container">
     <input id="text-input" type="text" placeholder="Enter text or URL for QR" />
-    <input id="name-input" type="text" placeholder="Enter name to overlay on QR" />
-    <button id="generate">📄 Generate & Download PDF</button>
-    <div id="qrcode"></div>
+    <input id="name-input" type="text" placeholder="Enter name to center on QR" />
+    <button id="generate">Generate QR</button>
+    <canvas id="qrcode-canvas" width="200" height="200"></canvas>
+    <button id="download">Download as PNG</button>
   </div>
 
   <script>
-    const qrContainer = document.getElementById('qrcode');
-    const generateBtn = document.getElementById('generate');
+    const canvas = document.getElementById("qrcode-canvas");
+    const ctx = canvas.getContext("2d");
+    const generateBtn = document.getElementById("generate");
+    const downloadBtn = document.getElementById("download");
 
-    generateBtn.addEventListener('click', async () => {
-      const text = document.getElementById('text-input').value.trim();
-      const name = document.getElementById('name-input').value.trim();
-      if (!text) return alert('Please enter text to generate the QR code.');
-
-      qrContainer.innerHTML = ''; // Clear previous QR
-
-      const qr = new QRCode(qrContainer, {
-        text,
+    function generateQRCodeWithName(text, name) {
+      // Use QRCode.js to generate the QR on a temporary element
+      const tempDiv = document.createElement("div");
+      const qr = new QRCode(tempDiv, {
+        text: text,
         width: 200,
         height: 200,
         correctLevel: QRCode.CorrectLevel.H
       });
 
-      // Wait for QR to render
-      await new Promise(resolve => setTimeout(resolve, 100));
+      setTimeout(() => {
+        const qrImg = tempDiv.querySelector("img");
 
-      const imgTag = qrContainer.querySelector('img');
-      if (!imgTag) return alert('QR image not ready.');
+        const qrImage = new Image();
+        qrImage.crossOrigin = "Anonymous"; // For CORS (not always necessary)
+        qrImage.src = qrImg.src;
 
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
+        qrImage.onload = () => {
+          // Clear canvas
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(qrImage, 0, 0, 200, 200);
 
-      const imgData = imgTag.src;
-      const x = 55, y = 40, size = 100;
+          // Draw name in center
+          if (name) {
+            ctx.font = "bold 16px Segoe UI, sans-serif";
+            ctx.fillStyle = "#000";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
 
-      // Add QR image
-      doc.addImage(imgData, 'PNG', x, y, size, size);
+            // White circle background for better visibility
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.arc(100, 100, 40, 0, Math.PI * 2);
+            ctx.fill();
 
-      // Add name overlay at center
-      if (name) {
-        const centerX = x + size / 2;
-        const centerY = y + size / 2 + 2;
-        doc.setFontSize(14);
-        doc.setTextColor(0, 0, 0);
-        doc.text(name, centerX, centerY, { align: 'center' });
+            // Draw name text on top
+            ctx.fillStyle = "#000";
+            ctx.fillText(name, 100, 100);
+          }
+
+          // Clean up temporary div
+          tempDiv.remove();
+        };
+      }, 100);
+    }
+
+    generateBtn.addEventListener("click", () => {
+      const text = document.getElementById("text-input").value.trim();
+      const name = document.getElementById("name-input").value.trim();
+      if (!text) {
+        alert("Please enter text to generate QR code.");
+        return;
       }
+      generateQRCodeWithName(text, name);
+    });
 
-      doc.save('qr-code.pdf');
+    downloadBtn.addEventListener("click", () => {
+      const dataUrl = canvas.toDataURL("image/png");
+
+      // Create a temporary link to trigger download
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = "qr-code.png";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     });
   </script>
 
