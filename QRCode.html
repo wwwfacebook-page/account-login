@@ -7,71 +7,149 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 2rem;
+    :root {
+      --primary: #007bff;
+      --primary-dark: #0056b3;
+      --background: #f4f9ff;
+      --text: #333;
+      --input-bg: #fff;
+      --shadow: rgba(0, 0, 0, 0.1);
     }
-    #qrcode { margin: 1rem auto; }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--background);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 2rem 1rem;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      text-align: center;
+      color: var(--primary-dark);
+      margin-bottom: 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      background: var(--input-bg);
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px var(--shadow);
+    }
+
     input, button {
-      padding: 0.8rem;
+      width: 100%;
+      padding: 1rem;
       font-size: 1rem;
-      margin: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+      outline: none;
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover,
+    button:active {
+      background: var(--primary-dark);
+    }
+
+    #qrcode {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
 
-  <h1>QR Code Generator with Central Name</h1>
-  <input id="text-input" type="text" placeholder="Enter text for QR" />
-  <input id="name-input" type="text" placeholder="Enter name to overlay" />
-  <button id="generate">Generate & Download PDF</button>
+  <h1>QR Code Generator</h1>
+  <div class="container">
+    <input id="text-input" type="text" placeholder="Enter text or URL for QR" />
+    <input id="name-input" type="text" placeholder="Enter name to overlay on QR" />
+    <button id="generate">📄 Generate & Download PDF</button>
+    <div id="qrcode"></div>
+  </div>
 
-  <div id="qrcode"></div>
+  <script>
+    const qrContainer = document.getElementById('qrcode');
+    const generateBtn = document.getElementById('generate');
 
-<script>
-  const qrContainer = document.getElementById('qrcode');
-  const generateBtn = document.getElementById('generate');
+    generateBtn.addEventListener('click', async () => {
+      const text = document.getElementById('text-input').value.trim();
+      const name = document.getElementById('name-input').value.trim();
+      if (!text) return alert('Please enter text to generate the QR code.');
 
-  generateBtn.addEventListener('click', async () => {
-    const text = document.getElementById('text-input').value.trim();
-    const name = document.getElementById('name-input').value.trim();
-    if (!text) return alert('Enter text for QR');
+      qrContainer.innerHTML = ''; // Clear previous QR
 
-    qrContainer.innerHTML = ''; // clear previous
-    const qr = new QRCode(qrContainer, {
-      text,
-      width: 200,
-      height: 200,
-      correctLevel: QRCode.CorrectLevel.H
+      const qr = new QRCode(qrContainer, {
+        text,
+        width: 200,
+        height: 200,
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      // Wait for QR to render
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const imgTag = qrContainer.querySelector('img');
+      if (!imgTag) return alert('QR image not ready.');
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      const imgData = imgTag.src;
+      const x = 55, y = 40, size = 100;
+
+      // Add QR image
+      doc.addImage(imgData, 'PNG', x, y, size, size);
+
+      // Add name overlay at center
+      if (name) {
+        const centerX = x + size / 2;
+        const centerY = y + size / 2 + 2;
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.text(name, centerX, centerY, { align: 'center' });
+      }
+
+      doc.save('qr-code.pdf');
     });
-
-    // Wait for QR code to be drawn
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    const imgTag = qrContainer.querySelector('img');
-    if (!imgTag) return alert('QR image not ready');
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-
-    // Draw QR into PDF
-    const imgData = imgTag.src;
-    const x = 20, y = 40, size = 100;
-    doc.addImage(imgData, 'PNG', x, y, size, size);
-
-    // Overlay center name
-    if (name) {
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const centerX = x + size / 2;
-      const centerY = y + size / 2 + 2; // slight vertical adjustment
-      doc.setFontSize(14);
-      doc.text(name, centerX, centerY, { align: 'center' });
-    }
-
-    doc.save('qrcode.pdf');
-  });
-</script>
+  </script>
 
 </body>
 </html>
