@@ -58,6 +58,7 @@
       border-radius: 6px;
       font-weight: bold;
       font-size: 1rem;
+      margin: 0.25rem;
       transition: background 0.3s ease;
     }
 
@@ -143,6 +144,7 @@
     <p>Instantly share our latest product or service prices with customers using our mobile-friendly web-based price list.</p>
     <div class="cta-buttons">
       <a href="#" id="view-prices-btn" role="button" aria-label="View price list">📋 View Prices</a>
+      <a href="#" id="order-btn" role="button" aria-label="Place an order">🛒 Order Now</a>
     </div>
   </header>
 
@@ -180,6 +182,11 @@
     document.getElementById("view-prices-btn").addEventListener("click", function (e) {
       e.preventDefault();
       window.location.href = "pricelist.html"; // 🔗 Change to your actual price list page
+    });
+
+    document.getElementById("order-btn").addEventListener("click", function (e) {
+      e.preventDefault();
+      window.location.href = "orders.html"; // 🔗 Change to your actual order page
     });
   </script>
 
