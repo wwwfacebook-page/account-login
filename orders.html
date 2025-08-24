@@ -5,179 +5,260 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Order Products - Pana's Store</title>
   <style>
-    :root {
-      --primary-color: #2d89ef;
-      --font-main: 'Segoe UI', sans-serif;
-    }
-    * { box-sizing: border-box; }
-    body {
-      font-family: var(--font-main);
-      margin: 0; padding: 1rem;
-      background: linear-gradient(rgba(255,240,210,0.95), rgba(255,240,210,0.95)),
-        url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
-      background-size: cover;
-      color: #333;
-    }
-    h1 { text-align: center; color: var(--primary-color); margin-bottom: 1rem; }
-    #search-container { max-width: 500px; margin: 0 auto 1.5rem; }
-    #search-input {
-      width: 100%; padding: 0.9rem 1rem; font-size: 1rem;
-      border: 1px solid #ccc; border-radius: 6px;
-    }
-    .table-container { overflow-x: auto; margin-bottom: 2rem; }
+  :root {
+    --primary-color: #2d89ef;
+    --font-main: 'Segoe UI', sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: var(--font-main);
+    margin: 0;
+    padding: 1rem;
+    background: linear-gradient(rgba(255, 240, 210, 0.95), rgba(255, 240, 210, 0.95)),
+      url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+    background-size: cover;
+    color: #333;
+  }
+
+  h1 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+  }
+
+  #search-container {
+    max-width: 500px;
+    margin: 0 auto 1.5rem;
+  }
+
+  #search-input {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+
+  .table-container {
+    overflow-x: auto;
+    margin-bottom: 2rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+  }
+
+  th, td {
+    padding: 0.8rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  th {
+    background-color: var(--primary-color);
+    color: white;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  td button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    background-color: #2ecc71;
+    color: white;
+    cursor: pointer;
+  }
+
+  form {
+    margin-top: 2rem;
+    background: white;
+    border-radius: 10px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    display: none;
+  }
+
+  form h2 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+  }
+
+  input, button {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  button {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #1b6ec2;
+  }
+
+  .success-message {
+    text-align: center;
+    color: green;
+    display: none;
+    font-weight: bold;
+    margin-top: 1rem;
+  }
+
+  #receipt-section,
+  #cart-section {
+    margin-top: 3rem;
+    max-width: 100%;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+  }
+
+  #receipt-section h2,
+  #cart-section h2 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+  }
+
+  #receipt-table,
+  #cart-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  #receipt-table th, #receipt-table td,
+  #cart-table th, #cart-table td {
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+  }
+
+  #receipt-table th,
+  #cart-table th {
+    background-color: var(--primary-color);
+    color: white;
+  }
+
+  #cart-table td button {
+    background-color: #e74c3c;
+    border: none;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  #submit-all-btn,
+  #print-receipt-btn,
+  #delete-receipt-btn {
+    margin-top: 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  #submit-all-btn:hover,
+  #print-receipt-btn:hover {
+    background-color: #1b6ec2;
+  }
+
+  #delete-receipt-btn {
+    background-color: #e74c3c;
+  }
+
+  #delete-receipt-btn:hover {
+    background-color: #c0392b;
+  }
+
+  @media (max-width: 768px) {
     table {
-      width: 100%; border-collapse: collapse; min-width: 600px;
+      font-size: 0.9rem;
+      min-width: 100%;
     }
+
     th, td {
-      padding: 0.8rem; text-align: left; border-bottom: 1px solid #ddd;
+      padding: 0.6rem;
     }
-    th {
-      background-color: var(--primary-color); color: white;
-    }
-    tr:nth-child(even) { background-color: #f9f9f9; }
-    td button {
-      padding: 6px 12px; border: none; border-radius: 5px;
-      font-size: 0.9rem; background-color: #2ecc71;
-      color: white; cursor: pointer;
-    }
-    form {
-      margin-top: 2rem; background: white; border-radius: 10px;
-      max-width: 500px; margin-left: auto; margin-right: auto;
-      padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-      display: none;
-    }
-    form h2 {
-      text-align: center; color: var(--primary-color);
-      margin-bottom: 1rem;
-    }
+
     input, button {
-      width: 100%; padding: 0.9rem 1rem; margin-bottom: 1rem;
-      font-size: 1rem; border-radius: 6px; border: 1px solid #ccc;
-    }
-    button {
-      background-color: var(--primary-color); color: white;
-      font-weight: bold; border: none; cursor: pointer;
-    }
-    button:hover { background-color: #1b6ec2; }
-    .success-message {
-      text-align: center; color: green; display: none;
-      font-weight: bold; margin-top: 1rem;
+      font-size: 0.95rem;
+      padding: 0.8rem;
     }
 
-    #receipt-section {
-      margin-top: 3rem;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-      background: white;
-      padding: 1rem 1.5rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-    }
-    #receipt-section h2 {
-      text-align: center;
-      color: var(--primary-color);
-      margin-bottom: 1rem;
-    }
-    #receipt-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-    #receipt-table th, #receipt-table td {
-      padding: 0.6rem 0.8rem;
-      border-bottom: 1px solid #ddd;
-      text-align: left;
-    }
-    #receipt-table th {
-      background-color: var(--primary-color);
-      color: white;
-    }
-    #print-receipt-btn {
-      margin-top: 1rem;
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 0.8rem 1.2rem;
-      font-size: 1rem;
-      cursor: pointer;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    #print-receipt-btn:hover {
-      background-color: #1b6ec2;
-    }
-    #delete-receipt-btn {
-      margin-top: 1rem;
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 0.8rem 1.2rem;
-      font-size: 1rem;
-      cursor: pointer;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    #delete-receipt-btn:hover {
-      background-color: #c0392b;
+    #search-container {
+      padding: 0 1rem;
     }
 
-    #cart-section {
-      max-width: 600px;
-      margin: 1.5rem auto;
-      background: white;
-      border-radius: 10px;
-      padding: 1rem 1.5rem;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-      display: none;
+    form {
+      margin: 1rem;
     }
-    #cart-section h2 {
-      text-align: center;
-      color: var(--primary-color);
-      margin-bottom: 1rem;
+
+    #receipt-section, #cart-section {
+      margin: 1.5rem 1rem;
     }
-    #cart-table {
+
+    #submit-all-btn, #print-receipt-btn, #delete-receipt-btn {
       width: 100%;
-      border-collapse: collapse;
     }
-    #cart-table th, #cart-table td {
-      border-bottom: 1px solid #ddd;
-      padding: 0.6rem 0.8rem;
-      text-align: left;
+  }
+
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 1.5rem;
     }
-    #cart-table th {
-      background-color: var(--primary-color);
-      color: white;
+
+    table {
+      font-size: 0.85rem;
     }
-    #cart-table td button {
-      background-color: #e74c3c;
-      border: none;
-      color: white;
-      padding: 4px 10px;
-      border-radius: 5px;
-      cursor: pointer;
+
+    input, button {
       font-size: 0.9rem;
     }
-    #submit-all-btn {
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 0.8rem 1.2rem;
-      font-size: 1rem;
-      cursor: pointer;
-      display: block;
-      margin: 1rem auto 0;
-      width: 100%;
+
+    #receipt-section, #cart-section {
+      padding: 1rem;
     }
-    #submit-all-btn:hover {
-      background-color: #1b6ec2;
+
+    td button {
+      padding: 4px 8px;
+      font-size: 0.8rem;
     }
-  </style>
+  }
+</style>
 </head>
 <body>
 
@@ -496,3 +577,4 @@
   </script>
 </body>
 </html>
+
