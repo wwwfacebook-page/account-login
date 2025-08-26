@@ -175,7 +175,8 @@
 
   #submit-all-btn,
   #print-receipt-btn,
-  #delete-receipt-btn {
+  #delete-receipt-btn,
+  #download-png-btn {
     margin-top: 1rem;
     background-color: var(--primary-color);
     color: white;
@@ -192,7 +193,8 @@
   }
 
   #submit-all-btn:hover,
-  #print-receipt-btn:hover {
+  #print-receipt-btn:hover,
+  #download-png-btn:hover {
     background-color: #1b6ec2;
   }
 
@@ -475,81 +477,73 @@
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    doc.setFontSize(18);
+    doc.setFontSize(16);
     doc.text("Order Receipt Summary", 14, 20);
 
-    const colX = [14, 90, 150];
-    const headers = ["Product", "Total Quantity", "Total Amount"];
+    // Table headers
+    const headers = [["Product", "Total Quantity", "Total Amount"]];
+    const data = [];
 
-    doc.setFontSize(12);
-    let y = 30;
-
-    headers.forEach((header, i) => {
-      doc.text(header, colX[i], y);
+    // Collect table data
+    const rows = receiptTableBody.querySelectorAll("tr");
+    rows.forEach(row => {
+      const cols = row.querySelectorAll("td");
+      data.push([
+        cols[0].textContent,
+        cols[1].textContent,
+        cols[2].textContent
+      ]);
     });
 
-    y += 8;
-    doc.setLineWidth(0.5);
-    doc.line(14, y - 4, 200, y - 4);
+    // Add total row
+    data.push([
+      "Total",
+      receiptTotalQuantity.textContent,
+      receiptTotalAmount.textContent
+    ]);
 
-    for (const row of receiptTableBody.children) {
-      const cells = row.children;
-      for (let i = 0; i < cells.length; i++) {
-        doc.text(cells[i].textContent, colX[i], y);
-      }
-      y += 8;
-      if (y > 270) {
-        doc.addPage();
-        y = 20;
-      }
-    }
-
-    y += 6;
-    doc.setFont(undefined, "bold");
-    doc.text("Total", colX[0], y);
-    doc.text(receiptTotalQuantity.textContent, colX[1], y);
-    doc.text(receiptTotalAmount.textContent, colX[2], y);
+    doc.autoTable({
+      head: headers,
+      body: data,
+      startY: 30
+    });
 
     doc.save("Order_Receipt_Summary.pdf");
   });
 
-  document.getElementById("download-png-btn").addEventListener("click", () => {
-  html2canvas(document.getElementById("receipt-section"), {
-    scale: 2,
-    useCORS: true
-  }).then(canvas => {
-    const link = document.createElement("a");
-    link.download = "Order_Receipt_Summary.png";
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-  }).catch(err => {
-    alert("Failed to generate PNG: " + err.message);
-  });
-});
-
-  // 🗑️ Delete orders
+  // 🗑️ Delete all orders
   deleteReceiptBtn.addEventListener("click", () => {
-    if (confirm("Are you sure you want to delete the entire receipt summary? This cannot be undone.")) {
-      remove(orderRef)
-        .then(() => {
-          alert("Order receipt summary deleted successfully.");
-          receiptTableBody.innerHTML = "";
-          receiptTotalQuantity.textContent = "0";
-          receiptTotalAmount.textContent = "$0.00";
-        })
-        .catch((error) => {
-          alert("Error deleting receipt summary: " + error.message);
-        });
+    if (confirm("Are you sure you want to delete the entire order receipt summary?")) {
+      remove(orderRef).then(() => {
+        alert("Order receipt summary deleted.");
+      }).catch(error => {
+        alert("Error deleting orders: " + error.message);
+      });
     }
   });
-</script>
+
+  </script>
+
+  <!-- html2canvas library (must load BEFORE using it) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- Download PNG -->
+  <script>
+  document.getElementById("download-png-btn").addEventListener("click", () => {
+    const receiptSection = document.getElementById("receipt-section");
+    html2canvas(receiptSection, {
+      scale: 2,
+      useCORS: true
+    }).then(canvas => {
+      const link = document.createElement("a");
+      link.download = "Order_Receipt_Summary.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }).catch(err => {
+      alert("Failed to generate PNG: " + err.message);
+    });
+  });
+  </script>
+
 </body>
 </html>
-
-
-
-
-
-
-
