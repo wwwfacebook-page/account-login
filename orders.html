@@ -481,12 +481,27 @@
       });
     });
 
-    // Print receipt as PDF
-    printReceiptBtn.addEventListener("click", () => {
+    // Print receipt as PNG
+printReceiptBtn.addEventListener("click", () => {
+  const receiptSection = document.getElementById("receipt-section");
+
   if (receiptTableBody.children.length === 0) {
     alert("No orders to print.");
     return;
   }
+
+  html2canvas(receiptSection, {
+    scale: 2, // higher scale for better quality
+    useCORS: true
+  }).then(canvas => {
+    const link = document.createElement("a");
+    link.download = "Order_Receipt_Summary.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  }).catch(err => {
+    alert("Failed to generate PNG: " + err.message);
+  });
+});
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
@@ -554,8 +569,10 @@
       }
     });
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </body>
 </html>
+
 
 
 
