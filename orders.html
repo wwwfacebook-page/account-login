@@ -312,6 +312,7 @@
       </tfoot>
     </table>
     <button id="print-receipt-btn">Print Receipt (PDF)</button>
+    <button id="download-png-btn">Download PNG</button>
     <button id="delete-receipt-btn">Delete Order Receipt Summary</button>
   </div>
 
@@ -322,176 +323,199 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+  import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBeyKlZ3a0I-3uApVYa7OAG-VK2lHkyDcg",
-      authDomain: "web-pricelist.firebaseapp.com",
-      databaseURL: "https://web-pricelist-default-rtdb.firebaseio.com",
-      projectId: "web-pricelist",
-      storageBucket: "web-pricelist.appspot.com",
-      messagingSenderId: "649791610425",
-      appId: "1:649791610425:web:0d5847a54d27525b7cb7e8"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyBeyKlZ3a0I-3uApVYa7OAG-VK2lHkyDcg",
+    authDomain: "web-pricelist.firebaseapp.com",
+    databaseURL: "https://web-pricelist-default-rtdb.firebaseio.com",
+    projectId: "web-pricelist",
+    storageBucket: "web-pricelist.appspot.com",
+    messagingSenderId: "649791610425",
+    appId: "1:649791610425:web:0d5847a54d27525b7cb7e8"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const productRef = ref(db, "products");
-    const orderRef = ref(db, "orders");
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const productRef = ref(db, "products");
+  const orderRef = ref(db, "orders");
 
-    const productTableBody = document.querySelector("#product-table tbody");
-    const receiptTableBody = document.querySelector("#receipt-table tbody");
-    const receiptTotalQuantity = document.getElementById("receipt-total-quantity");
-    const receiptTotalAmount = document.getElementById("receipt-total-amount");
+  const productTableBody = document.querySelector("#product-table tbody");
+  const receiptTableBody = document.querySelector("#receipt-table tbody");
+  const receiptTotalQuantity = document.getElementById("receipt-total-quantity");
+  const receiptTotalAmount = document.getElementById("receipt-total-amount");
 
-    const searchInput = document.getElementById("search-input");
-    const orderForm = document.getElementById("order-form");
-    const customerNameInput = document.getElementById("customer-name");
-    const quantityInput = document.getElementById("order-quantity");
-    const orderProductNameInput = document.getElementById("order-product-name");
-    const successMessage = document.getElementById("success-message");
+  const searchInput = document.getElementById("search-input");
+  const orderForm = document.getElementById("order-form");
+  const quantityInput = document.getElementById("order-quantity");
+  const orderProductNameInput = document.getElementById("order-product-name");
+  const successMessage = document.getElementById("success-message");
 
-    const cartSection = document.getElementById("cart-section");
-    const cartTableBody = document.querySelector("#cart-table tbody");
-    const submitAllBtn = document.getElementById("submit-all-btn");
+  const printReceiptBtn = document.getElementById("print-receipt-btn");
+  const deleteReceiptBtn = document.getElementById("delete-receipt-btn");
 
-    const printReceiptBtn = document.getElementById("print-receipt-btn");
-    const deleteReceiptBtn = document.getElementById("delete-receipt-btn");
+  let products = [];
 
-    let products = [];
-    let cart = [];
-
-    function renderProduct(product) {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${product.name}</td>
-        <td>${product.description}</td>
-        <td>${product.price}</td>
-        <td><button class="order-btn">Order</button></td>
-      `;
-      row.querySelector(".order-btn").addEventListener("click", () => {
-        orderProductNameInput.value = product.name;
-        orderForm.style.display = "block";
-        orderForm.scrollIntoView({ behavior: "smooth" });
-      });
-      productTableBody.appendChild(row);
-    }
-
-    function renderAllProducts(productList) {
-      productTableBody.innerHTML = "";
-      productList.forEach(renderProduct);
-    }
-
-    function renderReceipt(orderList) {
-      const summary = {};
-      let totalQty = 0;
-      let totalAmt = 0;
-
-      orderList.forEach(order => {
-        if (!summary[order.product]) {
-          summary[order.product] = { quantity: 0, amount: 0 };
-        }
-        const qty = parseInt(order.quantity, 10);
-        const amt = parseFloat(order.total);
-        summary[order.product].quantity += qty;
-        summary[order.product].amount += amt;
-        totalQty += qty;
-        totalAmt += amt;
-      });
-
-      receiptTableBody.innerHTML = "";
-
-      for (const product in summary) {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${product}</td>
-          <td>${summary[product].quantity}</td>
-          <td>$${summary[product].amount.toFixed(2)}</td>
-        `;
-        receiptTableBody.appendChild(row);
-      }
-      receiptTotalQuantity.textContent = totalQty;
-      receiptTotalAmount.textContent = `$${totalAmt.toFixed(2)}`;
-    }
-
-    function filterProducts(searchText) {
-      const filtered = products.filter(p =>
-        p.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchText.toLowerCase())
-      );
-      renderAllProducts(filtered);
-    }
-
-    // Load products from Firebase
-    onValue(productRef, snapshot => {
-      const data = snapshot.val() || {};
-      products = Object.values(data);
-      renderAllProducts(products);
+  function renderProduct(product) {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${product.name}</td>
+      <td>${product.description}</td>
+      <td>${product.price}</td>
+      <td><button class="order-btn">Order</button></td>
+    `;
+    row.querySelector(".order-btn").addEventListener("click", () => {
+      orderProductNameInput.value = product.name;
+      orderForm.style.display = "block";
+      orderForm.scrollIntoView({ behavior: "smooth" });
     });
-
-    // Load orders and render receipt
-    onValue(orderRef, snapshot => {
-      const data = snapshot.val();
-      const orders = data ? Object.values(data) : [];
-      renderReceipt(orders);
-    });
-
-    searchInput.addEventListener("input", e => {
-      filterProducts(e.target.value);
-    });
-
-    orderForm.addEventListener("submit", e => {
-      e.preventDefault();
-      const quantity = quantityInput.value.trim();
-      const productName = orderProductNameInput.value.trim();
-
-      if (!quantity || !productName) {
-        alert("Please fill in all required fields.");
-        return;
-      }
-
-      // Find product price
-      const product = products.find(p => p.name === productName);
-      if (!product) {
-        alert("Product not found.");
-        return;
-      }
-      const unitPrice = parseFloat(product.price);
-      const total = unitPrice * parseInt(quantity, 10);
-
-      const newOrderRef = push(orderRef);
-      set(newOrderRef, {
-        product: productName,
-        quantity: parseInt(quantity, 10),
-        unitPrice: unitPrice,
-        total: total.toFixed(2),
-        timestamp: Date.now()
-      }).then(() => {
-        successMessage.textContent = "Order added successfully!";
-        successMessage.style.display = "block";
-        setTimeout(() => {
-          successMessage.style.display = "none";
-        }, 3000);
-        orderForm.reset();
-        orderProductNameInput.value = "";
-        orderForm.style.display = "none";
-      }).catch(error => {
-        alert("Error adding order: " + error.message);
-      });
-    });
-
-    // Print receipt as PNG
-printReceiptBtn.addEventListener("click", () => {
-  const receiptSection = document.getElementById("receipt-section");
-
-  if (receiptTableBody.children.length === 0) {
-    alert("No orders to print.");
-    return;
+    productTableBody.appendChild(row);
   }
 
-  html2canvas(receiptSection, {
-    scale: 2, // higher scale for better quality
+  function renderAllProducts(productList) {
+    productTableBody.innerHTML = "";
+    productList.forEach(renderProduct);
+  }
+
+  function renderReceipt(orderList) {
+    const summary = {};
+    let totalQty = 0;
+    let totalAmt = 0;
+
+    orderList.forEach(order => {
+      if (!summary[order.product]) {
+        summary[order.product] = { quantity: 0, amount: 0 };
+      }
+      const qty = parseInt(order.quantity, 10);
+      const amt = parseFloat(order.total);
+      summary[order.product].quantity += qty;
+      summary[order.product].amount += amt;
+      totalQty += qty;
+      totalAmt += amt;
+    });
+
+    receiptTableBody.innerHTML = "";
+
+    for (const product in summary) {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${product}</td>
+        <td>${summary[product].quantity}</td>
+        <td>$${summary[product].amount.toFixed(2)}</td>
+      `;
+      receiptTableBody.appendChild(row);
+    }
+    receiptTotalQuantity.textContent = totalQty;
+    receiptTotalAmount.textContent = `$${totalAmt.toFixed(2)}`;
+  }
+
+  // Load products
+  onValue(productRef, snapshot => {
+    const data = snapshot.val() || {};
+    products = Object.values(data);
+    renderAllProducts(products);
+  });
+
+  // Load orders
+  onValue(orderRef, snapshot => {
+    const data = snapshot.val();
+    const orders = data ? Object.values(data) : [];
+    renderReceipt(orders);
+  });
+
+  searchInput.addEventListener("input", e => {
+    const value = e.target.value.toLowerCase();
+    const filtered = products.filter(p =>
+      p.name.toLowerCase().includes(value) ||
+      p.description.toLowerCase().includes(value)
+    );
+    renderAllProducts(filtered);
+  });
+
+  orderForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const quantity = quantityInput.value.trim();
+    const productName = orderProductNameInput.value.trim();
+
+    if (!quantity || !productName) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    const product = products.find(p => p.name === productName);
+    if (!product) {
+      alert("Product not found.");
+      return;
+    }
+
+    const unitPrice = parseFloat(product.price);
+    const total = unitPrice * parseInt(quantity, 10);
+
+    const newOrderRef = push(orderRef);
+    set(newOrderRef, {
+      product: productName,
+      quantity: parseInt(quantity, 10),
+      unitPrice: unitPrice,
+      total: total.toFixed(2),
+      timestamp: Date.now()
+    }).then(() => {
+      successMessage.textContent = "Order added successfully!";
+      successMessage.style.display = "block";
+      setTimeout(() => successMessage.style.display = "none", 3000);
+      orderForm.reset();
+      orderForm.style.display = "none";
+    }).catch(error => {
+      alert("Error adding order: " + error.message);
+    });
+  });
+
+  // 📄 Download receipt as PDF
+  printReceiptBtn.addEventListener("click", () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text("Order Receipt Summary", 14, 20);
+
+    const colX = [14, 90, 150];
+    const headers = ["Product", "Total Quantity", "Total Amount"];
+
+    doc.setFontSize(12);
+    let y = 30;
+
+    headers.forEach((header, i) => {
+      doc.text(header, colX[i], y);
+    });
+
+    y += 8;
+    doc.setLineWidth(0.5);
+    doc.line(14, y - 4, 200, y - 4);
+
+    for (const row of receiptTableBody.children) {
+      const cells = row.children;
+      for (let i = 0; i < cells.length; i++) {
+        doc.text(cells[i].textContent, colX[i], y);
+      }
+      y += 8;
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+      }
+    }
+
+    y += 6;
+    doc.setFont(undefined, "bold");
+    doc.text("Total", colX[0], y);
+    doc.text(receiptTotalQuantity.textContent, colX[1], y);
+    doc.text(receiptTotalAmount.textContent, colX[2], y);
+
+    doc.save("Order_Receipt_Summary.pdf");
+  });
+
+  document.getElementById("download-png-btn").addEventListener("click", () => {
+  html2canvas(document.getElementById("receipt-section"), {
+    scale: 2,
     useCORS: true
   }).then(canvas => {
     const link = document.createElement("a");
@@ -503,75 +527,26 @@ printReceiptBtn.addEventListener("click", () => {
   });
 });
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  doc.setFontSize(18);
-  doc.text("Order Receipt Summary", 14, 20);
-
-  // Define columns and their X positions
-  const colX = [14, 90, 150];
-  const headers = ["Product", "Total Quantity", "Total Amount"];
-  
-  doc.setFontSize(12);
-  let y = 30;
-
-  // Draw headers
-  headers.forEach((header, i) => {
-    doc.text(header, colX[i], y);
+  // 🗑️ Delete orders
+  deleteReceiptBtn.addEventListener("click", () => {
+    if (confirm("Are you sure you want to delete the entire receipt summary? This cannot be undone.")) {
+      remove(orderRef)
+        .then(() => {
+          alert("Order receipt summary deleted successfully.");
+          receiptTableBody.innerHTML = "";
+          receiptTotalQuantity.textContent = "0";
+          receiptTotalAmount.textContent = "$0.00";
+        })
+        .catch((error) => {
+          alert("Error deleting receipt summary: " + error.message);
+        });
+    }
   });
-
-  y += 8;
-  // Draw a line below headers
-  doc.setLineWidth(0.5);
-  doc.line(14, y - 4, 200, y - 4);
-
-  // Draw each row
-  for (const row of receiptTableBody.children) {
-    const cells = row.children;
-    for (let i = 0; i < cells.length; i++) {
-      doc.text(cells[i].textContent, colX[i], y);
-    }
-    y += 8;
-
-    // Add a page break if near bottom of page
-    if (y > 270) {
-      doc.addPage();
-      y = 20;
-    }
-  }
-
-  // Draw total row from footer
-  y += 6;
-  doc.setFont(undefined, "bold");
-  doc.text("Total", colX[0], y);
-  doc.text(receiptTotalQuantity.textContent, colX[1], y);
-  doc.text(receiptTotalAmount.textContent, colX[2], y);
-  doc.setFont(undefined, "normal");
-
-  // Save the PNG
-  doc.save("Order_Receipt_Summary.png");
-});
-
-    // Delete receipt summary (all orders)
-    deleteReceiptBtn.addEventListener("click", () => {
-      if (confirm("Are you sure you want to delete the entire receipt summary? This cannot be undone.")) {
-        remove(orderRef)
-          .then(() => {
-            alert("Order receipt summary deleted successfully.");
-            receiptTableBody.innerHTML = "";
-            receiptTotalQuantity.textContent = "0";
-            receiptTotalAmount.textContent = "$0.00";
-          })
-          .catch((error) => {
-            alert("Error deleting receipt summary: " + error.message);
-          });
-      }
-    });
-  </script>
+</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </body>
 </html>
+
 
 
 
