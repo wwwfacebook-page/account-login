@@ -70,15 +70,14 @@
   }
 
   td button {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 5px;
-    font-size: 0.9rem;
-    background-color: #2ecc71;
-    color: white;
-    cursor: pointer;
-  }
-
+  padding: 10px 16px;           
+  font-size: 1rem;              
+  border-radius: 6px;           
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
   form {
     margin-top: 2rem;
     background: white;
@@ -309,7 +308,7 @@
         <tr>
           <th>Total</th>
           <th id="receipt-total-quantity">0</th>
-          <th id="receipt-total-amount">$0.00</th>
+          <th id="receipt-total-amount">₱0.00</th> <!-- ✅ Updated to Peso -->
         </tr>
       </tfoot>
     </table>
@@ -325,203 +324,199 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-  import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBeyKlZ3a0I-3uApVYa7OAG-VK2lHkyDcg",
-    authDomain: "web-pricelist.firebaseapp.com",
-    databaseURL: "https://web-pricelist-default-rtdb.firebaseio.com",
-    projectId: "web-pricelist",
-    storageBucket: "web-pricelist.appspot.com",
-    messagingSenderId: "649791610425",
-    appId: "1:649791610425:web:0d5847a54d27525b7cb7e8"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyBeyKlZ3a0I-3uApVYa7OAG-VK2lHkyDcg",
+      authDomain: "web-pricelist.firebaseapp.com",
+      databaseURL: "https://web-pricelist-default-rtdb.firebaseio.com",
+      projectId: "web-pricelist",
+      storageBucket: "web-pricelist.appspot.com",
+      messagingSenderId: "649791610425",
+      appId: "1:649791610425:web:0d5847a54d27525b7cb7e8"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const productRef = ref(db, "products");
-  const orderRef = ref(db, "orders");
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const productRef = ref(db, "products");
+    const orderRef = ref(db, "orders");
 
-  const productTableBody = document.querySelector("#product-table tbody");
-  const receiptTableBody = document.querySelector("#receipt-table tbody");
-  const receiptTotalQuantity = document.getElementById("receipt-total-quantity");
-  const receiptTotalAmount = document.getElementById("receipt-total-amount");
+    const productTableBody = document.querySelector("#product-table tbody");
+    const receiptTableBody = document.querySelector("#receipt-table tbody");
+    const receiptTotalQuantity = document.getElementById("receipt-total-quantity");
+    const receiptTotalAmount = document.getElementById("receipt-total-amount");
 
-  const searchInput = document.getElementById("search-input");
-  const orderForm = document.getElementById("order-form");
-  const quantityInput = document.getElementById("order-quantity");
-  const orderProductNameInput = document.getElementById("order-product-name");
-  const successMessage = document.getElementById("success-message");
+    const searchInput = document.getElementById("search-input");
+    const orderForm = document.getElementById("order-form");
+    const quantityInput = document.getElementById("order-quantity");
+    const orderProductNameInput = document.getElementById("order-product-name");
+    const successMessage = document.getElementById("success-message");
 
-  const printReceiptBtn = document.getElementById("print-receipt-btn");
-  const deleteReceiptBtn = document.getElementById("delete-receipt-btn");
+    const printReceiptBtn = document.getElementById("print-receipt-btn");
+    const deleteReceiptBtn = document.getElementById("delete-receipt-btn");
 
-  let products = [];
+    let products = [];
 
-  function renderProduct(product) {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${product.name}</td>
-      <td>${product.description}</td>
-      <td>${product.price}</td>
-      <td><button class="order-btn">Order</button></td>
-    `;
-    row.querySelector(".order-btn").addEventListener("click", () => {
-      orderProductNameInput.value = product.name;
-      orderForm.style.display = "block";
-      orderForm.scrollIntoView({ behavior: "smooth" });
-    });
-    productTableBody.appendChild(row);
-  }
-
-  function renderAllProducts(productList) {
-    productTableBody.innerHTML = "";
-    productList.forEach(renderProduct);
-  }
-
-  function renderReceipt(orderList) {
-    const summary = {};
-    let totalQty = 0;
-    let totalAmt = 0;
-
-    orderList.forEach(order => {
-      if (!summary[order.product]) {
-        summary[order.product] = { quantity: 0, amount: 0 };
-      }
-      const qty = parseInt(order.quantity, 10);
-      const amt = parseFloat(order.total);
-      summary[order.product].quantity += qty;
-      summary[order.product].amount += amt;
-      totalQty += qty;
-      totalAmt += amt;
-    });
-
-    receiptTableBody.innerHTML = "";
-
-    for (const product in summary) {
+    function renderProduct(product) {
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td>${product}</td>
-        <td>${summary[product].quantity}</td>
-        <td>$${summary[product].amount.toFixed(2)}</td>
+        <td>${product.name}</td>
+        <td>${product.description}</td>
+        <td>₱${parseFloat(product.price).toFixed(2)}</td> <!-- ✅ Updated to Peso -->
+        <td><button class="order-btn">Order</button></td>
       `;
-      receiptTableBody.appendChild(row);
-    }
-    receiptTotalQuantity.textContent = totalQty;
-    receiptTotalAmount.textContent = `$${totalAmt.toFixed(2)}`;
-  }
-
-  // Load products
-  onValue(productRef, snapshot => {
-    const data = snapshot.val() || {};
-    products = Object.values(data);
-    renderAllProducts(products);
-  });
-
-  // Load orders
-  onValue(orderRef, snapshot => {
-    const data = snapshot.val();
-    const orders = data ? Object.values(data) : [];
-    renderReceipt(orders);
-  });
-
-  searchInput.addEventListener("input", e => {
-    const value = e.target.value.toLowerCase();
-    const filtered = products.filter(p =>
-      p.name.toLowerCase().includes(value) ||
-      p.description.toLowerCase().includes(value)
-    );
-    renderAllProducts(filtered);
-  });
-
-  orderForm.addEventListener("submit", e => {
-    e.preventDefault();
-    const quantity = quantityInput.value.trim();
-    const productName = orderProductNameInput.value.trim();
-
-    if (!quantity || !productName) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-
-    const product = products.find(p => p.name === productName);
-    if (!product) {
-      alert("Product not found.");
-      return;
-    }
-
-    const unitPrice = parseFloat(product.price);
-    const total = unitPrice * parseInt(quantity, 10);
-
-    const newOrderRef = push(orderRef);
-    set(newOrderRef, {
-      product: productName,
-      quantity: parseInt(quantity, 10),
-      unitPrice: unitPrice,
-      total: total.toFixed(2),
-      timestamp: Date.now()
-    }).then(() => {
-      successMessage.textContent = "Order added successfully!";
-      successMessage.style.display = "block";
-      setTimeout(() => successMessage.style.display = "none", 3000);
-      orderForm.reset();
-      orderForm.style.display = "none";
-    }).catch(error => {
-      alert("Error adding order: " + error.message);
-    });
-  });
-
-  // 📄 Download receipt as PDF
-  printReceiptBtn.addEventListener("click", () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-
-    doc.setFontSize(16);
-    doc.text("Order Receipt Summary", 14, 20);
-
-    // Table headers
-    const headers = [["Product", "Total Quantity", "Total Amount"]];
-    const data = [];
-
-    // Collect table data
-    const rows = receiptTableBody.querySelectorAll("tr");
-    rows.forEach(row => {
-      const cols = row.querySelectorAll("td");
-      data.push([
-        cols[0].textContent,
-        cols[1].textContent,
-        cols[2].textContent
-      ]);
-    });
-
-    // Add total row
-    data.push([
-      "Total",
-      receiptTotalQuantity.textContent,
-      receiptTotalAmount.textContent
-    ]);
-
-    doc.autoTable({
-      head: headers,
-      body: data,
-      startY: 30
-    });
-
-    doc.save("Order_Receipt_Summary.pdf");
-  });
-
-  // 🗑️ Delete all orders
-  deleteReceiptBtn.addEventListener("click", () => {
-    if (confirm("Are you sure you want to delete the entire order receipt summary?")) {
-      remove(orderRef).then(() => {
-        alert("Order receipt summary deleted.");
-      }).catch(error => {
-        alert("Error deleting orders: " + error.message);
+      row.querySelector(".order-btn").addEventListener("click", () => {
+        orderProductNameInput.value = product.name;
+        orderForm.style.display = "block";
+        orderForm.scrollIntoView({ behavior: "smooth" });
       });
+      productTableBody.appendChild(row);
     }
-  });
 
+    function renderAllProducts(productList) {
+      productTableBody.innerHTML = "";
+      productList.forEach(renderProduct);
+    }
+
+    function renderReceipt(orderList) {
+      const summary = {};
+      let totalQty = 0;
+      let totalAmt = 0;
+
+      orderList.forEach(order => {
+        if (!summary[order.product]) {
+          summary[order.product] = { quantity: 0, amount: 0 };
+        }
+        const qty = parseInt(order.quantity, 10);
+        const amt = parseFloat(order.total);
+        summary[order.product].quantity += qty;
+        summary[order.product].amount += amt;
+        totalQty += qty;
+        totalAmt += amt;
+      });
+
+      receiptTableBody.innerHTML = "";
+
+      for (const product in summary) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${product}</td>
+          <td>${summary[product].quantity}</td>
+          <td>₱${summary[product].amount.toFixed(2)}</td> <!-- ✅ Updated to Peso -->
+        `;
+        receiptTableBody.appendChild(row);
+      }
+      receiptTotalQuantity.textContent = totalQty;
+      receiptTotalAmount.textContent = `₱${totalAmt.toFixed(2)}`; // ✅ Updated to Peso
+    }
+
+    // Load products
+    onValue(productRef, snapshot => {
+      const data = snapshot.val() || {};
+      products = Object.values(data);
+      renderAllProducts(products);
+    });
+
+    // Load orders
+    onValue(orderRef, snapshot => {
+      const data = snapshot.val();
+      const orders = data ? Object.values(data) : [];
+      renderReceipt(orders);
+    });
+
+    searchInput.addEventListener("input", e => {
+      const value = e.target.value.toLowerCase();
+      const filtered = products.filter(p =>
+        p.name.toLowerCase().includes(value) ||
+        p.description.toLowerCase().includes(value)
+      );
+      renderAllProducts(filtered);
+    });
+
+    orderForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const quantity = quantityInput.value.trim();
+      const productName = orderProductNameInput.value.trim();
+
+      if (!quantity || !productName) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+
+      const product = products.find(p => p.name === productName);
+      if (!product) {
+        alert("Product not found.");
+        return;
+      }
+
+      const unitPrice = parseFloat(product.price);
+      const total = unitPrice * parseInt(quantity, 10);
+
+      const newOrderRef = push(orderRef);
+      set(newOrderRef, {
+        product: productName,
+        quantity: parseInt(quantity, 10),
+        unitPrice: unitPrice,
+        total: total.toFixed(2),
+        timestamp: Date.now()
+      }).then(() => {
+        successMessage.textContent = "Order added successfully!";
+        successMessage.style.display = "block";
+        setTimeout(() => successMessage.style.display = "none", 3000);
+        orderForm.reset();
+        orderForm.style.display = "none";
+      }).catch(error => {
+        alert("Error adding order: " + error.message);
+      });
+    });
+
+    // 📄 Download receipt as PDF
+    printReceiptBtn.addEventListener("click", () => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(16);
+      doc.text("Order Receipt Summary", 14, 20);
+
+      const headers = [["Product", "Total Quantity", "Total Amount"]];
+      const data = [];
+
+      const rows = receiptTableBody.querySelectorAll("tr");
+      rows.forEach(row => {
+        const cols = row.querySelectorAll("td");
+        data.push([
+          cols[0].textContent,
+          cols[1].textContent,
+          cols[2].textContent // Already includes ₱ if rendered correctly
+        ]);
+      });
+
+      data.push([
+        "Total",
+        receiptTotalQuantity.textContent,
+        receiptTotalAmount.textContent
+      ]);
+
+      doc.autoTable({
+        head: headers,
+        body: data,
+        startY: 30
+      });
+
+      doc.save("Order_Receipt_Summary.pdf");
+    });
+
+    // 🗑️ Delete all orders
+    deleteReceiptBtn.addEventListener("click", () => {
+      if (confirm("Are you sure you want to delete the entire order receipt summary?")) {
+        remove(orderRef).then(() => {
+          alert("Order receipt summary deleted.");
+        }).catch(error => {
+          alert("Error deleting orders: " + error.message);
+        });
+      }
+    });
   </script>
 
   <!-- html2canvas library (must load BEFORE using it) -->
@@ -529,21 +524,22 @@
 
   <!-- Download PNG -->
   <script>
-  document.getElementById("download-png-btn").addEventListener("click", () => {
-    const receiptSection = document.getElementById("receipt-section");
-    html2canvas(receiptSection, {
-      scale: 2,
-      useCORS: true
-    }).then(canvas => {
-      const link = document.createElement("a");
-      link.download = "Order_Receipt_Summary.png";
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    }).catch(err => {
-      alert("Failed to generate PNG: " + err.message);
+    document.getElementById("download-png-btn").addEventListener("click", () => {
+      const receiptSection = document.getElementById("receipt-section");
+      html2canvas(receiptSection, {
+        scale: 2,
+        useCORS: true
+      }).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "Order_Receipt_Summary.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }).catch(err => {
+        alert("Failed to generate PNG: " + err.message);
+      });
     });
-  });
   </script>
 
 </body>
 </html>
+
