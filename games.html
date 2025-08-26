@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>📱 QR Code Scanner</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      font-family: 'Montserrat', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      min-height: 100vh;
+      color: #fff;
+      padding: 2rem 1rem;
+    }
+
+    h1 {
+      font-weight: 600;
+      font-size: 2.4rem;
+      margin-bottom: 0.3rem;
+      text-align: center;
+      text-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    #reader {
+      width: 100%;
+      max-width: 400px;
+      aspect-ratio: 1 / 1;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+      position: relative;
+      margin: 1.5rem 0 0.8rem;
+      background: #000;
+    }
+
+    #reader::before {
+      content: '';
+      position: absolute;
+      top: 15%;
+      left: 15%;
+      width: 70%;
+      height: 70%;
+      border: 3px solid #48e5c2;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #48e5c2, 0 0 30px #48e5c2;
+      animation: pulse 2.5s infinite ease-in-out;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 0 15px #48e5c2, 0 0 30px #48e5c2;
+        opacity: 1;
+      }
+      50% {
+        box-shadow: 0 0 35px #48e5c2, 0 0 60px #48e5c2;
+        opacity: 0.7;
+      }
+    }
+
+    #result {
+      min-height: 3rem;
+      background: rgba(255 255 255 / 0.15);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      font-weight: 600;
+      font-size: 1.2rem;
+      text-align: center;
+      color: #bfffcf;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+      transition: background-color 0.3s ease;
+    }
+
+    #result.error {
+      color: #ff6b6b;
+      background: rgba(255, 107, 107, 0.2);
+      box-shadow: inset 0 0 10px #ff6b6b;
+    }
+
+    #result.success {
+      color: #2affb0;
+      background: rgba(42, 255, 176, 0.2);
+      box-shadow: inset 0 0 10px #2affb0;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    button {
+      flex: 1 1 120px;
+      padding: 0.9rem 1.4rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+      background: linear-gradient(135deg, #00b09b, #96c93d);
+      color: white;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      user-select: none;
+    }
+
+    button:hover:not(:disabled) {
+      background: linear-gradient(135deg, #00d2ff, #3a47d5);
+      box-shadow: 0 8px 25px rgba(58, 71, 213, 0.6);
+      transform: translateY(-3px);
+    }
+
+    button:disabled {
+      background: #444;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+      color: #999;
+    }
+
+    #tip {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #aad9d9cc;
+      text-align: center;
+      max-width: 400px;
+      user-select: none;
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+      button {
+        font-size: 1rem;
+      }
+    }
+  </style>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+
+  <h1>📱 QR Code Scanner</h1>
+
+  <div id="reader"></div>
+
+  <div id="result">Scan a QR code to open the URL</div>
+  <div id="tip">Back camera is active. Works best on mobile.</div>
+
+  <div class="buttons">
+    <button id="start-button">Start Scanning</button>
+    <button id="stop-button" disabled>Stop Scanning</button>
+  </div>
+
+  <script>
+    const resultDiv = document.getElementById('result');
+    const startBtn = document.getElementById('start-button');
+    const stopBtn = document.getElementById('stop-button');
+    const html5QrCode = new Html5Qrcode("reader");
+
+    function isValidUrl(string) {
+      try {
+        new URL(string);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    async function onScanSuccess(decodedText, decodedResult) {
+      await html5QrCode.stop();
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+
+      if (isValidUrl(decodedText)) {
+        resultDiv.className = 'success';
+        resultDiv.textContent = `Opening URL: ${decodedText}`;
+        setTimeout(() => {
+          window.open(decodedText, '_blank');
+        }, 500); // Delay slightly for better UX
+      } else {
+        resultDiv.className = 'error';
+        resultDiv.textContent = `Scanned data is not a valid URL: ${decodedText}`;
+      }
+    }
+
+    function onScanFailure(error) {
+      // silent fail
+    }
+
+    startBtn.addEventListener('click', () => {
+      html5QrCode.start(
+        { facingMode: { exact: "environment" } }, // Use back camera
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        onScanSuccess,
+        onScanFailure
+      ).then(() => {
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        resultDiv.className = '';
+        resultDiv.textContent = "Scanning... Point the back camera at a QR code.";
+      }).catch(err => {
+        resultDiv.className = 'error';
+        resultDiv.textContent = `Failed to start camera: ${err}`;
+      });
+    });
+
+    stopBtn.addEventListener('click', () => {
+      html5QrCode.stop().then(() => {
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        resultDiv.className = '';
+        resultDiv.textContent = "Scanning stopped.";
+      }).catch(err => {
+        resultDiv.className = 'error';
+        resultDiv.textContent = `Failed to stop camera: ${err}`;
+      });
+    });
+  </script>
+
+</body>
+</html>

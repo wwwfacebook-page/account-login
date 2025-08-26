@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR Code Generator</title>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .container {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      padding: 30px 20px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 1.8em;
+      color: #0072ff;
+    }
+
+    p {
+      font-size: 1em;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"],
+    input[type="color"] {
+      width: 100%;
+      padding: 14px;
+      font-size: 1em;
+      border: 2px solid #0072ff;
+      border-radius: 8px;
+      outline: none;
+      transition: 0.3s;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"]:focus {
+      border-color: #00c6ff;
+      box-shadow: 0 0 5px rgba(0, 198, 255, 0.3);
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #0072ff;
+    }
+
+    .qr-wrapper {
+      background: #f0f0f0;
+      padding: 16px;
+      border-radius: 12px;
+      display: inline-block;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+      margin-bottom: 20px;
+    }
+
+    .qr-wrapper:hover {
+      transform: scale(1.05);
+    }
+
+    canvas {
+      width: 220px;
+      height: 220px;
+    }
+
+    button {
+      background-color: #0072ff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #005ed8;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5em;
+      }
+
+      canvas {
+        width: 180px;
+        height: 180px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>QR Code Generator</h1>
+    <p>Enter a link, name, and background color for your QR code</p>
+
+    <label for="linkInput">QR Code URL/Text</label>
+    <input type="text" id="linkInput" placeholder="https://example.com">
+
+    <label for="nameInput">Center Name</label>
+    <input type="text" id="nameInput" placeholder="Enter name in center">
+
+    <label for="bgColor">QR Background Color</label>
+    <input type="color" id="bgColor" value="#ffffff">
+
+    <div class="qr-wrapper">
+      <canvas id="qrcode" width="220" height="220"></canvas>
+    </div>
+
+    <button id="downloadBtn">Download QR</button>
+  </div>
+
+  <!-- QRious Library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
+  <script>
+    const linkInput = document.getElementById('linkInput');
+    const nameInput = document.getElementById('nameInput');
+    const bgColorInput = document.getElementById('bgColor');
+    const canvas = document.getElementById('qrcode');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const ctx = canvas.getContext('2d');
+
+    const qr = new QRious({
+      element: canvas,
+      size: 220,
+      value: ''
+    });
+
+    function updateQR() {
+      const link = linkInput.value.trim();
+      const name = nameInput.value.trim();
+      const bgColor = bgColorInput.value;
+
+      // Set the value of the QR
+      qr.set({
+        value: link || ' ',
+        background: bgColor
+      });
+
+      const image = new Image();
+      image.src = canvas.toDataURL('image/png');
+
+      image.onload = () => {
+        // Clear canvas and draw QR code
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+        // Draw name in the center if provided
+        if (name) {
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(canvas.width / 2, canvas.height / 2, 40, 0, 2 * Math.PI);
+          ctx.fill();
+
+          ctx.fillStyle = "#000000";
+          ctx.font = 'bold 16px Poppins, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(name, canvas.width / 2, canvas.height / 2);
+        }
+      };
+    }
+
+    // Update QR code on input
+    linkInput.addEventListener('input', updateQR);
+    nameInput.addEventListener('input', updateQR);
+    bgColorInput.addEventListener('input', updateQR);
+
+    downloadBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = 'qr-code.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // Initialize with default values
+    updateQR();
+  </script>
+</body>
+</html>

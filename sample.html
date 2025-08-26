@@ -1,0 +1,54 @@
+from flask import Flask, request, jsonify, render_template_string
+
+app = Flask(__name__)
+
+# Fake "blocked SIMs" database
+blocked_sims = set()
+
+# Home Page HTML
+HTML_PAGE = """
+<!doctype html>
+<title>SIM Blocker</title>
+<h2>Block a SIM Card</h2>
+<form method="POST" action="/block">
+    SIM Card Number: <input type="text" name="sim_number">
+    <input type="submit" value="Block SIM">
+</form>
+<h3>Blocked SIMs:</h3>
+<ul>
+    {% for sim in blocked_sims %}
+        <li>{{ sim }}</li>
+    {% endfor %}
+</ul>
+"""
+
+@app.route("/", methods=["GET"])
+def home():
+    return render_template_string(HTML_PAGE, blocked_sims=blocked_sims)
+
+@app.route("/block", methods=["POST"])
+def block_sim():
+    sim_number = request.form.get("sim_number")
+    if not sim_number:
+        return "No SIM number provided", 400
+
+    # Simulate blocking logic
+    blocked_sims.add(sim_number)
+    
+    # In a real case, this is where you’d call your backend system:
+    # block_sim_in_network(sim_number)
+
+    return render_template_string(HTML_PAGE, blocked_sims=blocked_sims)
+
+@app.route("/api/block", methods=["POST"])
+def api_block_sim():
+    data = request.json
+    sim_number = data.get("sim_number")
+    if not sim_number:
+        return jsonify({"error": "SIM number required"}), 400
+
+    blocked_sims.add(sim_number)
+    return jsonify({"status": "SIM blocked", "sim_number": sim_number}), 200
+
+if __name__ == "__main__":
+    app.run(debug=True)
