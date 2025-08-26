@@ -443,11 +443,10 @@
 
     orderForm.addEventListener("submit", e => {
       e.preventDefault();
-      const customerName = customerNameInput.value.trim();
       const quantity = quantityInput.value.trim();
       const productName = orderProductNameInput.value.trim();
 
-      if (!customerName || !quantity || !productName) {
+      if (!quantity || !productName) {
         alert("Please fill in all required fields.");
         return;
       }
@@ -463,7 +462,6 @@
 
       const newOrderRef = push(orderRef);
       set(newOrderRef, {
-        customer: customerName,
         product: productName,
         quantity: parseInt(quantity, 10),
         unitPrice: unitPrice,
@@ -558,6 +556,7 @@
   </script>
 </body>
 </html>
+
 
 
 
