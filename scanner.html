@@ -40,6 +40,7 @@
       border-radius: 10px;
       text-align: center;
       font-weight: bold;
+      min-height: 2.5rem;
     }
 
     #result.success { color: #00ffae; }
@@ -92,90 +93,103 @@
   </div>
 
   <script>
-  const resultDiv = document.getElementById('result');
-  const startBtn = document.getElementById('start-button');
-  const stopBtn = document.getElementById('stop-button');
+    const resultDiv = document.getElementById('result');
+    const startBtn = document.getElementById('start-button');
+    const stopBtn = document.getElementById('stop-button');
 
-  const html5QrCode = new Html5Qrcode("reader");
-  let scanned = false;
+    const html5QrCode = new Html5Qrcode("reader");
+    let scanning = false;
 
-  function isValidUrl(string) {
-    try {
-      new URL(string);
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  const onScanSuccess = (decodedText, decodedResult) => {
-    if (scanned) return; // prevent multiple triggers
-    scanned = true;
-
-    if (isValidUrl(decodedText)) {
-      resultDiv.className = 'success';
-      resultDiv.textContent = `Valid URL scanned: ${decodedText}`;
-      window.open(decodedText, '_blank');
-    } else {
-      resultDiv.className = 'error';
-      resultDiv.textContent = `Scanned content is not a URL: ${decodedText}`;
+    function isValidUrl(string) {
+      try {
+        new URL(string);
+        return true;
+      } catch (_) {
+        return false;
+      }
     }
 
-    html5QrCode.stop().then(() => {
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-    });
-  };
+    const onScanSuccess = (decodedText, decodedResult) => {
+      if (!scanning) return; // prevent if scanning stopped
+      scanning = false;
 
-  const onScanFailure = (error) => {
-    // No-op
-  };
-
-  startBtn.addEventListener('click', () => {
-    scanned = false;
-    Html5Qrcode.getCameras().then(devices => {
-      if (devices && devices.length) {
-        const backCamera = devices.find(device => device.label.toLowerCase().includes("back")) || devices[0];
-
-        html5QrCode.start(
-          { deviceId: { exact: backCamera.id } },
-          {
-            fps: 10,
-            qrbox: 250
-          },
-          onScanSuccess,
-          onScanFailure
-        ).then(() => {
-          startBtn.disabled = true;
-          stopBtn.disabled = false;
-          resultDiv.className = '';
-          resultDiv.textContent = "Scanning... Point your camera at a QR code.";
-        }).catch(err => {
-          resultDiv.className = 'error';
-          resultDiv.textContent = `Error starting camera: ${err}`;
-        });
+      if (isValidUrl(decodedText)) {
+        resultDiv.className = 'success';
+        resultDiv.textContent = `Valid URL scanned: ${decodedText}`;
+        window.open(decodedText, '_blank');
       } else {
         resultDiv.className = 'error';
-        resultDiv.textContent = "No camera devices found.";
+        resultDiv.textContent = `Scanned content is not a URL: ${decodedText}`;
       }
-    }).catch(err => {
-      resultDiv.className = 'error';
-      resultDiv.textContent = `Camera access error: ${err}`;
-    });
-  });
 
-  stopBtn.addEventListener('click', () => {
-    html5QrCode.stop().then(() => {
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-      resultDiv.className = '';
-      resultDiv.textContent = "Scanning stopped.";
-    }).catch(err => {
-      resultDiv.className = 'error';
-      resultDiv.textContent = `Error stopping scan: ${err}`;
+      // Stop scanning after successful scan
+      html5QrCode.stop().then(() => {
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+      }).catch(err => {
+        console.error('Failed to stop scanning:', err);
+      });
+    };
+
+    const onScanFailure = (error) => {
+      // Optional: you can display scan failure messages here if desired
+      // console.warn(`Scan failure: ${error}`);
+    };
+
+    startBtn.addEventListener('click', () => {
+      if (scanning) return; // Prevent multiple starts
+      scanning = true;
+
+      Html5Qrcode.getCameras().then(cameras => {
+        if (cameras && cameras.length) {
+          // Prefer back camera if available
+          const backCamera = cameras.find(cam => cam.label.toLowerCase().includes('back')) || cameras[0];
+
+          html5QrCode.start(
+            { deviceId: { exact: backCamera.id } },
+            {
+              fps: 10,
+              qrbox: 250
+            },
+            onScanSuccess,
+            onScanFailure
+          ).then(() => {
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            resultDiv.className = '';
+            resultDiv.textContent = "Scanning... Point your camera at a QR code.";
+          }).catch(err => {
+            scanning = false;
+            resultDiv.className = 'error';
+            resultDiv.textContent = `Error starting camera: ${err}`;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+          });
+        } else {
+          scanning = false;
+          resultDiv.className = 'error';
+          resultDiv.textContent = "No camera devices found.";
+        }
+      }).catch(err => {
+        scanning = false;
+        resultDiv.className = 'error';
+        resultDiv.textContent = `Camera access error: ${err}`;
+      });
     });
-  });
-</script>
+
+    stopBtn.addEventListener('click', () => {
+      if (!scanning) return;
+      html5QrCode.stop().then(() => {
+        scanning = false;
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        resultDiv.className = '';
+        resultDiv.textContent = "Scanning stopped.";
+      }).catch(err => {
+        resultDiv.className = 'error';
+        resultDiv.textContent = `Error stopping scan: ${err}`;
+      });
+    });
+  </script>
 </body>
 </html>
-
