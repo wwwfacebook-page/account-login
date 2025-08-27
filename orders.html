@@ -326,7 +326,7 @@
       </tfoot>
     </table>
     <button id="print-receipt-btn">Print Receipt (PDF)</button>
-    <button id="download-png-btn">Download PNG</button>
+    <button id="print-receipt-btn">Download receipt as PNG</button>
     <button id="delete-receipt-btn">Delete Order Receipt Summary</button>
   </div>
 
@@ -546,13 +546,7 @@
       receiptTotalQuantity.textContent = totalQty;
       receiptTotalAmount.textContent = `₱${totalAmt.toFixed(2)}`;
     }
-
-    // Print receipt (PDF) button click
-    printReceiptBtn.addEventListener("click", () => {
-      if (!cart.length) {
-        alert("No orders to print.");
-        return;
-      }
+    
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
@@ -626,4 +620,5 @@
 
 </body>
 </html>
+
 
