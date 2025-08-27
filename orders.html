@@ -325,9 +325,10 @@
         </tr>
       </tfoot>
     </table>
-    <button id="print-receipt-btn">Print Receipt (PDF)</button>
-    <button id="print-receipt-btn">Download receipt as PNG</button>
-    <button id="delete-receipt-btn">Delete Order Receipt Summary</button>
+    <!-- RECEIPT SECTION BUTTONS -->
+<button id="print-receipt-btn">Print Receipt (PDF)</button>
+<button id="download-png-btn">Download receipt as PNG</button>
+<button id="delete-receipt-btn">Delete Order Receipt Summary</button>
   </div>
 
   <!-- Firebase and other libraries are loaded as ES modules below -->
@@ -547,39 +548,45 @@
       receiptTotalAmount.textContent = `₱${totalAmt.toFixed(2)}`;
     }
     
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
+      // Print receipt as PDF
+printReceiptBtn.addEventListener("click", () => {
+  if (!cart.length) {
+    alert("No orders to print.");
+    return;
+  }
 
-      doc.setFontSize(18);
-      doc.text("Order Receipt Summary", 14, 22);
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
 
-      const headers = [["Product", "Quantity", "Amount (₱)"]];
-      const data = cart.map(item => {
-        const product = products.find(p => p.name === item.name);
-        const price = product ? Number(product.price) : 0;
-        const amount = item.quantity * price;
-        return [item.name, item.quantity.toString(), amount.toFixed(2)];
-      });
+  doc.setFontSize(18);
+  doc.text("Order Receipt Summary", 14, 22);
 
-      doc.autoTable({
-        head: headers,
-        body: data,
-        startY: 30,
-        theme: "striped",
-        margin: { top: 30 },
-      });
+  const headers = [["Product", "Quantity", "Amount (₱)"]];
+  const data = cart.map(item => {
+    const product = products.find(p => p.name === item.name);
+    const price = product ? Number(product.price) : 0;
+    const amount = item.quantity * price;
+    return [item.name, item.quantity.toString(), amount.toFixed(2)];
+  });
 
-      // Total row at bottom
-      const totalAmount = cart.reduce((sum, item) => {
-        const p = products.find(pr => pr.name === item.name);
-        return sum + (p ? p.price * item.quantity : 0);
-      }, 0);
+  doc.autoTable({
+    head: headers,
+    body: data,
+    startY: 30,
+    theme: "striped",
+    margin: { top: 30 },
+  });
 
-      doc.setFontSize(14);
-      doc.text(`Total Amount: ₱${totalAmount.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 10);
+  const totalAmount = cart.reduce((sum, item) => {
+    const p = products.find(pr => pr.name === item.name);
+    return sum + (p ? p.price * item.quantity : 0);
+  }, 0);
 
-      doc.save("order-receipt.pdf");
-    });
+  doc.setFontSize(14);
+  doc.text(`Total Amount: ₱${totalAmount.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 10);
+
+  doc.save("order-receipt.pdf");
+});
 
     // Delete receipt summary button click
     deleteReceiptBtn.addEventListener("click", async () => {
@@ -620,5 +627,6 @@
 
 </body>
 </html>
+
 
 
