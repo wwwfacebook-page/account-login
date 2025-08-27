@@ -411,32 +411,36 @@
 
     // Render product list in table
     function renderProducts(list) {
-      productTableBody.innerHTML = "";
-      if (!list.length) {
-        productTableBody.innerHTML = '<tr><td colspan="4">No products found</td></tr>';
-        return;
-      }
-      for (const product of list) {
-        if (!product || !product.name || !product.price) continue;
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${escapeHTML(product.name)}</td>
-          <td>${escapeHTML(product.description || '')}</td>
-          <td>₱${Number(product.price).toFixed(2)}</td>
-          <td><button class="order-btn" type="button" aria-label="Order ${escapeHTML(product.name)}">Order</button></td>
-        `;
-        // Order button click handler
-        tr.querySelector("button").addEventListener("click", () => {
-          orderProductNameInput.value = product.name;
-          orderQuantityInput.value = 1;
-          successMessage.style.display = "none";
-          orderForm.style.display = "block";
-          orderQuantityInput.focus();
-        });
-        productTableBody.appendChild(tr);
-      }
-    }
+  productTableBody.innerHTML = "";
 
+  if (!list.length) {
+    productTableBody.innerHTML = '<tr><td colspan="4">No products found</td></tr>';
+    return;
+  }
+
+  for (const product of list) {
+    if (!product || !product.name || product.price == null) continue; // allow 0 as price
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${escapeHTML(product.name)}</td>
+      <td>${escapeHTML(product.description || '')}</td>
+      <td>₱${Number(product.price).toFixed(2)}</td>
+      <td><button class="order-btn" type="button" aria-label="Order ${escapeHTML(product.name)}">Order</button></td>
+    `;
+
+    // Button logic
+    tr.querySelector("button").addEventListener("click", () => {
+      orderProductNameInput.value = product.name;
+      orderQuantityInput.value = 1;
+      successMessage.style.display = "none";
+      orderForm.style.display = "block";
+      orderQuantityInput.focus();
+    });
+
+    productTableBody.appendChild(tr);
+  }
+}
     // Search functionality
     searchInput.addEventListener("input", () => {
       const query = searchInput.value.trim().toLowerCase();
@@ -496,26 +500,22 @@
     });
 
     // Listen to orders and update receipt summary
-    onValue(orderRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        // Aggregate order quantities per product
-        const orderArr = Object.values(data);
-        cart = []; // reset cart in-memory to match orders from Firebase
-        const map = new Map();
-        for (const order of orderArr) {
-          if (!order.name || !order.quantity) continue;
-          const existing = map.get(order.name) || 0;
-          map.set(order.name, existing + Number(order.quantity));
-        }
-        for (const [name, qty] of map.entries()) {
-          cart.push({ name, quantity: qty });
-        }
-      } else {
-        cart = [];
-      }
-      renderReceiptSummary();
-    });
+    onValue(productRef, (snapshot) => {
+  const data = snapshot.val();
+  if (data) {
+    // Convert Firebase object to array with keys
+    products = Object.entries(data).map(([id, product]) => ({
+      id,
+      ...product
+    }));
+    renderProducts(products);
+  } else {
+    products = [];
+    renderProducts([]);
+  }
+}, (error) => {
+  console.error("Error fetching products:", error);
+});
 
     // Render receipt summary
     function renderReceiptSummary() {
@@ -626,3 +626,4 @@
 
 </body>
 </html>
+
