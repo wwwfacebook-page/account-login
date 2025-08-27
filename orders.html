@@ -262,7 +262,7 @@
 </style>
 </head>
 <body>
-
+  
   <h1>Order Products</h1>
 
   <div id="search-container">
@@ -291,7 +291,7 @@
     <button type="submit">Add to Cart</button>
     <div class="success-message" id="success-message"></div>
   </form>
-  
+
   <!-- Receipt Section -->
   <div id="receipt-section">
     <h2>Order Receipt Summary</h2>
@@ -308,7 +308,7 @@
         <tr>
           <th>Total</th>
           <th id="receipt-total-quantity">0</th>
-          <th id="receipt-total-amount">₱0.00</th> <!-- ✅ Updated to Peso -->
+          <th id="receipt-total-amount">₱0.00</th>
         </tr>
       </tfoot>
     </table>
@@ -317,16 +317,18 @@
     <button id="delete-receipt-btn">Delete Order Receipt Summary</button>
   </div>
 
-  <!-- Firebase SDKs -->
+  <!-- ✅ Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-  <!-- jsPDF library -->
+
+  <!-- ✅ jsPDF & autoTable (non-module) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+  <!-- ✅ html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBeyKlZ3a0I-3uApVYa7OAG-VK2lHkyDcg",
       authDomain: "web-pricelist.firebaseapp.com",
@@ -337,10 +339,10 @@
       appId: "1:649791610425:web:0d5847a54d27525b7cb7e8"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const productRef = ref(db, "products");
-    const orderRef = ref(db, "orders");
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const productRef = db.ref("products");
+    const orderRef = db.ref("orders");
 
     const productTableBody = document.querySelector("#product-table tbody");
     const receiptTableBody = document.querySelector("#receipt-table tbody");
@@ -363,7 +365,7 @@
       row.innerHTML = `
         <td>${product.name}</td>
         <td>${product.description}</td>
-        <td>₱${parseFloat(product.price).toFixed(2)}</td> <!-- ✅ Updated to Peso -->
+        <td>₱${parseFloat(product.price).toFixed(2)}</td>
         <td><button class="order-btn">Order</button></td>
       `;
       row.querySelector(".order-btn").addEventListener("click", () => {
@@ -403,23 +405,21 @@
         row.innerHTML = `
           <td>${product}</td>
           <td>${summary[product].quantity}</td>
-          <td>₱${summary[product].amount.toFixed(2)}</td> <!-- ✅ Updated to Peso -->
+          <td>₱${summary[product].amount.toFixed(2)}</td>
         `;
         receiptTableBody.appendChild(row);
       }
       receiptTotalQuantity.textContent = totalQty;
-      receiptTotalAmount.textContent = `₱${totalAmt.toFixed(2)}`; // ✅ Updated to Peso
+      receiptTotalAmount.textContent = `₱${totalAmt.toFixed(2)}`;
     }
 
-    // Load products
-    onValue(productRef, snapshot => {
+    productRef.on("value", snapshot => {
       const data = snapshot.val() || {};
       products = Object.values(data);
       renderAllProducts(products);
     });
 
-    // Load orders
-    onValue(orderRef, snapshot => {
+    orderRef.on("value", snapshot => {
       const data = snapshot.val();
       const orders = data ? Object.values(data) : [];
       renderReceipt(orders);
@@ -453,8 +453,8 @@
       const unitPrice = parseFloat(product.price);
       const total = unitPrice * parseInt(quantity, 10);
 
-      const newOrderRef = push(orderRef);
-      set(newOrderRef, {
+      const newOrderRef = orderRef.push();
+      newOrderRef.set({
         product: productName,
         quantity: parseInt(quantity, 10),
         unitPrice: unitPrice,
@@ -471,7 +471,6 @@
       });
     });
 
-    // 📄 Download receipt as PDF
     printReceiptBtn.addEventListener("click", () => {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
@@ -488,7 +487,7 @@
         data.push([
           cols[0].textContent,
           cols[1].textContent,
-          cols[2].textContent // Already includes ₱ if rendered correctly
+          cols[2].textContent
         ]);
       });
 
@@ -507,23 +506,16 @@
       doc.save("Order_Receipt_Summary.pdf");
     });
 
-    // 🗑️ Delete all orders
     deleteReceiptBtn.addEventListener("click", () => {
       if (confirm("Are you sure you want to delete the entire order receipt summary?")) {
-        remove(orderRef).then(() => {
+        orderRef.remove().then(() => {
           alert("Order receipt summary deleted.");
         }).catch(error => {
           alert("Error deleting orders: " + error.message);
         });
       }
     });
-  </script>
 
-  <!-- html2canvas library (must load BEFORE using it) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-  <!-- Download PNG -->
-  <script>
     document.getElementById("download-png-btn").addEventListener("click", () => {
       const receiptSection = document.getElementById("receipt-section");
       html2canvas(receiptSection, {
@@ -539,8 +531,8 @@
       });
     });
   </script>
-
 </body>
 </html>
+
 
 
