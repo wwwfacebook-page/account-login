@@ -6,188 +6,249 @@
   <title>Product Prices - Pana's Store</title>
   <style>
     :root {
-      --primary-color: #2d89ef;
-      --accent-color: #fefefe;
-      --font-main: 'Segoe UI', sans-serif;
-    }
+  --primary-color: #4a90e2;
+  --accent-color: #ffffff;
+  --highlight-color: #f5faff;
+  --danger-color: #e74c3c;
+  --warning-color: #f39c12;
+  --success-color: #2ecc71;
+  --font-main: 'Segoe UI', 'Roboto', sans-serif;
+  --shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
 
-    * {
-      box-sizing: border-box;
-    }
+* {
+  box-sizing: border-box;
+}
 
-    body {
-      font-family: var(--font-main);
-      margin: 0;
-      padding: 1rem;
-      background: linear-gradient(rgba(255, 240, 210, 0.95), rgba(255, 240, 210, 0.95)),
-        url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
-      background-size: cover;
-      color: #333;
-    }
+body {
+  font-family: var(--font-main);
+  margin: 0;
+  padding: 2rem 1rem 4rem;
+  background: linear-gradient(to bottom right, #fdfbfb, #ebedee);
+  color: #333;
+}
 
-    h1 {
-      text-align: center;
-      font-size: 1.8rem;
-      color: var(--primary-color);
-      margin-bottom: 1rem;
-    }
+h1 {
+  text-align: center;
+  font-size: 2.2rem;
+  color: var(--primary-color);
+  margin-bottom: 2rem;
+  letter-spacing: 0.5px;
+}
 
-    #search-container {
-      max-width: 500px;
-      margin: 0 auto 1.5rem auto;
-    }
+#search-container {
+  max-width: 500px;
+  margin: 0 auto 2rem;
+}
 
-    #search-input {
-      width: 100%;
-      padding: 0.9rem 1rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
+#search-input {
+  width: 100%;
+  padding: 0.8rem 1.2rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
 
-    #search-input:focus {
-      border-color: var(--primary-color);
-      outline: none;
-      box-shadow: 0 0 6px rgba(45, 137, 239, 0.4);
-    }
+#search-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+  outline: none;
+}
 
-    .table-container {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
+.table-container {
+  max-width: 1000px;
+  margin: 0 auto 250px;
+  overflow-x: auto;
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 600px;
-    }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
 
-    th, td {
-      padding: 0.8rem;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-    }
+th, td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
 
-    th {
-      background-color: var(--primary-color);
-      color: white;
-    }
+th {
+  background-color: var(--primary-color);
+  color: white;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
 
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
+tr:hover {
+  background-color: var(--highlight-color);
+}
 
-    td button {
-      padding: 6px 12px;
-      border: none;
-      border-radius: 5px;
-      font-size: 0.9rem;
-      margin-right: 5px;
-    }
+td button {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-right: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
 
-    .edit-btn {
-      background-color: #f39c12;
-      color: white;
-    }
+.edit-btn {
+  background-color: var(--warning-color);
+  color: white;
+}
 
-    .delete-btn {
-      background-color: #e74c3c;
-      color: white;
-    }
+.edit-btn:hover {
+  background-color: #d78f0d;
+}
 
-    form {
-      margin-top: 2rem;
-      background: white;
-      border-radius: 10px;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-      padding: 1.5rem 1.5rem;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-    }
+.delete-btn {
+  background-color: var(--danger-color);
+  color: white;
+}
 
-    form h2 {
-      text-align: center;
-      color: var(--primary-color);
-      margin-bottom: 1rem;
-    }
+.delete-btn:hover {
+  background-color: #c0392b;
+}
 
-    input, button {
-      width: 100%;
-      padding: 0.9rem 1rem;
-      margin-bottom: 1rem;
-      font-size: 1rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
+/* Floating Form Button */
+#toggle-form-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 15px 20px;
+  border-radius: 50%;
+  box-shadow: var(--shadow);
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 2000;
+  transition: background-color 0.3s ease;
+}
 
-    input:focus {
-      border-color: var(--primary-color);
-      outline: none;
-    }
+#toggle-form-btn:hover {
+  background-color: #3b7cd4;
+}
 
-    button {
-      background-color: var(--primary-color);
-      color: white;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
+/* Floating Form Container */
+form {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 320px;
+  max-width: 90%;
+  z-index: 1000;
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  display: none;
+}
 
-    button:hover {
-      background-color: #1b6ec2;
-    }
+form.show {
+  display: block;
+}
 
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 1.5rem;
-      }
+form h2 {
+  text-align: center;
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  font-size: 1.4rem;
+}
 
-      table {
-        min-width: 100%;
-      }
+input, button[type="submit"] {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  transition: 0.3s ease;
+}
 
-      table, thead, tbody, th, td, tr {
-        display: block;
-      }
+input:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 6px rgba(74, 144, 226, 0.3);
+}
 
-      thead {
-        display: none;
-      }
+button[type="submit"] {
+  background-color: var(--success-color);
+  color: white;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
 
-      tr {
-        margin-bottom: 1rem;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        padding: 10px;
-        background: white;
-      }
+button[type="submit"]:hover {
+  background-color: #27ae60;
+}
 
-      td {
-        position: relative;
-        padding-left: 50%;
-        border: none;
-        border-bottom: 1px solid #eee;
-      }
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.8rem;
+  }
 
-      td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 10px;
-        font-weight: bold;
-        white-space: nowrap;
-      }
-    }
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tr {
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 1rem;
+    background: white;
+  }
+
+  td {
+    position: relative;
+    padding-left: 50%;
+    border: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    font-weight: bold;
+    color: #666;
+    white-space: nowrap;
+  }
+
+  form {
+    width: 90%;
+    left: 5%;
+    right: 5%;
+  }
+
+  #toggle-form-btn {
+    padding: 12px 16px;
+    font-size: 1.2rem;
+  }
+}
   </style>
 </head>
 <body>
-
   <h1>Product Price List</h1>
 
   <div id="search-container">
-    <input type="text" id="search-input" placeholder="Search products..." autocomplete="off" />
+    <input type="text" id="search-input" placeholder="🔍 Search products..." autocomplete="off" />
   </div>
 
   <div class="table-container">
@@ -206,19 +267,16 @@
     </table>
   </div>
 
+  <button id="toggle-form-btn" title="Add Product">＋</button>
+
   <form id="add-product-form">
     <h2>Add New Product</h2>
     <input type="text" id="product-name" placeholder="Product Name" required />
     <input type="text" id="product-description" placeholder="Description" required />
-    <input type="number" id="product-price" placeholder="Price (e.g. 12.99)" step="0.01" min="0" required />
+    <input type="number" id="product-price" placeholder="Price in ₱ (e.g. 499.99)" step="0.01" min="0" required />
     <button type="submit">Add Product</button>
   </form>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-
-  <!-- JS Module -->
   <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
   import {
@@ -231,6 +289,7 @@
     update
   } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
+  // ✅ Firebase config — keep your values
   const firebaseConfig = {
     apiKey: "AIzaSyBeyKlZ3a0I-3uApVYa7OAG-VK2lHkyDcg",
     authDomain: "web-pricelist.firebaseapp.com",
@@ -251,6 +310,7 @@
   const descInput = document.getElementById("product-description");
   const priceInput = document.getElementById("product-price");
   const submitBtn = form.querySelector("button");
+  const searchInput = document.getElementById("search-input");
 
   let products = [];
   let isEditMode = false;
@@ -263,19 +323,21 @@
     row.innerHTML = `
       <td data-label="Product">${product.name}</td>
       <td data-label="Description">${product.description}</td>
-      <td data-label="Price">${product.price}</td>
+      <td data-label="Price">₱${parseFloat(product.price).toFixed(2)}</td>
       <td data-label="Action">
         <button class="edit-btn">Edit</button>
         <button class="delete-btn">Delete</button>
       </td>
     `;
 
-    row.querySelector(".delete-btn").addEventListener("click", () => {
-      deleteProductFromFirebase(product.id);
-    });
-
     row.querySelector(".edit-btn").addEventListener("click", () => {
       enterEditMode(product);
+    });
+
+    row.querySelector(".delete-btn").addEventListener("click", () => {
+      if (confirm(`Delete "${product.name}"?`)) {
+        deleteProductFromFirebase(product.id);
+      }
     });
 
     tbody.appendChild(row);
@@ -312,32 +374,27 @@
     descInput.value = product.description;
     priceInput.value = product.price;
     submitBtn.textContent = "Update Product";
-    document.querySelector("#add-product-form h2").textContent = "Update Product";
-
-    form.scrollIntoView({ behavior: "smooth", block: "start" });
+    form.querySelector("h2").textContent = "Update Product";
+    form.scrollIntoView({ behavior: "smooth" });
   }
 
   function exitEditMode() {
     isEditMode = false;
     editingProductId = null;
     submitBtn.textContent = "Add Product";
-    document.querySelector("#add-product-form h2").textContent = "Add New Product";
+    form.querySelector("h2").textContent = "Add New Product";
     form.reset();
   }
 
-  function scrollToTable() {
-    document.querySelector(".table-container").scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
+  // 🟡 Real-time data fetch from Firebase
   onValue(dbRef, (snapshot) => {
     const data = snapshot.val();
-    products = data
-      ? Object.entries(data).map(([id, value]) => ({ id, ...value }))
-      : [];
+    products = data ? Object.values(data) : [];
     renderAll(products);
   });
 
-  form.addEventListener("submit", function (e) {
+  // 🟢 Handle form submission
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
     const name = nameInput.value.trim();
     const description = descInput.value.trim();
@@ -355,24 +412,29 @@
       exitEditMode();
     } else {
       saveProductToFirebase(productData);
-      scrollToTable(); // Scroll to table to show added product
     }
 
     form.reset();
   });
 
-  document.getElementById("search-input").addEventListener("input", function () {
-    const query = this.value.toLowerCase();
-    const filteredProducts = products.filter(p =>
-      p.name.toLowerCase().includes(query) ||
-      p.description.toLowerCase().includes(query)
+  // 🔍 Handle search filter
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase();
+    const filtered = products.filter(product =>
+      product.name.toLowerCase().includes(query) ||
+      product.description.toLowerCase().includes(query)
     );
-    renderAll(filteredProducts);
+    renderAll(filtered);
   });
+
+  // Toggle floating form
+const toggleFormBtn = document.getElementById("toggle-form-btn");
+
+toggleFormBtn.addEventListener("click", () => {
+  form.classList.toggle("show");
+});
+
 </script>
+
 </body>
 </html>
-
-
-
-
