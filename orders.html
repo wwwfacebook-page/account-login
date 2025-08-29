@@ -15,14 +15,14 @@
     }
 
     body {
-      font-family: var(--font-main);
-      margin: 0;
-      padding: 1rem;
-      background: linear-gradient(rgba(255, 240, 210, 0.95), rgba(255, 240, 210, 0.95)),
-        url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
-      background-size: cover;
-      color: #333;
-    }
+  font-family: var(--font-main);
+  margin: 0;
+  padding: 1rem;
+  background: linear-gradient(270deg, #89f7fe, #66a6ff, #70a1ff, #89f7fe);
+  background-size: 800% 800%;
+  animation: gradientAnimation 20s ease infinite;
+  color: #333;
+}
 
     h1 {
       text-align: center;
@@ -309,6 +309,7 @@
         padding: 4px 8px;
         font-size: 0.8rem;
       }
+
     }
 
     /* Accessibility helper */
@@ -376,12 +377,23 @@
       </tfoot>
     </table>
     <!-- RECEIPT SECTION BUTTONS -->
+<!-- RECEIPT SECTION BUTTONS -->
 <div class="button-group">
   <button id="print-receipt-btn">Print Receipt (PDF)</button>
   <button id="download-png-btn">Download receipt as PNG</button>
   <button id="delete-receipt-btn">Delete Order Receipt Summary</button>
+  <button id="show-gcash-btn">Pay with GCash</button> <!-- ✅ New button -->
 </div>
+
+<!-- ✅ GCash QR Code Modal -->
+<div id="gcash-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); z-index:1000; justify-content:center; align-items:center;">
+  <div style="background:white; padding:2rem; border-radius:10px; text-align:center; position:relative;">
+    <h2>Scan to Pay with GCash</h2>
+    <img src="gcash-qr.png" alt="GCash QR Code" style="max-width:300px; width:100%; margin-top:1rem;" />
+    <button id="close-gcash-btn" style="margin-top:1.5rem; padding:0.7rem 1rem; border:none; background:#2d89ef; color:white; border-radius:6px; cursor:pointer;">Close</button>
   </div>
+</div>
+
 
   <!-- Firebase and other libraries are loaded as ES modules below -->
   <script type="module">
@@ -693,6 +705,26 @@ deleteReceiptBtn.addEventListener("click", async () => {
         alert("Failed to download image. Please try again.");
       });
     });
+
+    // Show/hide GCash QR modal
+const gcashModal = document.getElementById("gcash-modal");
+const showGcashBtn = document.getElementById("show-gcash-btn");
+const closeGcashBtn = document.getElementById("close-gcash-btn");
+
+showGcashBtn.addEventListener("click", () => {
+  gcashModal.style.display = "flex";
+});
+
+closeGcashBtn.addEventListener("click", () => {
+  gcashModal.style.display = "none";
+});
+
+// Close modal when clicking outside
+gcashModal.addEventListener("click", (e) => {
+  if (e.target === gcashModal) {
+    gcashModal.style.display = "none";
+  }
+});
 
     // Initial render with no data
     renderReceiptSummary();
