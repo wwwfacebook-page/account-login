@@ -119,6 +119,30 @@ canvas {
   .player-controls {
     margin-bottom: 15px;
   }
+  
+  #joystick-container {
+  position: fixed;
+  bottom: 80px;
+  left: 30px;
+  width: 120px;
+  height: 120px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  touch-action: none;
+  z-index: 1000;
+}
+
+#joystick {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  left: 30px;
+  top: 30px;
+  touch-action: none;
+}
+
 }
 </style>
 </head>
@@ -156,6 +180,10 @@ canvas {
 <!-- Game Canvas -->
 <main>
   <canvas id="gameCanvas" width="800" height="400" aria-label="Stickman Showdown Game"></canvas>
+  <!-- Virtual Joystick -->
+  <div id="joystick-container">
+    <div id="joystick"></div>
+  </div>
 </main>
 
 <!-- Controls UI -->
@@ -268,6 +296,19 @@ document.getElementById('gameMode').addEventListener('change', function () {
   const isAISelected = this.value === 'ai';
   document.getElementById('difficultyWrapper').style.display = isAISelected ? 'block' : 'none';
 });
+
+function resizeCanvas() {
+  const canvas = document.getElementById('gameCanvas');
+  const width = window.innerWidth * 0.7;
+  canvas.style.width = `${width}px`;
+  canvas.width = width * 2;  // adjust pixel ratio if you want crisp rendering
+  canvas.height = canvas.width / 2;
+}
+
+window.addEventListener('resize', resizeCanvas);
+window.addEventListener('orientationchange', resizeCanvas);
+
+resizeCanvas(); // initial call
 
 function hideTitle() {
   titleScreen.style.display = 'none';
@@ -533,17 +574,69 @@ function detectHit(attacker, defender) {
   return Math.abs(armX - defender.x) < 25 && Math.abs(armY - defender.y) < 30;
 }
 
+let gamepads = [];
+
+window.addEventListener("gamepadconnected", function(e) {
+  console.log("Gamepad connected:", e.gamepad);
+  gamepads[e.gamepad.index] = e.gamepad;
+});
+
+window.addEventListener("gamepaddisconnected", function(e) {
+  console.log("Gamepad disconnected:", e.gamepad);
+  delete gamepads[e.gamepad.index];
+});
+
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = '#222';
   ctx.fillRect(0, ground + 10, canvas.width, 5);
+  // Refresh gamepad state
+gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+
+// Handle Player 1 - Gamepad 0
+const gp1 = gamepads[0];
+if (gp1) {
+  const axisX = gp1.axes[0]; // Left stick horizontal
+  const btnA = gp1.buttons[0].pressed; // A = Punch
+  const btnB = gp1.buttons[1].pressed; // B = Jump
+  const btnX = gp1.buttons[2].pressed; // X = Ultimate
+
+  if (axisX < -0.3) player1.moveLeft();
+  else if (axisX > 0.3) player1.moveRight();
+
+  if (btnB && player1.onGround) player1.jump();
+  if (btnA) player1.punch();
+  if (btnX) player1.ultimate();
+}
+
+// Handle Player 2 - Gamepad 1 (only in PvP)
+const gp2 = gamepads[1];
+if (!isAI && gp2) {
+  const axisX = gp2.axes[0];
+  const btnA = gp2.buttons[0].pressed;
+  const btnB = gp2.buttons[1].pressed;
+  const btnX = gp2.buttons[2].pressed;
+
+  if (axisX < -0.3) player2.moveLeft();
+  else if (axisX > 0.3) player2.moveRight();
+
+  if (btnB && player2.onGround) player2.jump();
+  if (btnA) player2.punch();
+  if (btnX) player2.ultimate();
+}
 
   if (gameOver) return;
 
   // Player input
+  if (joystickActive) {
+  if (joystickCurrentX < -10) player1.moveLeft();
+  if (joystickCurrentX > 10) player1.moveRight();
+  if (joystickCurrentY < -30 && player1.onGround) player1.jump(); // Slide up to jump
+} else {
   if (keys['a']) player1.moveLeft();
   if (keys['d']) player1.moveRight();
   if (keys['s']) player1.jump();
+}
   if (!isAI) {
     if (keys['ArrowLeft']) player2.moveLeft();
     if (keys['ArrowRight']) player2.moveRight();
@@ -655,6 +748,48 @@ window.addEventListener('keydown', e => {
 
 window.addEventListener('keyup', e => {
   keys[e.key] = false;
+});
+
+let joystickActive = false;
+let joystickStartX = 0;
+let joystickStartY = 0;
+let joystickCurrentX = 0;
+let joystickCurrentY = 0;
+
+const joystick = document.getElementById('joystick');
+const joystickContainer = document.getElementById('joystick-container');
+
+joystickContainer.addEventListener('touchstart', e => {
+  const touch = e.touches[0];
+  joystickActive = true;
+  joystickStartX = touch.clientX;
+  joystickStartY = touch.clientY;
+});
+
+joystickContainer.addEventListener('touchmove', e => {
+  if (!joystickActive) return;
+  const touch = e.touches[0];
+  joystickCurrentX = touch.clientX - joystickStartX;
+  joystickCurrentY = touch.clientY - joystickStartY;
+
+  // Limit range
+  const distance = Math.hypot(joystickCurrentX, joystickCurrentY);
+  const maxDist = 40;
+  if (distance > maxDist) {
+    const angle = Math.atan2(joystickCurrentY, joystickCurrentX);
+    joystickCurrentX = Math.cos(angle) * maxDist;
+    joystickCurrentY = Math.sin(angle) * maxDist;
+  }
+
+  // Move joystick visually
+  joystick.style.transform = `translate(${joystickCurrentX}px, ${joystickCurrentY}px)`;
+}, { passive: false });
+
+joystickContainer.addEventListener('touchend', () => {
+  joystickActive = false;
+  joystickCurrentX = 0;
+  joystickCurrentY = 0;
+  joystick.style.transform = `translate(0px, 0px)`;
 });
 
 // Start loop
