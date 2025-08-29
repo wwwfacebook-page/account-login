@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -192,3 +193,199 @@
 
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pana's Store - Web Price List</title>
+  <style>
+    :root {
+      --primary-color: #2d89ef;
+      --accent-color: #1b6ec2;
+      --text-color: #333;
+      --light-bg: #f9f9f9;
+      --highlight-bg: #eef3fb;
+      --font-main: 'Segoe UI', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-main);
+      background-color: var(--light-bg);
+      color: var(--text-color);
+      line-height: 1.6;
+      font-size: 1rem;
+    }
+
+    header {
+      background: var(--primary-color);
+      color: #fff;
+      text-align: center;
+      padding: 2.5rem 1rem;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      margin: 0 auto 1rem;
+      max-width: 500px;
+    }
+
+    .cta-buttons {
+      margin-top: 1rem;
+    }
+
+    .cta-buttons a {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      text-decoration: none;
+      color: white;
+      background-color: var(--accent-color);
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 1rem;
+      margin: 0.25rem;
+      transition: background 0.3s ease;
+    }
+
+    .cta-buttons a:hover {
+      background-color: #155a99;
+    }
+
+    section {
+      padding: 2rem 1rem;
+      max-width: 960px;
+      margin: auto;
+    }
+
+    section h2 {
+      font-size: 1.5rem;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+
+    section p, section ul {
+      font-size: 1rem;
+    }
+
+    ul {
+      padding-left: 1.25rem;
+      margin: 0;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    .testimonials {
+      background-color: var(--highlight-bg);
+      border-left: 4px solid var(--primary-color);
+      padding: 1rem;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #777;
+      padding: 2rem 1rem;
+      background-color: #f0f0f0;
+    }
+
+    /* Mobile-first - default is already mobile optimized */
+    @media (min-width: 600px) {
+      header h1 {
+        font-size: 2.5rem;
+      }
+
+      header p {
+        font-size: 1.2rem;
+      }
+
+      .cta-buttons a {
+        font-size: 1.1rem;
+      }
+
+      section h2 {
+        font-size: 1.7rem;
+      }
+    }
+
+    @media (min-width: 900px) {
+      section {
+        padding: 3rem 2rem;
+      }
+
+      header p {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Pana's Store Price List</h1>
+    <p>Instantly share our latest product or service prices with customers using our mobile-friendly web-based price list.</p>
+    <div class="cta-buttons">
+      <a href="#" id="view-prices-btn" role="button" aria-label="View price list">📋 View Prices</a>
+      <a href="#" id="order-btn" role="button" aria-label="Place an order">🛒 Order Now</a>
+    </div>
+  </header>
+
+  <section>
+    <h2>What Is a Web-Based Price List?</h2>
+    <p>A web-based price list is an online, always-accessible pricing page that updates in real time. Upload your products, organize by categories, and control who sees what prices — all from a simple dashboard.</p>
+  </section>
+
+  <section>
+    <h2>Powerful Features</h2>
+    <ul>
+      <li>✅ Real-Time Updates</li>
+      <li>✅ Mobile-Friendly Design</li>
+      <li>✅ Private or Public Access</li>
+      <li>✅ Search & Filter</li>
+      <li>✅ Excel Import Support</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Perfect For...</h2>
+    <ul>
+      <li>Wholesalers who update pricing frequently</li>
+      <li>Sales teams needing real-time info</li>
+      <li>Service providers with dynamic pricing</li>
+      <li>Retailers managing seasonal changes</li>
+    </ul>
+  </section>
+
+  <footer>
+    &copy; 2025 WebPriceList Inc. All rights reserved.
+  </footer>
+
+  <script>
+    document.getElementById("view-prices-btn").addEventListener("click", function (e) {
+      e.preventDefault();
+      window.location.href = "pricelist.html"; // 🔗 Change to your actual price list page
+    });
+
+    document.getElementById("order-btn").addEventListener("click", function (e) {
+      e.preventDefault();
+      window.location.href = "orders.html"; // 🔗 Change to your actual order page
+    });
+  </script>
+
+</body>
+</html>
+>>>>>>> 3fef314f5be64460933bd95b7817822037901572

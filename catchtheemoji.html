@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -232,3 +233,239 @@
 
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catch the Emoji 🎯</title>
+  <style>
+    :root {
+      --gradient-bg: linear-gradient(-45deg, #f093fb, #f5576c, #4facfe, #43e97b);
+      --primary-color: #ffffff;
+      --accent-color: #ff4081;
+    }
+
+    * {
+      box-sizing: border-box;
+      touch-action: manipulation;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      height: 100%;
+      overflow: hidden;
+      background: var(--gradient-bg);
+      background-size: 400% 400%;
+      animation: gradient 10s ease infinite;
+    }
+
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      text-align: center;
+      color: white;
+      font-size: 2.5rem;
+      margin: 1rem 0 0.5rem;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+    }
+
+    #scoreboard {
+      text-align: center;
+      font-size: 1.2rem;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.5rem 1rem;
+      margin: 0 auto 1rem;
+      width: fit-content;
+      border-radius: 10px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #game {
+      position: relative;
+      width: 100vw;
+      height: calc(100vh - 160px);
+      overflow: hidden;
+      border-top: 2px solid white;
+    }
+
+    .emoji {
+      position: absolute;
+      font-size: 2.5rem;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      animation: bounceIn 0.3s ease;
+      filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.3));
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0); }
+      60% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    .emoji:active {
+      transform: scale(1.3);
+    }
+
+    #game-over {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255,255,255,0.8);
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+      display: none;
+      z-index: 10;
+    }
+
+    #game-over h2 {
+      font-size: 2rem;
+      color: #e53935;
+      margin-bottom: 1rem;
+    }
+
+    #restart-btn {
+      padding: 0.8rem 1.6rem;
+      font-size: 1.1rem;
+      background: linear-gradient(45deg, #43e97b, #38f9d7);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    #restart-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 2rem;
+      }
+      .emoji {
+        font-size: 2.2rem;
+      }
+      #restart-btn {
+        font-size: 1rem;
+        padding: 0.6rem 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Catch the Emoji 🎯</h1>
+
+  <div id="scoreboard">
+    Score: <span id="score">0</span> |
+    Misses: <span id="misses">0</span> / 5
+  </div>
+
+  <div id="game">
+    <div id="game-over">
+      <h2>Game Over 💀</h2>
+      <button id="restart-btn">Play Again</button>
+    </div>
+  </div>
+
+  <script>
+    const game = document.getElementById("game");
+    const scoreEl = document.getElementById("score");
+    const missesEl = document.getElementById("misses");
+    const gameOverScreen = document.getElementById("game-over");
+    const restartBtn = document.getElementById("restart-btn");
+
+    const emojis = ["😀", "🍕", "🐱", "👻", "🌟", "🦄", "🎯", "💎", "🍩", "⚽"];
+    let score = 0;
+    let misses = 0;
+    let intervalId;
+
+    function getRandomEmoji() {
+      return emojis[Math.floor(Math.random() * emojis.length)];
+    }
+
+    function getRandomX() {
+      const maxX = game.offsetWidth - 40;
+      return Math.floor(Math.random() * maxX);
+    }
+
+    function dropEmoji() {
+      const emoji = document.createElement("div");
+      emoji.classList.add("emoji");
+      emoji.textContent = getRandomEmoji();
+      emoji.style.left = `${getRandomX()}px`;
+      emoji.style.top = `-40px`;
+      game.appendChild(emoji);
+
+      let y = 0;
+      const fallSpeed = Math.random() * 1.5 + 1;
+
+      const fall = setInterval(() => {
+        y += fallSpeed;
+        emoji.style.top = `${y}px`;
+
+        if (y > game.offsetHeight - 40) {
+          clearInterval(fall);
+          if (game.contains(emoji)) game.removeChild(emoji);
+          misses++;
+          missesEl.textContent = misses;
+          checkGameOver();
+        }
+      }, 10);
+
+      emoji.addEventListener("click", () => {
+        clearInterval(fall);
+        if (game.contains(emoji)) game.removeChild(emoji);
+        score++;
+        scoreEl.textContent = score;
+      });
+
+      emoji.addEventListener("touchstart", () => {
+        clearInterval(fall);
+        if (game.contains(emoji)) game.removeChild(emoji);
+        score++;
+        scoreEl.textContent = score;
+      }, { passive: true });
+    }
+
+    function startGame() {
+      score = 0;
+      misses = 0;
+      scoreEl.textContent = "0";
+      missesEl.textContent = "0";
+      gameOverScreen.style.display = "none";
+      intervalId = setInterval(dropEmoji, 800);
+    }
+
+    function checkGameOver() {
+      if (misses >= 5) {
+        clearInterval(intervalId);
+        gameOverScreen.style.display = "block";
+      }
+    }
+
+    restartBtn.addEventListener("click", startGame);
+    window.onload = startGame;
+  </script>
+
+</body>
+</html>
+>>>>>>> 3fef314f5be64460933bd95b7817822037901572
