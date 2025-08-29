@@ -389,14 +389,28 @@ function showGameOver(message) {
 
   // === Game Classes ===
   class BloodParticle {
-    constructor(x, y) {
-      this.x = x + (Math.random() - 0.5) * 20;
-      this.y = y + (Math.random() - 0.5) * 10;
-      this.velX = (Math.random() - 0.5) * 2;
-      this.velY = Math.random() * 2 + 1;
-      this.alpha = 1;
-      this.size = Math.random() * 3 + 2;
-    }
+    constructor(x, color) {
+  this.x = x;
+  this.y = ground;
+  this.color = color;
+  this.velX = 0;
+  this.velY = 0;
+  this.speed = 0.3;
+  this.maxSpeed = 4;
+  this.friction = 0.9;
+  this.onGround = true;
+  this.health = 300;
+  this.stamina = 100;
+  this.isPunching = false;
+  this.punchProgress = 0;
+  this.knockback = 0;
+  this.staggerTime = 0;
+  this.facing = 1;
+  this.power = 0;
+  this.ultimateReady = false;
+  this.ultimateCooldown = 0;
+  this.hasWeapon = false; // ← NEW LINE
+}
     update() {
       this.x += this.velX;
       this.y += this.velY;
@@ -438,6 +452,10 @@ function showGameOver(message) {
       this.power = 0;
       this.ultimateReady = false;
       this.ultimateCooldown = 0;
+    }
+
+    equipWeapon() {
+      this.hasWeapon = true;
     }
 
     gainPower(amount) {
@@ -501,7 +519,8 @@ function showGameOver(message) {
 
     receiveHit(direction) {
       if (this.staggerTime > 0) return;
-      this.health -= 15;
+      const damage = this.hasWeapon ? 30 : 15;
+      this.health -= damage;
       this.gainPower(10);
       this.knockback = direction * 5;
       punchSound.currentTime = 0;
@@ -630,7 +649,7 @@ p2UltimateBtn.addEventListener('click', () => player2.ultimate());
 
 function detectHit(attacker, defender) {
   if (!attacker.isPunching) return false;
-  let reach = 45;
+  let reach = attacker.hasWeapon ? 75 : 45;
   let armX = attacker.x + reach * attacker.facing;
   let armY = attacker.y - 20;
   return Math.abs(armX - defender.x) < 25 && Math.abs(armY - defender.y) < 30;
