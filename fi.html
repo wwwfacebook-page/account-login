@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <title>John Paul Showdown🔥</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      background: radial-gradient(circle at center, #222, #000);
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background: linear-gradient(to bottom, #333, #111);
+      border: 3px solid #fff;
+      border-radius: 12px;
+      width: 100vw;
+      max-width: 800px;
+      height: 50vh;
+      max-height: 400px;
+      touch-action: none;
+    }
+
+    #titleScreen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.9);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      z-index: 10;
+    }
+
+    #titleScreen h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+      color: #f39c12;
+      text-shadow: 0 0 20px #f39c12;
+    }
+
+    #pressStart {
+      font-size: 20px;
+      animation: blink 1s infinite;
+      color: #fff;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    #controls {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 5px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      flex-wrap: wrap;
+    }
+
+    .player-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .buttons-row {
+      display: flex;
+      gap: 10px;
+      margin: 5px 0;
+    }
+
+    button {
+      background: #444;
+      border: 2px solid #888;
+      border-radius: 8px;
+      color: white;
+      font-size: 18px;
+      padding: 12px 18px;
+      cursor: pointer;
+      min-width: 50px;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 5px rgba(255,255,255,0.2);
+    }
+
+    button:hover {
+      background: #666;
+      border-color: #ccc;
+    }
+
+    button:active {
+      background: #888;
+      transform: scale(0.95);
+    }
+
+    .punch-btn.p1 { background: #e63946; border-color: #ff6f61; }
+    .punch-btn.p2 { background: #457b9d; border-color: #6fb1fc; }
+
+    #volumeControl {
+      margin: 10px auto;
+      text-align: center;
+      color: white;
+    }
+
+    #volumeSlider {
+      width: 220px;
+      height: 8px;
+    }
+
+    h3 {
+      margin: 0 0 5px 0;
+    }
+
+    #gameOverOverlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      font-size: 36px;
+      z-index: 20;
+      text-align: center;
+    }
+
+    #gameOverOverlay.show {
+      display: flex;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Title Screen -->
+<div id="titleScreen">
+  <h1>🔥 STICKMAN SHOWDOWN 🔥</h1>
+  <div id="pressStart">Tap or Click to Start</div>
+</div>
+
+<!-- Game Canvas -->
+<main>
+  <canvas id="gameCanvas" width="800" height="400" aria-label="Stickman Showdown Game"></canvas>
+</main>
+
+<!-- Controls UI -->
+<section id="controls" aria-label="Game Controls">
+  <!-- Player 1 Controls -->
+  <div class="player-controls" aria-label="Player 1 Controls">
+    <h3 style="color:#e63946;">Player 1</h3>
+    <div class="buttons-row">
+      <button id="p1-left" aria-label="Player 1 Left">◀️</button>
+      <button id="p1-right" aria-label="Player 1 Right">▶️</button>
+      <button id="p1-ultimate" style="background:gold;color:black;font-weight:bold;display:none;">💥 Ultimate</button>
+    </div>
+    <div class="buttons-row">
+      <button id="p1-jump" aria-label="Player 1 Jump">🔼 Jump</button>
+      <button id="p1-punch" class="punch-btn p1" aria-label="Player 1 Punch">👊 Punch</button>
+    </div>
+  </div>
+
+  <!-- Player 2 Controls -->
+  <div class="player-controls" aria-label="Player 2 Controls">
+    <h3 style="color:#457b9d;">Player 2</h3>
+    <div class="buttons-row">
+      <button id="p2-left" aria-label="Player 2 Left">◀️</button>
+      <button id="p2-right" aria-label="Player 2 Right">▶️</button>
+      <button id="p2-ultimate" style="background:gold;color:black;font-weight:bold;display:none;">💥 Ultimate</button>
+    </div>
+    <div class="buttons-row">
+      <button id="p2-jump" aria-label="Player 2 Jump">🔼 Jump</button>
+      <button id="p2-punch" class="punch-btn p2" aria-label="Player 2 Punch">👊 Punch</button>
+    </div>
+  </div>
+</section>
+
+<!-- Volume Control -->
+<div id="volumeControl">
+  🔊 Volume: <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.3" />
+</div>
+
+<!-- Game Over Overlay -->
+<div id="gameOverOverlay" role="alert" aria-live="assertive"></div>
+
+<!-- Audio -->
+<audio id="bgMusic" src="background.mp3" loop preload="auto"></audio>
+<audio id="punchSound" src="punch.mp3" preload="auto"></audio>
+<audio id="koSound" src="ko.mp3" preload="auto"></audio>
+
+<!-- Game Script -->
+<script>
+  // === Initial Setup (Reorganized & Optimized) ===
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const ground = canvas.height - 50;
+  const gravity = 0.7;
+
+  const titleScreen = document.getElementById('titleScreen');
+  const gameOverOverlay = document.getElementById('gameOverOverlay');
+
+  const bgMusic = document.getElementById('bgMusic');
+  const punchSound = document.getElementById('punchSound');
+  const koSound = document.getElementById('koSound');
+  const volumeSlider = document.getElementById('volumeSlider');
+
+  const p1UltimateBtn = document.getElementById('p1-ultimate');
+  const p2UltimateBtn = document.getElementById('p2-ultimate');
+
+  let musicStarted = false;
+  let gameOver = false;
+
+  const keys = {};
+  const bloodParticles = [];
+
+  // === Sound ===
+  function startMusic() {
+    bgMusic.volume = volumeSlider.value;
+    bgMusic.play().catch(() => {});
+    musicStarted = true;
+  }
+
+  volumeSlider.addEventListener('input', () => {
+    const vol = parseFloat(volumeSlider.value);
+    bgMusic.volume = vol;
+    punchSound.volume = vol;
+    koSound.volume = vol;
+  });
+
+  // === Event Listeners ===
+  ['mousedown', 'touchstart'].forEach(evt => {
+    document.addEventListener(evt, () => {
+      if (!musicStarted) {
+        startMusic();
+        hideTitle();
+      }
+    }, { once: true });
+  });
+
+  function showTitle() {
+    titleScreen.style.display = 'flex';
+  }
+
+  function hideTitle() {
+    titleScreen.style.display = 'none';
+  }
+
+  function showGameOver(message) {
+    gameOverOverlay.classList.add('show');
+    gameOverOverlay.innerHTML = `
+      <div>
+        ${message}<br><br>
+        <button onclick="location.reload()">🔁 Restart</button>
+      </div>
+    `;
+    gameOverOverlay.style.display = 'flex';
+  }
+
+  // === Game Classes ===
+  class BloodParticle {
+    constructor(x, y) {
+      this.x = x + (Math.random() - 0.5) * 20;
+      this.y = y + (Math.random() - 0.5) * 10;
+      this.velX = (Math.random() - 0.5) * 2;
+      this.velY = Math.random() * 2 + 1;
+      this.alpha = 1;
+      this.size = Math.random() * 3 + 2;
+    }
+    update() {
+      this.x += this.velX;
+      this.y += this.velY;
+      this.velY += 0.1;
+      this.alpha -= 0.02;
+    }
+    draw(ctx) {
+      ctx.save();
+      ctx.globalAlpha = this.alpha;
+      ctx.fillStyle = 'red';
+      ctx.beginPath();
+      ctx.ellipse(this.x, this.y, this.size, this.size * 0.6, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    isDead() {
+      return this.alpha <= 0;
+    }
+  }
+
+  class Stickman {
+    constructor(x, color) {
+      this.x = x;
+      this.y = ground;
+      this.color = color;
+      this.velX = 0;
+      this.velY = 0;
+      this.speed = 0.3;
+      this.maxSpeed = 4;
+      this.friction = 0.9;
+      this.onGround = true;
+      this.health = 300;
+      this.stamina = 100;
+      this.isPunching = false;
+      this.punchProgress = 0;
+      this.knockback = 0;
+      this.staggerTime = 0;
+      this.facing = 1;
+      this.power = 0;
+      this.ultimateReady = false;
+      this.ultimateCooldown = 0;
+    }
+
+    gainPower(amount) {
+      this.power = Math.min(this.power + amount, 100);
+      if (this.power >= 100) this.ultimateReady = true;
+    }
+
+    ultimate() {
+      if (!this.ultimateReady || this.ultimateCooldown > 0) return;
+      this.ultimateReady = false;
+      this.power = 0;
+      this.ultimateCooldown = 300;
+
+      const target = this === player1 ? player2 : player1;
+      const direction = this.facing;
+
+      if (Math.abs(this.x - target.x) < 80) {
+        target.receiveHit(direction);
+        target.receiveHit(direction);
+      }
+
+      for (let i = 0; i < 20; i++) {
+        bloodParticles.push(new BloodParticle(target.x, target.y - 30));
+      }
+    }
+
+    applyPhysics() {
+      if (!this.onGround) this.velY += gravity;
+      this.y += this.velY;
+      this.velX += this.knockback;
+      this.knockback *= 0.7;
+      this.x += this.velX;
+      this.velX *= this.friction;
+      if (this.y >= ground) {
+        this.y = ground;
+        this.velY = 0;
+        this.onGround = true;
+      }
+      this.x = Math.min(Math.max(this.x, 30), canvas.width - 30);
+      this.facing = (this.x < canvas.width / 2) ? 1 : -1;
+    }
+
+    moveLeft() { if (this.staggerTime <= 0) this.velX = Math.max(this.velX - this.speed, -this.maxSpeed); }
+    moveRight() { if (this.staggerTime <= 0) this.velX = Math.min(this.velX + this.speed, this.maxSpeed); }
+
+    jump() {
+      if (this.onGround && this.stamina >= 10) {
+        this.velY = -12;
+        this.onGround = false;
+        this.stamina -= 10;
+      }
+    }
+
+    punch() {
+      if (this.isPunching || this.stamina < 15 || this.staggerTime > 0) return;
+      this.isPunching = true;
+      this.punchProgress = 0;
+      this.stamina -= 15;
+      this.gainPower(5);
+    }
+
+    receiveHit(direction) {
+      if (this.staggerTime > 0) return;
+      this.health -= 15;
+      this.gainPower(10);
+      this.knockback = direction * 5;
+      punchSound.currentTime = 0;
+      punchSound.play().catch(() => {});
+    }
+
+    recover() {
+      if (!this.isPunching && this.stamina < 100) {
+        this.stamina = Math.min(this.stamina + 0.4, 100);
+      }
+      if (this.staggerTime > 0) this.staggerTime--;
+      if (this.ultimateCooldown > 0) this.ultimateCooldown--;
+    }
+
+    updatePunch() {
+      if (!this.isPunching) return;
+      this.punchProgress += 0.05;
+      if (this.punchProgress >= 1) {
+        this.isPunching = false;
+        this.punchProgress = 0;
+      }
+    }
+    
+    // Stickman body and bars (unchanged for brevity)
+    draw() {
+  // Draw stickman
+  ctx.save();
+  ctx.strokeStyle = this.color;
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
+
+  const headY = this.y - 50;
+  const bodyY = this.y - 20;
+
+  // Head
+  ctx.beginPath();
+  ctx.arc(this.x, headY, 12, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Body
+  ctx.beginPath();
+  ctx.moveTo(this.x, headY + 12);
+  ctx.lineTo(this.x, bodyY);
+  ctx.stroke();
+
+  // Arms
+  ctx.beginPath();
+  ctx.moveTo(this.x, headY + 20);
+  ctx.lineTo(this.x - 15 * this.facing, headY + 35);
+  ctx.moveTo(this.x, headY + 20);
+  ctx.lineTo(this.x + 15 * this.facing, headY + 35);
+  ctx.stroke();
+
+  // Legs
+  ctx.beginPath();
+  ctx.moveTo(this.x, bodyY);
+  ctx.lineTo(this.x - 10, this.y);
+  ctx.moveTo(this.x, bodyY);
+  ctx.lineTo(this.x + 10, this.y);
+  ctx.stroke();
+
+  // Punch Arm
+  if (this.isPunching) {
+    ctx.beginPath();
+    ctx.moveTo(this.x, headY + 20);
+    ctx.lineTo(this.x + 25 * this.facing, headY + 10);
+    ctx.stroke();
+  }
+
+  // Health bar
+  const barWidth = 60;
+  const healthRatio = this.health / 300;
+  ctx.fillStyle = 'rgba(255, 0, 0, 0.6)';
+  ctx.fillRect(this.x - barWidth / 2, this.y - 80, barWidth, 8);
+  ctx.fillStyle = 'lime';
+  ctx.fillRect(this.x - barWidth / 2, this.y - 80, barWidth * healthRatio, 8);
+
+  // Power bar
+  const powerRatio = this.power / 100;
+  ctx.fillStyle = 'rgba(255, 255, 0, 0.6)';
+  ctx.fillRect(this.x - barWidth / 2, this.y - 70, barWidth * powerRatio, 6);
+
+  ctx.restore();
+}
+  }
+
+  const player1 = new Stickman(150, '#e63946');
+  const player2 = new Stickman(650, '#457b9d');
+
+  // Setup button bindings
+  function setupButton(id, key, isPunch, player) {
+    const btn = document.getElementById(id);
+    btn.addEventListener('mousedown', e => { e.preventDefault(); keys[key] = true; if (isPunch) player.punch(); });
+    btn.addEventListener('mouseup', e => { e.preventDefault(); keys[key] = false; });
+    btn.addEventListener('mouseleave', e => { keys[key] = false; });
+    btn.addEventListener('touchstart', e => { e.preventDefault(); keys[key] = true; if (isPunch) player.punch(); }, { passive: false });
+    btn.addEventListener('touchend', e => { e.preventDefault(); keys[key] = false; }, { passive: false });
+  }
+
+  setupButton('p1-left', 'a');
+setupButton('p1-right', 'd');
+setupButton('p1-jump', 's');
+setupButton('p1-punch', 'w', true, player1);
+
+// Add jump handler for player1
+document.getElementById('p1-jump').addEventListener('mousedown', () => player1.jump());
+document.getElementById('p1-jump').addEventListener('touchstart', (e) => {
+  e.preventDefault(); player1.jump();
+}, { passive: false });
+
+
+  setupButton('p2-left', 'ArrowLeft');
+setupButton('p2-right', 'ArrowRight');
+setupButton('p2-jump', 'ArrowDown');
+setupButton('p2-punch', 'ArrowUp', true, player2);
+
+// Add jump handler for player2
+document.getElementById('p2-jump').addEventListener('mousedown', () => player2.jump());
+document.getElementById('p2-jump').addEventListener('touchstart', (e) => {
+  e.preventDefault(); player2.jump();
+}, { passive: false });
+
+  p1UltimateBtn.addEventListener('click', () => player1.ultimate());
+  p2UltimateBtn.addEventListener('click', () => player2.ultimate());
+
+  function detectHit(attacker, defender) {
+    if (!attacker.isPunching) return false;
+    let reach = 45;
+    let armX = attacker.x + reach * attacker.facing;
+    let armY = attacker.y - 20;
+    return Math.abs(armX - defender.x) < 25 && Math.abs(armY - defender.y) < 30;
+  }
+
+  // === Game Loop ===
+  function gameLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#222';
+    ctx.fillRect(0, ground + 10, canvas.width, 5);
+
+    if (gameOver) return;
+
+    if (keys['a']) player1.moveLeft();
+    if (keys['d']) player1.moveRight();
+    if (keys['s']) player1.jump();
+    if (keys['ArrowLeft']) player2.moveLeft();
+    if (keys['ArrowRight']) player2.moveRight();
+    if (keys['ArrowDown']) player2.jump();
+
+    player1.applyPhysics(); player2.applyPhysics();
+    player1.updatePunch(); player2.updatePunch();
+    player1.recover(); player2.recover();
+
+    if (detectHit(player1, player2)) player2.receiveHit(player1.facing);
+    if (detectHit(player2, player1)) player1.receiveHit(player2.facing);
+
+    for (let i = bloodParticles.length - 1; i >= 0; i--) {
+      bloodParticles[i].update();
+      bloodParticles[i].draw(ctx);
+      if (bloodParticles[i].isDead()) bloodParticles.splice(i, 1);
+    }
+
+    player1.draw(); player2.draw();
+
+    // Update ultimate buttons
+    p1UltimateBtn.style.display = (player1.ultimateReady && player1.ultimateCooldown <= 0) ? 'inline-block' : 'none';
+    p2UltimateBtn.style.display = (player2.ultimateReady && player2.ultimateCooldown <= 0) ? 'inline-block' : 'none';
+
+    if (player1.health <= 0 || player2.health <= 0) {
+      gameOver = true;
+      koSound.currentTime = 0;
+      koSound.play().catch(() => {});
+      showGameOver(player1.health <= 0 ? '🏆 Player 2 Wins!' : '🏆 Player 1 Wins!');
+      return;
+    }
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  window.addEventListener('keydown', e => {
+    keys[e.key] = true;
+    if (e.key === 'w') player1.punch();
+    if (e.key === 'ArrowUp') player2.punch();
+    if (e.key === 'q') player1.ultimate();
+    if (e.key === '/') player2.ultimate();
+  });
+
+  window.addEventListener('keyup', e => {
+    keys[e.key] = false;
+  });
+
+  gameLoop();
+</script>
+</body>
+</html>
