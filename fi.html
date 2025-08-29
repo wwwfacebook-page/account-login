@@ -125,6 +125,51 @@ canvas {
   }
 }
 
+#joystick-container {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 100px;
+  height: 100px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+  touch-action: none;
+  z-index: 999;
+}
+
+#joystick {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  left: 25px;
+  top: 25px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  pointer-events: none;
+  transition: transform 0.05s ease-out;
+}
+
+/* Attack button floating on bottom-right */
+#attack-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: var(--btn-size);
+  height: var(--btn-size);
+  font-size: 24px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  z-index: 999;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  touch-action: manipulation;
+}
+
 button {
   touch-action: manipulation;
   user-select: none;
@@ -217,6 +262,7 @@ button {
     <div class="buttons-row">
       <button id="p2-left" aria-label="Player 2 Left">◀️</button>
       <button id="p2-right" aria-label="Player 2 Right">▶️</button>
+      <button id="attack-button" aria-label="Attack Button">👊</button>
       <button id="p2-ultimate" style="background:gold;color:black;font-weight:bold;display:none;">💥 Ultimate</button>
     </div>
     <div class="buttons-row">
@@ -806,6 +852,17 @@ joystickContainer.addEventListener('touchend', () => {
   joystickCurrentX = 0;
   joystickCurrentY = 0;
   joystick.style.transform = `translate(0px, 0px)`;
+});
+const attackBtn = document.getElementById('attack-button');
+
+attackBtn.addEventListener('touchstart', e => {
+  e.preventDefault();
+  player1.punch();
+}, { passive: false });
+
+attackBtn.addEventListener('mousedown', e => {
+  e.preventDefault();
+  player1.punch();
 });
 
 // Start loop

@@ -139,10 +139,10 @@
   <h1>Catch the Emoji 🎯</h1>
 
   <div id="scoreboard">
-    Score: <span id="score">0</span> |
-    Misses: <span id="misses">0</span> / 3
-    <div id="high-score" style="margin-top: 0.3rem;">🏆 High Score: 0</div>
-  </div>
+  Score: <span id="score">0</span> |
+  Misses: <span id="misses">0</span> / 3
+  <!-- High Score will be added via JS -->
+</div>
 
   <div id="game">
     <div id="game-over">
@@ -152,94 +152,97 @@
   </div>
 
   <script>
-    const game = document.getElementById("game");
-    const scoreEl = document.getElementById("score");
-    const missesEl = document.getElementById("misses");
-    const gameOverScreen = document.getElementById("game-over");
-    const restartBtn = document.getElementById("restart-btn");
-    const highScoreEl = document.getElementById("high-score");
+  const game = document.getElementById("game");
+  const scoreEl = document.getElementById("score");
+  const missesEl = document.getElementById("misses");
+  const gameOverScreen = document.getElementById("game-over");
+  const restartBtn = document.getElementById("restart-btn");
 
-    const emojis = ["😀", "🍕", "🐱", "👻", "🌟", "🦄", "🎯", "💎", "🍩", "⚽"];
-    let score = 0;
-    let misses = 0;
-    let intervalId;
+  const emojis = ["😀", "🍕", "🐱", "👻", "🌟", "🦄", "🎯", "💎", "🍩", "⚽"];
+  let score = 0;
+  let misses = 0;
+  let intervalId;
 
-    // 🎯 High score handling
-    const highScoreKey = "highScore";
-    let highScore = parseInt(localStorage.getItem(highScoreKey)) || 0;
-    highScoreEl.textContent = `🏆 High Score: ${highScore}`;
+  // 🎯 High score handling
+  const highScoreKey = "highScore";
+  let highScore = localStorage.getItem(highScoreKey) || 0;
+  const scoreboard = document.getElementById("scoreboard");
+  const highScoreEl = document.createElement("div");
+  highScoreEl.style.marginTop = "0.3rem";
+  highScoreEl.textContent = `🏆 High Score: ${highScore}`;
+  scoreboard.appendChild(highScoreEl);
 
-    function getRandomEmoji() {
-      return emojis[Math.floor(Math.random() * emojis.length)];
-    }
+  function getRandomEmoji() {
+    return emojis[Math.floor(Math.random() * emojis.length)];
+  }
 
-    function getRandomX() {
-      const maxX = game.offsetWidth - 40;
-      return Math.floor(Math.random() * maxX);
-    }
+  function getRandomX() {
+    const maxX = game.offsetWidth - 40;
+    return Math.floor(Math.random() * maxX);
+  }
 
-    function dropEmoji() {
-      const emoji = document.createElement("div");
-      emoji.classList.add("emoji");
-      emoji.textContent = getRandomEmoji();
-      emoji.style.left = `${getRandomX()}px`;
-      emoji.style.top = `-40px`;
-      game.appendChild(emoji);
+  function dropEmoji() {
+    const emoji = document.createElement("div");
+    emoji.classList.add("emoji");
+    emoji.textContent = getRandomEmoji();
+    emoji.style.left = `${getRandomX()}px`;
+    emoji.style.top = `-40px`;
+    game.appendChild(emoji);
 
-      let y = 0;
-      const fallSpeed = Math.random() * 1.5 + 1;
+    let y = 0;
+    const fallSpeed = Math.random() * 1.5 + 1;
 
-      const fall = setInterval(() => {
-        y += fallSpeed;
-        emoji.style.top = `${y}px`;
+    const fall = setInterval(() => {
+      y += fallSpeed;
+      emoji.style.top = `${y}px`;
 
-        if (y > game.offsetHeight - 40) {
-          clearInterval(fall);
-          if (game.contains(emoji)) game.removeChild(emoji);
-          misses++;
-          missesEl.textContent = misses;
-          checkGameOver();
-        }
-      }, 10);
-
-      function catchEmoji() {
+      if (y > game.offsetHeight - 40) {
         clearInterval(fall);
         if (game.contains(emoji)) game.removeChild(emoji);
-        score++;
-        scoreEl.textContent = score;
-
-        // 🔥 Update high score
-        if (score > highScore) {
-          highScore = score;
-          localStorage.setItem(highScoreKey, highScore);
-          highScoreEl.textContent = `🏆 High Score: ${highScore}`;
-        }
+        misses++;
+        missesEl.textContent = misses;
+        checkGameOver();
       }
+    }, 10);
 
-      emoji.addEventListener("click", catchEmoji);
-      emoji.addEventListener("touchstart", catchEmoji, { passive: true });
-    }
+    function catchEmoji() {
+      clearInterval(fall);
+      if (game.contains(emoji)) game.removeChild(emoji);
+      score++;
+      scoreEl.textContent = score;
 
-    function startGame() {
-      score = 0;
-      misses = 0;
-      scoreEl.textContent = "0";
-      missesEl.textContent = "0";
-      gameOverScreen.style.display = "none";
-      highScore = parseInt(localStorage.getItem(highScoreKey)) || 0;
-      highScoreEl.textContent = `🏆 High Score: ${highScore}`;
-      intervalId = setInterval(dropEmoji, 800);
-    }
-
-    function checkGameOver() {
-      if (misses >= 3) {
-        clearInterval(intervalId);
-        gameOverScreen.style.display = "block";
+      // 🔥 Update high score
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem(highScoreKey, highScore);
+        highScoreEl.textContent = `🏆 High Score: ${highScore}`;
       }
     }
 
-    restartBtn.addEventListener("click", startGame);
-    window.onload = startGame;
-  </script>
+    emoji.addEventListener("click", catchEmoji);
+    emoji.addEventListener("touchstart", catchEmoji, { passive: true });
+  }
+
+  function startGame() {
+    score = 0;
+    misses = 0;
+    scoreEl.textContent = "0";
+    missesEl.textContent = "0";
+    gameOverScreen.style.display = "none";
+    highScore = localStorage.getItem(highScoreKey) || 0;
+    highScoreEl.textContent = `🏆 High Score: ${highScore}`;
+    intervalId = setInterval(dropEmoji, 800);
+  }
+
+  function checkGameOver() {
+    if (misses >= 3) {
+      clearInterval(intervalId);
+      gameOverScreen.style.display = "block";
+    }
+  }
+
+  restartBtn.addEventListener("click", startGame);
+  window.onload = startGame;
+</script>
 </body>
 </html>
