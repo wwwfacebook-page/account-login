@@ -91,19 +91,29 @@ tr:hover {
 }
 
 td button {
-  padding: 6px 14px;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.85rem;
+  padding: 12px 18px;
+  font-size: 1rem;
   font-weight: 600;
-  margin-right: 6px;
+  border: none;
+  border-radius: 12px;
+  margin: 6px 6px 0 0;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .edit-btn {
-  background-color: var(--warning-color);
+  background: linear-gradient(135deg, #f39c12, #f5b041);
   color: white;
+}
+
+.edit-btn:hover {
+  background: linear-gradient(135deg, #d78f0d, #e0a031);
+  transform: scale(1.05);
 }
 
 .edit-btn:hover {
@@ -111,8 +121,13 @@ td button {
 }
 
 .delete-btn {
-  background-color: var(--danger-color);
+  background: linear-gradient(135deg, #e74c3c, #f1948a);
   color: white;
+}
+
+.delete-btn:hover {
+  background: linear-gradient(135deg, #c0392b, #e57373);
+  transform: scale(1.05);
 }
 
 .delete-btn:hover {
@@ -124,16 +139,21 @@ td button {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: var(--primary-color);
+  background: linear-gradient(135deg, #4a90e2, #5dade2);
   color: white;
   border: none;
-  padding: 15px 20px;
+  padding: 16px 20px;
   border-radius: 50%;
-  box-shadow: var(--shadow);
-  font-size: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  font-size: 1.8rem;
   cursor: pointer;
   z-index: 2000;
-  transition: background-color 0.3s ease;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+#toggle-form-btn:hover {
+  transform: scale(1.1);
+  background: linear-gradient(135deg, #3b7cd4, #6cbafc);
 }
 
 #toggle-form-btn:hover {
@@ -183,15 +203,17 @@ input:focus {
 }
 
 button[type="submit"] {
-  background-color: var(--success-color);
+  background: linear-gradient(135deg, #2ecc71, #58d68d);
   color: white;
   font-weight: bold;
   border: none;
   cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
 button[type="submit"]:hover {
-  background-color: #27ae60;
+  background: linear-gradient(135deg, #27ae60, #45b97c);
+  transform: scale(1.03);
 }
 
 @media (max-width: 600px) {
@@ -202,6 +224,20 @@ button[type="submit"]:hover {
   table, thead, tbody, th, td, tr {
     display: block;
   }
+
+  @media (max-width: 600px) {
+  td[data-label="Action"] {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  td[data-label="Action"] button {
+    width: 100%;
+    font-size: 1rem;
+    padding: 12px;
+  }
+}
 
   thead {
     display: none;
@@ -321,14 +357,14 @@ button[type="submit"]:hover {
       row.setAttribute("data-id", product.id);
 
       row.innerHTML = `
-        <td data-label="Product">${product.name}</td>
-        <td data-label="Description">${product.description}</td>
-        <td data-label="Price">₱${parseFloat(product.price).toFixed(2)}</td>
-        <td data-label="Action">
-          <button class="edit-btn">Edit</button>
-          <button class="delete-btn">Delete</button>
-        </td>
-      `;
+  <td data-label="Product">${product.name}</td>
+  <td data-label="Description">${product.description}</td>
+  <td data-label="Price">₱${parseFloat(product.price).toFixed(2)}</td>
+  <td data-label="Action">
+    <button class="edit-btn">✏️ Edit</button>
+    <button class="delete-btn">🗑️ Delete</button>
+  </td>
+`;
 
       row.querySelector(".edit-btn").addEventListener("click", () => {
         enterEditMode(product);
