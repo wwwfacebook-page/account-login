@@ -289,14 +289,15 @@ button[type="submit"]:hover {
 
   <div class="table-container">
     <table id="product-table">
-      <thead>
-        <tr>
-          <th>Product</th>
-          <th>Description</th>
-          <th>Price</th>
-          <th>Action</th>
-        </tr>
-      </thead>
+     <thead>
+  <tr>
+    <th>Product</th>
+    <th>Description</th>
+    <th>Price</th>
+    <th>Image</th> <!-- New -->
+    <th>Action</th>
+  </tr>
+</thead>
       <tbody>
         <!-- Product rows are rendered here -->
       </tbody>
@@ -310,6 +311,7 @@ button[type="submit"]:hover {
     <input type="text" id="product-name" placeholder="Product Name" required />
     <input type="text" id="product-description" placeholder="Description" required />
     <input type="number" id="product-price" placeholder="Price in ₱ (e.g. 499.99)" step="0.01" min="0" required />
+    <input type="url" id="product-image" placeholder="Image URL (e.g. https://...)" />
     <button type="submit">Add Product</button>
   </form>
 
@@ -360,6 +362,11 @@ button[type="submit"]:hover {
   <td data-label="Product">${product.name}</td>
   <td data-label="Description">${product.description}</td>
   <td data-label="Price">₱${parseFloat(product.price).toFixed(2)}</td>
+  <td data-label="Image">
+  ${product.image
+    ? `<img src="${product.image}" alt="${product.name}" style="width:60px; height:auto; border-radius:8px;" />`
+    : '<span style="color:#aaa;">No Image</span>'}
+</td>
   <td data-label="Action">
     <button class="edit-btn">✏️ Edit</button>
     <button class="delete-btn">🗑️ Delete</button>
@@ -409,6 +416,7 @@ button[type="submit"]:hover {
       nameInput.value = product.name;
       descInput.value = product.description;
       priceInput.value = product.price;
+      imageInput.value = product.image || "";
       submitBtn.textContent = "Update Product";
       form.querySelector("h2").textContent = "Update Product";
       form.classList.add("show");
@@ -430,27 +438,30 @@ button[type="submit"]:hover {
     });
 
     form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const name = nameInput.value.trim();
-      const description = descInput.value.trim();
-      const price = priceInput.value.trim();
+  e.preventDefault();
+  const name = nameInput.value.trim();
+  const description = descInput.value.trim();
+  const price = priceInput.value.trim();
+  const image = imageInput.value.trim();
 
-      if (!name || !description || !price) {
-        alert("Please fill in all fields.");
-        return;
-      }
+  if (!name || !description || !price) {
+    alert("Please fill in all fields.");
+    return;
+  }
 
-      const productData = { name, description, price };
+  const productData = { name, description, price, image };
 
-      if (isEditMode && editingProductId) {
-        updateProductInFirebase(editingProductId, productData);
-        exitEditMode();
-      } else {
-        saveProductToFirebase(productData);
-      }
+  if (isEditMode && editingProductId) {
+    updateProductInFirebase(editingProductId, productData);
+    exitEditMode();
+  } else {
+    saveProductToFirebase(productData);
+  }
 
-      form.reset();
-    });
+  form.reset();
+});
+
+    const imageInput = document.getElementById("product-image");
 
     searchInput.addEventListener("input", () => {
       const query = searchInput.value.toLowerCase();
