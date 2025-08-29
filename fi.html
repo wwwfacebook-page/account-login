@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
   <meta name="screen-orientation" content="landscape">
   <title>John Paul Showdown🔥</title>
@@ -23,162 +24,102 @@
     touch-action: manipulation;
   }
 
+  /* Base canvas size (already mostly responsive) */
+canvas {
+  width: 95vw;
+  max-width: 800px;
+  height: auto;
+  aspect-ratio: 2 / 1;
+  border: 3px solid #fff;
+  border-radius: 12px;
+  background: linear-gradient(to bottom, #333, #111);
+  touch-action: none;
+  margin: 10px auto;
+}
+
+/* Controls container base */
+#controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  gap: 20px;
+  padding: 0 10px;
+}
+
+/* Controls rows */
+.buttons-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 6px 0;
+}
+
+/* Landscape styles */
+@media (orientation: landscape) and (max-width: 1024px) {
+  /* Make body full height with no overflow on X */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Resize canvas for landscape */
   canvas {
-    display: block;
-    margin: 10px auto;
-    width: 95vw;
-    max-width: 800px;
+    width: 70vw;
+    max-width: 1000px;
     height: auto;
     aspect-ratio: 2 / 1;
-    border: 3px solid #fff;
-    border-radius: 12px;
-    background: linear-gradient(to bottom, #333, #111);
-    touch-action: none;
   }
 
-  #titleScreen {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.9);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    z-index: 10;
-    overflow-y: auto;
-  }
-
-  #titleScreen h1 {
-    font-size: clamp(2rem, 6vw, 3.5rem);
-    margin-bottom: 20px;
-    color: #f39c12;
-    text-shadow: 0 0 20px #f39c12;
-  }
-
+  /* Controls layout changes for landscape */
   #controls {
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: flex-end;
+    gap: 15px;
+    padding: 0 15px;
+  }
+
+  /* Player controls side by side */
+  .player-controls {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 10px;
-    gap: 20px;
-    padding: 0 10px;
+  }
+
+  /* Buttons row wraps less in landscape */
+  .buttons-row {
+    flex-wrap: nowrap;
+    justify-content: center;
+  }
+
+  /* Increase button size for easier tapping */
+  button {
+    min-width: 60px;
+    min-height: 60px;
+    font-size: clamp(16px, 5vw, 22px);
+    padding: 14px;
+  }
+
+  /* Volume slider wider */
+  #volumeSlider {
+    width: 40vw;
+    max-width: 400px;
+  }
+}
+
+/* Portrait orientation (default, but just in case) */
+@media (orientation: portrait) {
+  #controls {
+    flex-direction: column;
+    align-items: center;
   }
 
   .player-controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    margin-bottom: 15px;
   }
-
-  .buttons-row {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin: 6px 0;
-  }
-
-  button {
-    font-size: clamp(14px, 4vw, 18px);
-    padding: 10px;
-    background: #444;
-    color: white;
-    border: 2px solid #888;
-    border-radius: 10px;
-    min-width: var(--btn-size);
-    min-height: var(--btn-size);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 0 5px rgba(255,255,255,0.2);
-    touch-action: manipulation;
-  }
-
-  button:hover {
-    background: #666;
-    border-color: #ccc;
-  }
-
-  button:active {
-    background: #888;
-    transform: scale(0.95);
-  }
-
-  .punch-btn.p1 { background: #e63946; border-color: #ff6f61; }
-  .punch-btn.p2 { background: #457b9d; border-color: #6fb1fc; }
-
-  #volumeControl {
-    text-align: center;
-    margin: 15px 0;
-  }
-
-  #volumeSlider {
-    width: 70vw;
-    max-width: 300px;
-  }
-
-  #gameOverOverlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    color: white;
-    display: none;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.8rem;
-    z-index: 20;
-    text-align: center;
-    padding: 20px;
-  }
-
-  #gameOverOverlay.show {
-    display: flex;
-    animation: fadeIn 0.5s ease-out;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-
-  /* Responsive form input styling */
-  #playerForm input,
-  #playerForm select,
-  #playerForm button {
-    width: 90vw;
-    max-width: 350px;
-    margin-bottom: 10px;
-    font-size: 1rem;
-  }
-
-  #playerForm input,
-  #playerForm select {
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-  }
-
-  #playerForm button {
-    background: #f39c12;
-    color: black;
-    font-weight: bold;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 1.1rem;
-  }
-
-  /* Handle extreme small screens */
-  @media (max-height: 500px) {
-    #titleScreen {
-      padding-top: 40px;
-    }
-  }
+}
 </style>
 </head>
 <body>
