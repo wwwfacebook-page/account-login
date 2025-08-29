@@ -69,15 +69,20 @@
       background-color: #f9f9f9;
     }
 
-    td button {
-      padding: 15px 21px;
+    td button.order-btn {
+      padding: 0.75rem 1.25rem;
       font-size: 1rem;
-      border-radius: 6px;
+      border-radius: 8px;
       background-color: #2ecc71;
       color: white;
       border: none;
       cursor: pointer;
+      width: 100%;
+      max-width: 180px;
+      margin: 0 auto;
+      display: block;
     }
+
 
     form {
       margin-top: 2rem;
@@ -117,6 +122,13 @@
     button:hover {
       background-color: #1b6ec2;
     }
+
+    .button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
 
     .success-message {
       text-align: center;
@@ -205,6 +217,44 @@
     #delete-receipt-btn:hover {
       background-color: #c0392b;
     }
+
+    #submit-all-btn,
+#print-receipt-btn,
+#delete-receipt-btn,
+#download-png-btn {
+  margin-top: 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.8rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  max-width: 300px;
+}
+
+@media (max-width: 480px) {
+  #submit-all-btn,
+  #print-receipt-btn,
+  #delete-receipt-btn,
+  #download-png-btn {
+    padding: 1rem;
+    font-size: 1rem;
+    max-width: 100%;
+    border-radius: 10px;
+  }
+
+  td button.order-btn {
+    padding: 0.65rem 0.9rem;
+    font-size: 0.95rem;
+    max-width: 100%;
+    width: 100%;
+  }
+}
 
     @media (max-width: 768px) {
       table {
@@ -326,9 +376,11 @@
       </tfoot>
     </table>
     <!-- RECEIPT SECTION BUTTONS -->
-<button id="print-receipt-btn">Print Receipt (PDF)</button>
-<button id="download-png-btn">Download receipt as PNG</button>
-<button id="delete-receipt-btn">Delete Order Receipt Summary</button>
+<div class="button-group">
+  <button id="print-receipt-btn">Print Receipt (PDF)</button>
+  <button id="download-png-btn">Download receipt as PNG</button>
+  <button id="delete-receipt-btn">Delete Order Receipt Summary</button>
+</div>
   </div>
 
   <!-- Firebase and other libraries are loaded as ES modules below -->
@@ -364,6 +416,7 @@
     const db = getDatabase(app);
     const productRef = ref(db, "products");
     const orderRef = ref(db, "orders");
+    const cartSummaryRef = ref(db, "cartSummary");
 
     const productTableBody = document.querySelector("#product-table tbody");
     const orderForm = document.getElementById("order-form");
@@ -409,6 +462,15 @@
     }, (error) => {
       console.error("Error fetching products:", error);
     });
+
+    // Load cart summary from Firebase and render
+onValue(cartSummaryRef, (snapshot) => {
+  const data = snapshot.val();
+  if (Array.isArray(data)) {
+    cart = data;
+    renderReceiptSummary();
+  }
+});
 
     // Render product list in table
     function renderProducts(list) {
@@ -476,7 +538,7 @@
       // Also push to Firebase under orders
       try {
         const newOrderRef = push(orderRef);
-        await set(newOrderRef, { name: productName, quantity, timestamp: Date.now() });
+        await set(cartSummaryRef, cart); // Save cart summary to Firebase
         successMessage.textContent = `Added ${quantity} x ${productName} to cart!`;
         successMessage.style.color = "green";
         successMessage.style.display = "block";
@@ -568,6 +630,7 @@ printReceiptBtn.addEventListener("click", () => {
     const amount = item.quantity * price;
     return [item.name, item.quantity.toString(), amount.toFixed(2)];
   });
+  
 
   doc.autoTable({
     head: headers,
@@ -589,19 +652,30 @@ printReceiptBtn.addEventListener("click", () => {
 });
 
     // Delete receipt summary button click
-    deleteReceiptBtn.addEventListener("click", async () => {
-      if (!confirm("Are you sure you want to delete all order receipts? This action cannot be undone.")) {
-        return;
-      }
-      try {
-        await remove(orderRef);
-        alert("Order receipt summary deleted successfully.");
-      } catch (error) {
-        console.error("Error deleting order receipts:", error);
-        alert("Failed to delete order receipts. Please try again.");
-      }
-    });
+deleteReceiptBtn.addEventListener("click", async () => {
+  if (!confirm("Are you sure you want to delete all order receipts? This action cannot be undone.")) {
+    return;
+  }
+  try {
 
+    // Remove from Firebase
+    await Promise.all([
+  remove(orderRef),
+  remove(cartSummaryRef)
+]);
+
+    // Clear local cart
+    cart = [];
+
+    // Re-render the UI
+    renderReceiptSummary();
+
+    alert("Order receipt summary deleted successfully.");
+  } catch (error) {
+    console.error("Error deleting order receipts:", error);
+    alert("Failed to delete order receipts. Please try again.");
+  }
+});
     // Download receipt as PNG image
     downloadPngBtn.addEventListener("click", () => {
       if (!cart.length) {
