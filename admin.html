@@ -6,205 +6,240 @@
     <title>Edit Profile</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* Global Styles */
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-image: url('portal.jpg');
-            background-size: cover;
-            background-position: center center;
-            background-repeat: no-repeat;
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: white;
-            text-align: center;
-            flex-grow: 1;
-        }
-
-        h1 {
-            font-size: 2.5em;
-            line-height: 1.2;
-            margin-bottom: 20px;
-            margin-top: -30px;
-        }
-
-        /* Responsive Styling */
-@media only screen and (max-width: 768px) {
     body {
-        font-size: 14px;
-    }
-
-    /* Sidebar Styles for Mobile */
-    .sidebar {
-        width: 100%;
-        position: relative;
-        height: auto;
-        background-color: rgba(73, 70, 70, 0.8); /* Adjust transparency for better visibility */
+        font-family: 'Poppins', sans-serif;
+        background-image: url('portal.jpg');
+        background-size: cover;
+        background-position: center;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
     }
 
     .container {
-        padding: 10px;
-        font-size: 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-grow: 1;
+        padding: 20px;
+        text-align: center;
+        color: white;
     }
 
     h1 {
-        font-size: 1.8em;
+        font-size: 2.5em;
         line-height: 1.2;
+        margin: 0;
     }
 
-    /* Image container */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: rgba(73, 70, 70, 0.575);
+        color: white;
+        padding: 20px;
+        border-radius: 0 0 10px 0;
+        width: 200px;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+        z-index: 1000;
+    }
+
+    .profile {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .profile img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .profile-name {
+        font-size: 1.1em;
+        font-weight: 600;
+    }
+
+    .options {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .option {
+        padding: 10px;
+        margin: 5px 0;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    .option:hover {
+        background-color: rgba(58, 108, 214, 0.5);
+    }
+
+    /* Modal Style (Profile, Edit, Settings) */
+    #profile-content,
+    #settings-content,
+    #edit-profile-content {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #000;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: left;
+        color: white;
+        width: 90%;
+        max-width: 600px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+        overflow-y: auto;
+        max-height: 90%;
+        z-index: 1100;
+    }
+
+    .profile-info,
+    .profile-edit,
+    .settings-edit {
+        margin: 10px 0;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+    }
+
+    .profile-edit input,
+    .settings-edit input {
+        width: 100%;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        background: transparent;
+        color: white;
+    }
+
+    .logout-button {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: rgba(255, 0, 0, 0.8);
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        font-weight: 500;
+        z-index: 1001;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        transition: background-color 0.3s ease;
+        cursor: pointer;
+    }
+
+    .logout-button:hover {
+        background-color: rgba(30, 0, 200, 0.658);
+    }
+
+    #image-content {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1100;
+        background: rgba(0, 0, 0, 0.95);
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 90%;
+        max-height: 90%;
+    }
+
     #image-content img {
-        max-width: 90%; /* Ensure the image doesn't overflow on smaller screens */
+        max-width: 100%;
         height: auto;
+        display: block;
+        margin-bottom: 10px;
     }
 
-    /* Button styling for the close button */
     #image-content button {
-        padding: 8px 12px;
-        font-size: 14px;
+        background-color: red;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
     }
-}
 
-        /* Sidebar Styles */
+    /* ========== RESPONSIVE MEDIA QUERIES ========== */
+    @media (max-width: 768px) {
         .sidebar {
-            position: fixed; 
-            top: 0;
-            left: 0;
-            background-color: rgba(73, 70, 70, 0.575); 
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            width: 200px;
-            height: 100vh; 
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-            z-index: 1000;
+            position: static;
+            width: 100%;
+            height: auto;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 10px;
+            border-radius: 0;
         }
 
         .profile {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-direction: row;
-        }
-
-        .profile img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin-right: 10px;
+            flex: 1 1 100%;
+            justify-content: center;
         }
 
         .profile-name {
-            font-size: 1.2em;
-            font-weight: 600;
+            font-size: 1em;
+            text-align: center;
         }
 
         .options {
+            flex: 1 1 100%;
             display: flex;
-            flex-direction: column;
-            width: 100%;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 10px;
         }
 
         .option {
-            padding: 10px;
-            margin: 5px 0;
-            width: 100%;
-            text-align: left;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-            color: white;
+            flex: 0 1 45%;
+            text-align: center;
+            font-size: 14px;
         }
 
-        .option:hover {
-            background-color: rgba(58, 108, 214, 0.5);
+        h1 {
+            font-size: 1.5em;
         }
 
-        /* Profile Content Styles */
-        #profile-content, #settings-content, #edit-profile-content {
-            display: none;
-            position: fixed;
-            top: 50%;
+        #profile-content,
+        #settings-content,
+        #edit-profile-content {
+            width: 95%;
+            top: 5%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgb(0, 0, 0);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: left;
-            color: white;
-            width: 50%;
-            max-width: 600px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-            overflow-y: auto;
-            max-height: 80%;
+            transform: translateX(-50%);
+            max-height: 90%;
         }
 
-        .profile-info, .profile-edit, .settings-edit {
-            margin: 15px 0;
-            padding: 10px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-        }
-
-        .profile-info span, .profile-edit label, .settings-edit label {
-            font-weight: 600;
-            display: inline-block;
-            width: 120px;
-        }
-
-        .profile-edit input, .settings-edit input {
-            background-color: transparent;
-            border: 1px solid #ddd;
-            padding: 5px 10px;
-            color: white;
-            width: 100%;
-            border-radius: 5px;
-        }
-
-        button {
-            margin-top: 20px;
-            padding: 10px 15px;
-            background-color: #4285f4;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #357ae8;
-        }
         .logout-button {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: rgba(255, 0, 0, 0.8);
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 500;
-            z-index: 1001; /* On top of sidebar */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            transition: background-color 0.3s ease;
+            top: 10px;
+            right: 10px;
+            padding: 8px 10px;
+            font-size: 14px;
         }
-
-        .logout-button:hover {
-            background-color: rgba(30, 0, 200, 0.658);
-        }
-    </style>
+    }
+</style>
 </head>
     <div class="logout-button" onclick="Logout()">Logout</div>    
 <body>

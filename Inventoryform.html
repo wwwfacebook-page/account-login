@@ -4,11 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Inventory Report Generator</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  
+  <!-- html2canvas for PNG generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
   <style>
     :root {
-      --blue-light: #e6f0ff;
       --blue: #2d89ef;
       --blue-dark: #1b6ec2;
       --danger: #e74c3c;
@@ -33,27 +34,27 @@
     h1 {
       text-align: center;
       color: var(--white);
-      font-size: 2rem;
+      font-size: 1.8rem;
       margin-bottom: 1rem;
     }
 
     form {
       background-color: var(--white);
-      padding: 1.2rem;
+      padding: 1rem;
       border-radius: 12px;
       box-shadow: 0 6px 16px var(--shadow);
       margin: auto;
       max-width: 600px;
+      width: 100%;
     }
 
     input, button {
       width: 100%;
-      padding: 0.9rem;
+      padding: 1rem;
       margin-bottom: 1rem;
       font-size: 1rem;
       border-radius: 8px;
       border: 1px solid #ccc;
-      transition: all 0.2s ease-in-out;
     }
 
     input:focus {
@@ -78,6 +79,7 @@
     .inventory-list {
       max-width: 600px;
       margin: 2rem auto;
+      width: 100%;
     }
 
     .item {
@@ -89,11 +91,6 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1rem;
-      transition: transform 0.2s ease;
-    }
-
-    .item:hover {
-      transform: translateY(-3px);
     }
 
     .item-name {
@@ -119,6 +116,7 @@
       max-width: 600px;
       margin: auto;
       margin-bottom: 2rem;
+      width: 100%;
     }
 
     @media (min-width: 600px) {
@@ -126,6 +124,32 @@
         flex-direction: row;
         justify-content: center;
       }
+    }
+
+    /* Hidden report preview container */
+    #report-container {
+      display: none;
+      background: white;
+      padding: 20px;
+      color: black;
+      font-family: sans-serif;
+      width: 600px;
+      margin: 0 auto;
+    }
+
+    #report-container table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    #report-container th, #report-container td {
+      border: 1px solid #999;
+      padding: 8px;
+      text-align: left;
+    }
+
+    #report-container th {
+      background-color: #f0f0f0;
     }
   </style>
 </head>
@@ -136,32 +160,42 @@
   <form id="inventory-form">
     <input type="text" id="distributor-name" placeholder="Distributor / Company Name" required />
     <input type="date" id="report-date" required />
-    <hr>
+    <hr />
     <input type="text" id="product-name" placeholder="Product Name" required />
     <input type="number" id="product-quantity" placeholder="Quantity" required />
-    <input type="text" id="product-price" placeholder="Price (e.g. ₱120.50)" required />
     <button type="submit">➕ Add to Inventory</button>
   </form>
 
   <div class="inventory-list" id="inventory-list"></div>
 
   <div class="actions">
-    <button id="download-pdf">📄 Download PDF</button>
-    <button id="save-json">💾 Save as JSON</button>
+    <button id="download-png">🖼️ Download PNG</button>
+  </div>
+
+  <!-- Hidden report for PNG rendering -->
+  <div id="report-container">
+    <h2>Inventory Report</h2>
+    <p id="report-distributor"></p>
+    <p id="report-date"></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+        </tr>
+      </thead>
+      <tbody id="report-table-body"></tbody>
+    </table>
   </div>
 
   <script>
-    const { jsPDF } = window.jspdf;
-
     const form = document.getElementById('inventory-form');
     const distInput = document.getElementById('distributor-name');
     const dateInput = document.getElementById('report-date');
     const prodName = document.getElementById('product-name');
     const prodQty = document.getElementById('product-quantity');
-    const prodPrice = document.getElementById('product-price');
     const inventoryList = document.getElementById('inventory-list');
-    const downloadBtn = document.getElementById('download-pdf');
-    const saveJsonBtn = document.getElementById('save-json');
+    const downloadBtn = document.getElementById('download-png');
 
     let inventory = [];
 
@@ -173,7 +207,7 @@
         div.innerHTML = `
           <div>
             <div class="item-name">${item.name}</div>
-            <div>Qty: ${item.quantity} • Price: ${item.price}</div>
+            <div>Qty: ${item.quantity}</div>
           </div>
           <button class="remove-btn" onclick="removeItem(${index})">Remove</button>
         `;
@@ -190,60 +224,51 @@
       e.preventDefault();
       inventory.push({
         name: prodName.value,
-        quantity: prodQty.value,
-        price: prodPrice.value
+        quantity: prodQty.value
       });
 
       prodName.value = '';
       prodQty.value = '';
-      prodPrice.value = '';
-
       renderInventory();
     });
 
-    downloadBtn.addEventListener('click', () => {
+    downloadBtn.addEventListener('click', async () => {
       if (inventory.length === 0) {
         alert("Please add at least one product.");
         return;
       }
 
-      const doc = new jsPDF();
-      doc.setFontSize(16);
-      doc.text("Inventory Report", 14, 20);
-      doc.setFontSize(12);
-      doc.text(`Distributor / Company: ${distInput.value}`, 14, 30);
-      doc.text(`Date: ${dateInput.value}`, 14, 38);
+      // Fill in report container
+      document.getElementById('report-distributor').textContent = `Distributor / Company: ${distInput.value}`;
+      document.getElementById('report-date').textContent = `Date: ${dateInput.value}`;
+      const tableBody = document.getElementById('report-table-body');
+      tableBody.innerHTML = '';
 
-      doc.autoTable({
-        startY: 50,
-        head: [["Product", "Quantity", "Price"]],
-        body: inventory.map(item => [item.name, item.quantity, item.price]),
-        theme: 'grid',
-        headStyles: { fillColor: [45, 137, 239] },
+      inventory.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${item.name}</td><td>${item.quantity}</td>`;
+        tableBody.appendChild(row);
       });
 
-      doc.save(`Inventory_${dateInput.value || 'Report'}.pdf`);
-    });
+      const reportEl = document.getElementById('report-container');
+      reportEl.style.display = 'block';
 
-    saveJsonBtn.addEventListener('click', () => {
-      if (inventory.length === 0) {
-        alert("No inventory to save.");
-        return;
+      try {
+        const canvas = await html2canvas(reportEl, { backgroundColor: null, scale: 2 });
+        const image = canvas.toDataURL("image/png");
+
+        const link = document.createElement("a");
+        link.href = image;
+        link.download = `Inventory_${dateInput.value || 'Report'}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        console.error("Error generating PNG:", error);
+        alert("There was an error generating the image.");
       }
 
-      const data = {
-        distributor: distInput.value,
-        date: dateInput.value,
-        inventory: inventory
-      };
-
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Inventory_${dateInput.value || 'data'}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
+      reportEl.style.display = 'none';
     });
   </script>
 </body>

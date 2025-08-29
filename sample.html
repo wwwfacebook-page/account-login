@@ -1,54 +1,196 @@
-from flask import Flask, request, jsonify, render_template_string
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catch the Emoji 🎯</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      touch-action: manipulation;
+    }
 
-app = Flask(__name__)
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #89f7fe, #66a6ff);
+      overflow: hidden;
+      height: 100%;
+    }
 
-# Fake "blocked SIMs" database
-blocked_sims = set()
+    h1 {
+      text-align: center;
+      margin: 1rem 0 0.5rem;
+      color: white;
+      font-size: 2rem;
+      text-shadow: 1px 1px 4px #000;
+    }
 
-# Home Page HTML
-HTML_PAGE = """
-<!doctype html>
-<title>SIM Blocker</title>
-<h2>Block a SIM Card</h2>
-<form method="POST" action="/block">
-    SIM Card Number: <input type="text" name="sim_number">
-    <input type="submit" value="Block SIM">
-</form>
-<h3>Blocked SIMs:</h3>
-<ul>
-    {% for sim in blocked_sims %}
-        <li>{{ sim }}</li>
-    {% endfor %}
-</ul>
-"""
+    #scoreboard {
+      text-align: center;
+      color: white;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
 
-@app.route("/", methods=["GET"])
-def home():
-    return render_template_string(HTML_PAGE, blocked_sims=blocked_sims)
+    #game {
+      position: relative;
+      width: 100vw;
+      height: calc(100vh - 140px);
+      border-top: 2px solid white;
+      background-color: rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+    }
 
-@app.route("/block", methods=["POST"])
-def block_sim():
-    sim_number = request.form.get("sim_number")
-    if not sim_number:
-        return "No SIM number provided", 400
+    .emoji {
+      position: absolute;
+      font-size: 2.5rem;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      transition: transform 0.1s;
+    }
 
-    # Simulate blocking logic
-    blocked_sims.add(sim_number)
-    
-    # In a real case, this is where you’d call your backend system:
-    # block_sim_in_network(sim_number)
+    .emoji:active {
+      transform: scale(1.3);
+    }
 
-    return render_template_string(HTML_PAGE, blocked_sims=blocked_sims)
+    #game-over {
+      position: absolute;
+      top: 40%;
+      width: 100%;
+      text-align: center;
+      font-size: 2rem;
+      color: red;
+      display: none;
+      font-weight: bold;
+      text-shadow: 1px 1px 5px #fff;
+    }
 
-@app.route("/api/block", methods=["POST"])
-def api_block_sim():
-    data = request.json
-    sim_number = data.get("sim_number")
-    if not sim_number:
-        return jsonify({"error": "SIM number required"}), 400
+    #restart-btn {
+      margin-top: 1rem;
+      padding: 0.8rem 1.6rem;
+      font-size: 1.1rem;
+      background-color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
 
-    blocked_sims.add(sim_number)
-    return jsonify({"status": "SIM blocked", "sim_number": sim_number}), 200
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+      #scoreboard {
+        font-size: 1rem;
+      }
+      .emoji {
+        font-size: 2.2rem;
+      }
+      #restart-btn {
+        font-size: 1rem;
+        padding: 0.6rem 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
 
-if __name__ == "__main__":
-    app.run(debug=True)
+  <h1>Catch the Emoji 🎯</h1>
+
+  <div id="scoreboard">
+    Score: <span id="score">0</span> |
+    Misses: <span id="misses">0</span> / 5
+  </div>
+
+  <div id="game">
+    <div id="game-over">
+      Game Over 💀<br />
+      <button id="restart-btn">Play Again</button>
+    </div>
+  </div>
+
+  <script>
+    const game = document.getElementById("game");
+    const scoreEl = document.getElementById("score");
+    const missesEl = document.getElementById("misses");
+    const gameOverScreen = document.getElementById("game-over");
+    const restartBtn = document.getElementById("restart-btn");
+
+    const emojis = ["😀", "🍕", "🐱", "👻", "🌟", "🦄", "🎯", "💎", "🍩", "⚽"];
+    let score = 0;
+    let misses = 0;
+    let intervalId;
+
+    function getRandomEmoji() {
+      return emojis[Math.floor(Math.random() * emojis.length)];
+    }
+
+    function getRandomX() {
+      const maxX = game.offsetWidth - 40;
+      return Math.floor(Math.random() * maxX);
+    }
+
+    function dropEmoji() {
+      const emoji = document.createElement("div");
+      emoji.classList.add("emoji");
+      emoji.textContent = getRandomEmoji();
+      emoji.style.left = `${getRandomX()}px`;
+      emoji.style.top = `-40px`;
+      game.appendChild(emoji);
+
+      let y = 0;
+      const fallSpeed = Math.random() * 1.5 + 1;
+
+      const fall = setInterval(() => {
+        y += fallSpeed;
+        emoji.style.top = `${y}px`;
+
+        if (y > game.offsetHeight - 40) {
+          clearInterval(fall);
+          if (game.contains(emoji)) game.removeChild(emoji);
+          misses++;
+          missesEl.textContent = misses;
+          checkGameOver();
+        }
+      }, 10);
+
+      emoji.addEventListener("click", () => {
+        clearInterval(fall);
+        if (game.contains(emoji)) game.removeChild(emoji);
+        score++;
+        scoreEl.textContent = score;
+      });
+
+      emoji.addEventListener("touchstart", () => {
+        clearInterval(fall);
+        if (game.contains(emoji)) game.removeChild(emoji);
+        score++;
+        scoreEl.textContent = score;
+      }, { passive: true });
+    }
+
+    function startGame() {
+      score = 0;
+      misses = 0;
+      scoreEl.textContent = "0";
+      missesEl.textContent = "0";
+      gameOverScreen.style.display = "none";
+      intervalId = setInterval(dropEmoji, 800);
+    }
+
+    function checkGameOver() {
+      if (misses >= 5) {
+        clearInterval(intervalId);
+        gameOverScreen.style.display = "block";
+      }
+    }
+
+    restartBtn.addEventListener("click", startGame);
+    window.onload = startGame;
+  </script>
+
+</body>
+</html>

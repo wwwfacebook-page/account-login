@@ -5,278 +5,291 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Order Products - Pana's Store</title>
   <style>
-  :root {
-    --primary-color: #2d89ef;
-    --font-main: 'Segoe UI', sans-serif;
-  }
-
-  * {
-    box-sizing: border-box;
-  }
-
-  body {
-    font-family: var(--font-main);
-    margin: 0;
-    padding: 1rem;
-    background: linear-gradient(rgba(255, 240, 210, 0.95), rgba(255, 240, 210, 0.95)),
-      url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
-    background-size: cover;
-    color: #333;
-  }
-
-  h1 {
-    text-align: center;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-  }
-
-  #search-container {
-    max-width: 500px;
-    margin: 0 auto 1.5rem;
-  }
-
-  #search-input {
-    width: 100%;
-    padding: 0.9rem 1rem;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-  }
-
-  .table-container {
-    overflow-x: auto;
-    margin-bottom: 2rem;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 600px;
-  }
-
-  th, td {
-    padding: 0.8rem;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-
-  th {
-    background-color: var(--primary-color);
-    color: white;
-  }
-
-  tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-
-  td button {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 5px;
-    font-size: 0.9rem;
-    background-color: #2ecc71;
-    color: white;
-    cursor: pointer;
-  }
-
-  form {
-    margin-top: 2rem;
-    background: white;
-    border-radius: 10px;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 1.5rem;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-    display: none;
-  }
-
-  form h2 {
-    text-align: center;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-  }
-
-  input, button {
-    width: 100%;
-    padding: 0.9rem 1rem;
-    margin-bottom: 1rem;
-    font-size: 1rem;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
-
-  button {
-    background-color: var(--primary-color);
-    color: white;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-  }
-
-  button:hover {
-    background-color: #1b6ec2;
-  }
-
-  .success-message {
-    text-align: center;
-    color: green;
-    display: none;
-    font-weight: bold;
-    margin-top: 1rem;
-  }
-
-  #receipt-section,
-  #cart-section {
-    margin-top: 3rem;
-    max-width: 100%;
-    background: white;
-    padding: 1rem 1.5rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-    overflow-x: auto;
-  }
-
-  #receipt-section h2,
-  #cart-section h2 {
-    text-align: center;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-  }
-
-  #receipt-table,
-  #cart-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  #receipt-table th, #receipt-table td,
-  #cart-table th, #cart-table td {
-    padding: 0.6rem 0.8rem;
-    border-bottom: 1px solid #ddd;
-    text-align: left;
-  }
-
-  #receipt-table th,
-  #cart-table th {
-    background-color: var(--primary-color);
-    color: white;
-  }
-
-  #cart-table td button {
-    background-color: #e74c3c;
-    border: none;
-    color: white;
-    padding: 4px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9rem;
-  }
-
-  #submit-all-btn,
-  #print-receipt-btn,
-  #delete-receipt-btn {
-    margin-top: 1rem;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 0.8rem 1.2rem;
-    font-size: 1rem;
-    cursor: pointer;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
-    max-width: 300px;
-  }
-
-  #submit-all-btn:hover,
-  #print-receipt-btn:hover {
-    background-color: #1b6ec2;
-  }
-
-  #delete-receipt-btn {
-    background-color: #e74c3c;
-  }
-
-  #delete-receipt-btn:hover {
-    background-color: #c0392b;
-  }
-
-  @media (max-width: 768px) {
-    table {
-      font-size: 0.9rem;
-      min-width: 100%;
+    :root {
+      --primary-color: #2d89ef;
+      --font-main: 'Segoe UI', sans-serif;
     }
 
-    th, td {
-      padding: 0.6rem;
+    * {
+      box-sizing: border-box;
     }
 
-    input, button {
-      font-size: 0.95rem;
-      padding: 0.8rem;
+    body {
+      font-family: var(--font-main);
+      margin: 0;
+      padding: 1rem;
+      background: linear-gradient(rgba(255, 240, 210, 0.95), rgba(255, 240, 210, 0.95)),
+        url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
     }
 
     #search-container {
-      padding: 0 1rem;
+      max-width: 500px;
+      margin: 0 auto 1.5rem;
     }
 
-    form {
-      margin: 1rem;
-    }
-
-    #receipt-section, #cart-section {
-      margin: 1.5rem 1rem;
-    }
-
-    #submit-all-btn, #print-receipt-btn, #delete-receipt-btn {
+    #search-input {
       width: 100%;
+      padding: 0.9rem 1rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
     }
-  }
 
-  @media (max-width: 480px) {
-    h1 {
-      font-size: 1.5rem;
+    .table-container {
+      overflow-x: auto;
+      margin-bottom: 2rem;
     }
 
     table {
-      font-size: 0.85rem;
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px;
     }
 
-    input, button {
-      font-size: 0.9rem;
+    th, td {
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
     }
 
-    #receipt-section, #cart-section {
-      padding: 1rem;
+    th {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
     }
 
     td button {
-      padding: 4px 8px;
-      font-size: 0.8rem;
+      padding: 15px 21px;
+      font-size: 1rem;
+      border-radius: 6px;
+      background-color: #2ecc71;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
-  }
-</style>
 
+    form {
+      margin-top: 2rem;
+      background: white;
+      border-radius: 10px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 1.5rem;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+      display: none;
+    }
+
+    form h2 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1b6ec2;
+    }
+
+    .success-message {
+      text-align: center;
+      color: green;
+      display: none;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+
+    #receipt-section,
+    #cart-section {
+      margin-top: 3rem;
+      max-width: 100%;
+      background: white;
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+      overflow-x: auto;
+    }
+
+    #receipt-section h2,
+    #cart-section h2 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+
+    #receipt-table,
+    #cart-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    #receipt-table th, #receipt-table td,
+    #cart-table th, #cart-table td {
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    #receipt-table th,
+    #cart-table th {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    #cart-table td button {
+      background-color: #e74c3c;
+      border: none;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    #submit-all-btn,
+    #print-receipt-btn,
+    #delete-receipt-btn,
+    #download-png-btn {
+      margin-top: 1rem;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.8rem 1.2rem;
+      font-size: 1rem;
+      cursor: pointer;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    #submit-all-btn:hover,
+    #print-receipt-btn:hover,
+    #download-png-btn:hover {
+      background-color: #1b6ec2;
+    }
+
+    #delete-receipt-btn {
+      background-color: #e74c3c;
+    }
+
+    #delete-receipt-btn:hover {
+      background-color: #c0392b;
+    }
+
+    @media (max-width: 768px) {
+      table {
+        font-size: 0.9rem;
+        min-width: 100%;
+      }
+
+      th, td {
+        padding: 0.6rem;
+      }
+
+      input, button {
+        font-size: 0.95rem;
+        padding: 0.8rem;
+      }
+
+      #search-container {
+        padding: 0 1rem;
+      }
+
+      form {
+        margin: 1rem;
+      }
+
+      #receipt-section, #cart-section {
+        margin: 1.5rem 1rem;
+      }
+
+      #submit-all-btn, #print-receipt-btn, #delete-receipt-btn {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      table {
+        font-size: 0.85rem;
+      }
+
+      input, button {
+        font-size: 0.9rem;
+      }
+
+      #receipt-section, #cart-section {
+        padding: 1rem;
+      }
+
+      td button {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+      }
+    }
+
+    /* Accessibility helper */
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      clip: rect(0 0 0 0);
+      overflow: hidden;
+      border: 0;
+    }
+  </style>
 </head>
 <body>
-
+  
   <h1>Order Products</h1>
 
   <div id="search-container">
+    <label for="search-input" class="visually-hidden">Search Products</label>
     <input type="text" id="search-input" placeholder="Search products..." autocomplete="off" />
   </div>
 
   <div class="table-container">
-    <table id="product-table">
+    <table id="product-table" aria-label="Product List">
       <thead>
         <tr>
-          <th>Product</th>
-          <th>Description</th>
-          <th>Price</th>
-          <th>Action</th>
+          <th scope="col">Product</th>
+          <th scope="col">Description</th>
+          <th scope="col">Price</th>
+          <th scope="col">Action</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -284,24 +297,23 @@
   </div>
 
   <!-- Order Form -->
-  <form id="order-form">
+  <form id="order-form" aria-label="Add Product to Cart">
     <h2>Add Product to Cart</h2>
-    <input type="text" id="customer-name" placeholder="Your Name" required />
-    <input type="number" id="order-quantity" placeholder="Quantity" min="1" value="1" required />
-    <input type="text" id="order-product-name" readonly />
+    <input type="number" id="order-quantity" placeholder="Quantity" min="1" value="1" required aria-required="true" aria-label="Quantity" />
+    <input type="text" id="order-product-name" readonly aria-readonly="true" aria-label="Product Name" />
     <button type="submit">Add to Cart</button>
-    <div class="success-message" id="success-message"></div>
+    <div class="success-message" id="success-message" role="alert"></div>
   </form>
 
   <!-- Receipt Section -->
   <div id="receipt-section">
     <h2>Order Receipt Summary</h2>
-    <table id="receipt-table">
+    <table id="receipt-table" aria-label="Order Receipt Summary Table">
       <thead>
         <tr>
-          <th>Product</th>
-          <th>Total Quantity</th>
-          <th>Total Amount</th>
+          <th scope="col">Product</th>
+          <th scope="col">Total Quantity</th>
+          <th scope="col">Total Amount</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -309,23 +321,34 @@
         <tr>
           <th>Total</th>
           <th id="receipt-total-quantity">0</th>
-          <th id="receipt-total-amount">$0.00</th>
+          <th id="receipt-total-amount">₱0.00</th>
         </tr>
       </tfoot>
     </table>
-    <button id="print-receipt-btn">Print Receipt (PDF)</button>
-    <button id="delete-receipt-btn">Delete Order Receipt Summary</button>
+    <!-- RECEIPT SECTION BUTTONS -->
+<button id="print-receipt-btn">Print Receipt (PDF)</button>
+<button id="download-png-btn">Download receipt as PNG</button>
+<button id="delete-receipt-btn">Delete Order Receipt Summary</button>
   </div>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-  <!-- jsPDF library -->
+  <!-- Firebase and other libraries are loaded as ES modules below -->
+  <script type="module">
+    // Firebase modular imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getDatabase, ref, onValue, push, set, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+    // jsPDF & autoTable (global from CDN, no module import available)
+    // html2canvas also loaded globally
+  </script>
+
+  <!-- Load jsPDF, jsPDF-Autotable, html2canvas via normal script tags (no modules) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    import { getDatabase, ref, onValue, push, set, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBeyKlZ3a0I-3uApVYa7OAG-VK2lHkyDcg",
@@ -343,151 +366,191 @@
     const orderRef = ref(db, "orders");
 
     const productTableBody = document.querySelector("#product-table tbody");
+    const orderForm = document.getElementById("order-form");
+    const orderQuantityInput = document.getElementById("order-quantity");
+    const orderProductNameInput = document.getElementById("order-product-name");
+    const successMessage = document.getElementById("success-message");
+    const searchInput = document.getElementById("search-input");
     const receiptTableBody = document.querySelector("#receipt-table tbody");
     const receiptTotalQuantity = document.getElementById("receipt-total-quantity");
     const receiptTotalAmount = document.getElementById("receipt-total-amount");
-
-    const searchInput = document.getElementById("search-input");
-    const orderForm = document.getElementById("order-form");
-    const customerNameInput = document.getElementById("customer-name");
-    const quantityInput = document.getElementById("order-quantity");
-    const orderProductNameInput = document.getElementById("order-product-name");
-    const successMessage = document.getElementById("success-message");
-
-    const cartSection = document.getElementById("cart-section");
-    const cartTableBody = document.querySelector("#cart-table tbody");
-    const submitAllBtn = document.getElementById("submit-all-btn");
-
     const printReceiptBtn = document.getElementById("print-receipt-btn");
     const deleteReceiptBtn = document.getElementById("delete-receipt-btn");
+    const downloadPngBtn = document.getElementById("download-png-btn");
 
+    // In-memory data
     let products = [];
     let cart = [];
 
-    function renderProduct(product) {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${product.name}</td>
-        <td>${product.description}</td>
-        <td>${product.price}</td>
-        <td><button class="order-btn">Order</button></td>
-      `;
-      row.querySelector(".order-btn").addEventListener("click", () => {
-        orderProductNameInput.value = product.name;
-        orderForm.style.display = "block";
-        orderForm.scrollIntoView({ behavior: "smooth" });
-      });
-      productTableBody.appendChild(row);
+    // Sanitize dynamic content to prevent XSS
+    function escapeHTML(str) {
+      if (!str) return "";
+      return String(str).replace(/[&<>'"]/g, tag =>
+        ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag])
+      );
     }
 
-    function renderAllProducts(productList) {
-      productTableBody.innerHTML = "";
-      productList.forEach(renderProduct);
-    }
+    // Fetch and listen to products from Firebase
+    onValue(productRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        products = Object.values(data);
+        renderProducts(products);
+      } else {
+        products = [];
+        renderProducts([]);
+      }
+    }, (error) => {
+      console.error("Error fetching products:", error);
+    });
 
-    function renderReceipt(orderList) {
-      const summary = {};
+    // Render product list in table
+    function renderProducts(list) {
+  productTableBody.innerHTML = "";
+
+  if (!list.length) {
+    productTableBody.innerHTML = '<tr><td colspan="4">No products found</td></tr>';
+    return;
+  }
+
+  for (const product of list) {
+    if (!product || !product.name || product.price == null) continue; // allow 0 as price
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${escapeHTML(product.name)}</td>
+      <td>${escapeHTML(product.description || '')}</td>
+      <td>₱${Number(product.price).toFixed(2)}</td>
+      <td><button class="order-btn" type="button" aria-label="Order ${escapeHTML(product.name)}">Order</button></td>
+    `;
+
+    // Button logic
+    tr.querySelector("button").addEventListener("click", () => {
+      orderProductNameInput.value = product.name;
+      orderQuantityInput.value = 1;
+      successMessage.style.display = "none";
+      orderForm.style.display = "block";
+      orderQuantityInput.focus();
+    });
+
+    productTableBody.appendChild(tr);
+  }
+}
+    // Search functionality
+    searchInput.addEventListener("input", () => {
+      const query = searchInput.value.trim().toLowerCase();
+      const filtered = products.filter(p => p.name.toLowerCase().includes(query));
+      renderProducts(filtered);
+    });
+
+    // Form submit event to add product to cart
+    orderForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      successMessage.style.display = "none";
+
+      const quantity = Number(orderQuantityInput.value);
+      const productName = orderProductNameInput.value.trim();
+      if (!productName || quantity <= 0) {
+        alert("Please enter a valid product and quantity.");
+        return;
+      }
+
+      // Disable submit button during processing
+      const submitBtn = orderForm.querySelector("button[type='submit']");
+      submitBtn.disabled = true;
+
+      // Add to cart (in-memory)
+      let cartItem = cart.find(item => item.name === productName);
+      if (cartItem) {
+        cartItem.quantity += quantity;
+      } else {
+        cart.push({ name: productName, quantity });
+      }
+
+      // Also push to Firebase under orders
+      try {
+        const newOrderRef = push(orderRef);
+        await set(newOrderRef, { name: productName, quantity, timestamp: Date.now() });
+        successMessage.textContent = `Added ${quantity} x ${productName} to cart!`;
+        successMessage.style.color = "green";
+        successMessage.style.display = "block";
+        orderForm.style.display = "none";
+        renderReceiptSummary();
+      } catch (error) {
+        console.error("Failed to add order:", error);
+        successMessage.textContent = "Failed to add to cart. Please try again.";
+        successMessage.style.color = "red";
+        successMessage.style.display = "block";
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Clicking outside form closes it
+    document.addEventListener("click", (e) => {
+      if (!orderForm.contains(e.target) && !e.target.classList.contains("order-btn")) {
+        orderForm.style.display = "none";
+        successMessage.style.display = "none";
+      }
+    });
+
+    // Listen to orders and update receipt summary
+    onValue(productRef, (snapshot) => {
+  const data = snapshot.val();
+  if (data) {
+    // Convert Firebase object to array with keys
+    products = Object.entries(data).map(([id, product]) => ({
+      id,
+      ...product
+    }));
+    renderProducts(products);
+  } else {
+    products = [];
+    renderProducts([]);
+  }
+}, (error) => {
+  console.error("Error fetching products:", error);
+});
+
+    // Render receipt summary
+    function renderReceiptSummary() {
+      receiptTableBody.innerHTML = "";
+      if (!cart.length) {
+        receiptTableBody.innerHTML = `<tr><td colspan="3" style="text-align:center;">No orders yet</td></tr>`;
+        receiptTotalQuantity.textContent = "0";
+        receiptTotalAmount.textContent = "₱0.00";
+        return;
+      }
       let totalQty = 0;
       let totalAmt = 0;
-
-      orderList.forEach(order => {
-        if (!summary[order.product]) {
-          summary[order.product] = { quantity: 0, amount: 0 };
-        }
-        const qty = parseInt(order.quantity, 10);
-        const amt = parseFloat(order.total);
-        summary[order.product].quantity += qty;
-        summary[order.product].amount += amt;
-        totalQty += qty;
-        totalAmt += amt;
-      });
-
-      receiptTableBody.innerHTML = "";
-
-      for (const product in summary) {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${product}</td>
-          <td>${summary[product].quantity}</td>
-          <td>$${summary[product].amount.toFixed(2)}</td>
+      for (const item of cart) {
+        // Find product price
+        const product = products.find(p => p.name === item.name);
+        const price = product ? Number(product.price) : 0;
+        const amount = item.quantity * price;
+        totalQty += item.quantity;
+        totalAmt += amount;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${escapeHTML(item.name)}</td>
+          <td>${item.quantity}</td>
+          <td>₱${amount.toFixed(2)}</td>
         `;
-        receiptTableBody.appendChild(row);
+        receiptTableBody.appendChild(tr);
       }
       receiptTotalQuantity.textContent = totalQty;
-      receiptTotalAmount.textContent = `$${totalAmt.toFixed(2)}`;
+      receiptTotalAmount.textContent = `₱${totalAmt.toFixed(2)}`;
     }
-
-    function filterProducts(searchText) {
-      const filtered = products.filter(p =>
-        p.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchText.toLowerCase())
-      );
-      renderAllProducts(filtered);
-    }
-
-    // Load products from Firebase
-    onValue(productRef, snapshot => {
-      const data = snapshot.val() || {};
-      products = Object.values(data);
-      renderAllProducts(products);
-    });
-
-    // Load orders and render receipt
-    onValue(orderRef, snapshot => {
-      const data = snapshot.val();
-      const orders = data ? Object.values(data) : [];
-      renderReceipt(orders);
-    });
-
-    searchInput.addEventListener("input", e => {
-      filterProducts(e.target.value);
-    });
-
-    orderForm.addEventListener("submit", e => {
-      e.preventDefault();
-      const customerName = customerNameInput.value.trim();
-      const quantity = quantityInput.value.trim();
-      const productName = orderProductNameInput.value.trim();
-
-      if (!customerName || !quantity || !productName) {
-        alert("Please fill in all required fields.");
-        return;
-      }
-
-      // Find product price
-      const product = products.find(p => p.name === productName);
-      if (!product) {
-        alert("Product not found.");
-        return;
-      }
-      const unitPrice = parseFloat(product.price);
-      const total = unitPrice * parseInt(quantity, 10);
-
-      const newOrderRef = push(orderRef);
-      set(newOrderRef, {
-        customer: customerName,
-        product: productName,
-        quantity: parseInt(quantity, 10),
-        unitPrice: unitPrice,
-        total: total.toFixed(2),
-        timestamp: Date.now()
-      }).then(() => {
-        successMessage.textContent = "Order added successfully!";
-        successMessage.style.display = "block";
-        setTimeout(() => {
-          successMessage.style.display = "none";
-        }, 3000);
-        orderForm.reset();
-        orderProductNameInput.value = "";
-        orderForm.style.display = "none";
-      }).catch(error => {
-        alert("Error adding order: " + error.message);
-      });
-    });
-
-    // Print receipt as PDF
-    printReceiptBtn.addEventListener("click", () => {
-  if (receiptTableBody.children.length === 0) {
+    
+      // Print receipt as PDF
+printReceiptBtn.addEventListener("click", () => {
+  if (!cart.length) {
     alert("No orders to print.");
     return;
   }
@@ -496,67 +559,71 @@
   const doc = new jsPDF();
 
   doc.setFontSize(18);
-  doc.text("Order Receipt Summary", 14, 20);
+  doc.text("Order Receipt Summary", 14, 22);
 
-  // Define columns and their X positions
-  const colX = [14, 90, 150];
-  const headers = ["Product", "Total Quantity", "Total Amount"];
-  
-  doc.setFontSize(12);
-  let y = 30;
-
-  // Draw headers
-  headers.forEach((header, i) => {
-    doc.text(header, colX[i], y);
+  const headers = [["Product", "Quantity", "Amount (₱)"]];
+  const data = cart.map(item => {
+    const product = products.find(p => p.name === item.name);
+    const price = product ? Number(product.price) : 0;
+    const amount = item.quantity * price;
+    return [item.name, item.quantity.toString(), amount.toFixed(2)];
   });
 
-  y += 8;
-  // Draw a line below headers
-  doc.setLineWidth(0.5);
-  doc.line(14, y - 4, 200, y - 4);
+  doc.autoTable({
+    head: headers,
+    body: data,
+    startY: 30,
+    theme: "striped",
+    margin: { top: 30 },
+  });
 
-  // Draw each row
-  for (const row of receiptTableBody.children) {
-    const cells = row.children;
-    for (let i = 0; i < cells.length; i++) {
-      doc.text(cells[i].textContent, colX[i], y);
-    }
-    y += 8;
+  const totalAmount = cart.reduce((sum, item) => {
+    const p = products.find(pr => pr.name === item.name);
+    return sum + (p ? p.price * item.quantity : 0);
+  }, 0);
 
-    // Add a page break if near bottom of page
-    if (y > 270) {
-      doc.addPage();
-      y = 20;
-    }
-  }
+  doc.setFontSize(14);
+  doc.text(`Total Amount: ₱${totalAmount.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 10);
 
-  // Draw total row from footer
-  y += 6;
-  doc.setFont(undefined, "bold");
-  doc.text("Total", colX[0], y);
-  doc.text(receiptTotalQuantity.textContent, colX[1], y);
-  doc.text(receiptTotalAmount.textContent, colX[2], y);
-  doc.setFont(undefined, "normal");
-
-  // Save the PDF
-  doc.save("Order_Receipt_Summary.pdf");
+  doc.save("order-receipt.pdf");
 });
 
-    // Delete receipt summary (all orders)
-    deleteReceiptBtn.addEventListener("click", () => {
-      if (confirm("Are you sure you want to delete the entire receipt summary? This cannot be undone.")) {
-        remove(orderRef)
-          .then(() => {
-            alert("Order receipt summary deleted successfully.");
-            receiptTableBody.innerHTML = "";
-            receiptTotalQuantity.textContent = "0";
-            receiptTotalAmount.textContent = "$0.00";
-          })
-          .catch((error) => {
-            alert("Error deleting receipt summary: " + error.message);
-          });
+    // Delete receipt summary button click
+    deleteReceiptBtn.addEventListener("click", async () => {
+      if (!confirm("Are you sure you want to delete all order receipts? This action cannot be undone.")) {
+        return;
+      }
+      try {
+        await remove(orderRef);
+        alert("Order receipt summary deleted successfully.");
+      } catch (error) {
+        console.error("Error deleting order receipts:", error);
+        alert("Failed to delete order receipts. Please try again.");
       }
     });
+
+    // Download receipt as PNG image
+    downloadPngBtn.addEventListener("click", () => {
+      if (!cart.length) {
+        alert("No orders to download.");
+        return;
+      }
+      const receiptSection = document.getElementById("receipt-section");
+      html2canvas(receiptSection, { backgroundColor: '#fff' }).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "order-receipt.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }).catch(err => {
+        console.error("Error generating image:", err);
+        alert("Failed to download image. Please try again.");
+      });
+    });
+
+    // Initial render with no data
+    renderReceiptSummary();
+
   </script>
+
 </body>
 </html>
