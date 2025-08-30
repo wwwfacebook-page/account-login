@@ -6,134 +6,254 @@
   <title>Pana's Store - Web Price List</title>
   <style>
     :root {
-      --primary-color: #2d89ef;
-      --accent-color: #1b6ec2;
+      --primary-color: #4caf50; /* Fresh green */
+      --accent-color: #ff7043; /* Warm accent color */
+      --background-color: #fafafa;
       --text-color: #333;
-      --light-bg: #f9f9f9;
-      --highlight-bg: #eef3fb;
-      --font-main: 'Segoe UI', sans-serif;
+      --highlight-color: #f0f7fc;
+      --font-main: 'Arial', sans-serif;
+      --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      --transition-speed: 0.3s;
     }
 
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
-      margin: 0;
       font-family: var(--font-main);
-      background-color: var(--light-bg);
+      background-color: var(--background-color);
       color: var(--text-color);
       line-height: 1.6;
-      font-size: 1rem;
     }
 
     header {
-      background: var(--primary-color);
+      background: linear-gradient(135deg, #2d89ef, #1b6ec2);
       color: #fff;
       text-align: center;
-      padding: 2.5rem 1rem;
+      padding: 4rem 1.5rem;
+      border-radius: 0 0 20px 20px;
+      box-shadow: var(--box-shadow);
     }
 
     header h1 {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: 1px;
     }
 
     header p {
-      font-size: 1.1rem;
-      margin: 0 auto 1rem;
-      max-width: 500px;
+      font-size: 1.2rem;
+      margin-top: 1rem;
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.6;
     }
 
     .cta-buttons {
-      margin-top: 1rem;
+      margin-top: 2rem;
     }
 
     .cta-buttons a {
       display: inline-block;
-      padding: 0.75rem 1.5rem;
+      padding: 1.2rem 2rem;
       text-decoration: none;
       color: white;
-      background-color: var(--accent-color);
-      border-radius: 6px;
+      background-color: var(--primary-color);
+      border-radius: 50px;
       font-weight: bold;
-      font-size: 1rem;
-      margin: 0.25rem;
-      transition: background 0.3s ease;
+      font-size: 1.1rem;
+      margin: 0.5rem;
+      transition: background 0.3s, transform 0.2s;
     }
 
     .cta-buttons a:hover {
-      background-color: #155a99;
+      background-color: #388e3c;
+      transform: scale(1.05);
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-top: 3rem;
+      background-color: var(--highlight-color);
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: var(--box-shadow);
+    }
+
+    .tabs button {
+      padding: 1.4rem 2rem;
+      font-size: 1.1rem;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      cursor: pointer;
+      flex-grow: 1;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .tabs button:hover {
+      background-color: #388e3c;
+      transform: scale(1.05);
+    }
+
+    .tabs button.active {
+      background-color: #2d89ef;
     }
 
     section {
-      padding: 2rem 1rem;
+      padding: 3rem 2rem;
       max-width: 960px;
-      margin: auto;
+      margin: 2rem auto;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: var(--box-shadow);
+      transition: opacity var(--transition-speed) ease;
     }
 
     section h2 {
-      font-size: 1.5rem;
+      font-size: 2.4rem;
       color: var(--primary-color);
       margin-bottom: 1rem;
+      font-weight: 700;
     }
 
     section p, section ul {
-      font-size: 1rem;
+      font-size: 1.1rem;
+      color: var(--text-color);
     }
 
     ul {
-      padding-left: 1.25rem;
-      margin: 0;
+      padding-left: 1.5rem;
     }
 
     li {
-      margin-bottom: 0.5rem;
-    }
-
-    .testimonials {
-      background-color: var(--highlight-bg);
-      border-left: 4px solid var(--primary-color);
-      padding: 1rem;
-      margin: 1.5rem 0;
-      font-size: 0.95rem;
+      margin-bottom: 1.2rem;
     }
 
     footer {
       text-align: center;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: #777;
-      padding: 2rem 1rem;
-      background-color: #f0f0f0;
+      padding: 3rem 1rem;
+      background-color: var(--highlight-color);
+      border-top-left-radius: 15px;
+      border-top-right-radius: 15px;
+      box-shadow: var(--box-shadow);
     }
 
-    /* Mobile-first - default is already mobile optimized */
-    @media (min-width: 600px) {
-      header h1 {
-        font-size: 2.5rem;
-      }
-
-      header p {
-        font-size: 1.2rem;
-      }
-
-      .cta-buttons a {
-        font-size: 1.1rem;
-      }
-
-      section h2 {
-        font-size: 1.7rem;
-      }
+    /* Form Styles */
+    label {
+      font-weight: 600;
+      display: block;
+      margin: 1rem 0 0.5rem;
     }
 
-    @media (min-width: 900px) {
-      section {
-        padding: 3rem 2rem;
-      }
+    input[type="date"],
+    input[type="text"],
+    button[type="submit"] {
+      width: 100%;
+      padding: 1rem;
+      margin: 0.8rem 0;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
 
-      header p {
-        font-size: 1.25rem;
-      }
+    input[type="date"]:focus,
+    input[type="text"]:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 5px var(--primary-color);
+    }
+
+    button[type="submit"] {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      font-size: 1.1rem;
+      margin-top: 1.5rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      border-radius: 8px;
+      padding: 1.2rem;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #388e3c;
+    }
+
+    /* Collapsible Elements */
+    #schedule-list,
+    #delivery-schedule-list {
+      margin-top: 2rem;
+      background-color: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: var(--box-shadow);
+      display: none; /* Hidden initially */
+      transition: max-height 0.3s ease;
+    }
+
+    #schedule-list.show,
+    #delivery-schedule-list.show {
+      display: block;
+    }
+
+    #toggle-schedule-btn,
+    #toggle-delivery-list-btn {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    #toggle-schedule-btn:hover,
+    #toggle-delivery-list-btn:hover {
+      background-color: #ff5722;
+      transform: scale(1.05);
+    }
+
+    /* Collapsible Add Schedule Form */
+    #add-schedule-form,
+    #delivery-schedule-form {
+      margin-top: 2rem;
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: var(--box-shadow);
+      display: none; /* Hidden initially */
+      transition: max-height 0.3s ease;
+    }
+
+    #add-schedule-form.show,
+    #delivery-schedule-form.show {
+      display: block;
+    }
+
+    #toggle-form-btn,
+    #toggle-delivery-form-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    #toggle-form-btn:hover,
+    #toggle-delivery-form-btn:hover {
+      background-color: #2d89ef;
+      transform: scale(1.05);
     }
   </style>
 </head>
@@ -143,51 +263,221 @@
     <h1>Pana's Store Price List</h1>
     <p>Instantly share our latest product or service prices with customers using our mobile-friendly web-based price list.</p>
     <div class="cta-buttons">
-      <a href="#" id="view-prices-btn" role="button" aria-label="View price list">📋 View Prices</a>
-      <a href="#" id="order-btn" role="button" aria-label="Place an order">🛒 Order Now</a>
+      <a href="pricelist.html" id="view-prices-btn" role="button" aria-label="View price list">📋 View Prices</a>
+      <a href="orders.html" id="order-btn" role="button" aria-label="Place an order">🛒 Order Now</a>
     </div>
   </header>
 
-  <section>
-    <h2>What Is a Web-Based Price List?</h2>
-    <p>A web-based price list is an online, always-accessible pricing page that updates in real time. Upload your products, organize by categories, and control who sees what prices — all from a simple dashboard.</p>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('Delivery-schedule')">Delivery Schedule</button>
+    <button class="tab-btn" onclick="showTab('inventory-schedule')">Inventory Schedule</button>
+  </div>
+
+  <section id="delivery-schedule" class="active">
+    <h2>Delivery Schedule</h2>
+    <p>Track your scheduled deliveries to ensure timely shipping and handling.</p>
+
+    <!-- Toggle Form Button for Delivery Schedule -->
+    <button id="toggle-delivery-form-btn" onclick="toggleDeliveryForm()">Add Delivery Schedule</button>
+
+    <!-- Add Delivery Schedule Form -->
+    <form id="delivery-schedule-form">
+      <label for="delivery-date">Date:</label>
+      <input type="date" id="delivery-date" required />
+
+      <label for="recipient">Recipient:</label>
+      <input type="text" id="recipient" placeholder="Enter recipient's name" required />
+
+      <button type="submit">Add Delivery Schedule</button>
+    </form>
+
+    <!-- Show Delivery Schedule List -->
+    <button id="toggle-delivery-list-btn" onclick="toggleDeliveryList()">Show Delivery Schedules</button>
+
+    <!-- Display Added Delivery Schedules -->
+    <div id="delivery-schedule-list">
+      <h3>Upcoming Delivery Schedules:</h3>
+      <ul id="delivery-schedule-items"></ul>
+    </div>
   </section>
 
-  <section>
-    <h2>Powerful Features</h2>
-    <ul>
-      <li>✅ Real-Time Updates</li>
-      <li>✅ Mobile-Friendly Design</li>
-      <li>✅ Private or Public Access</li>
-      <li>✅ Search & Filter</li>
-      <li>✅ Excel Import Support</li>
-    </ul>
-  </section>
+  <section id="inventory-schedule">
+    <h2>Inventory Schedule</h2>
+    <p>Keep track of all scheduled inventory updates.</p>
 
-  <section>
-    <h2>Perfect For...</h2>
-    <ul>
-      <li>Wholesalers who update pricing frequently</li>
-      <li>Sales teams needing real-time info</li>
-      <li>Service providers with dynamic pricing</li>
-      <li>Retailers managing seasonal changes</li>
-    </ul>
+    <!-- Toggle Form Button for Inventory Schedule -->
+    <button id="toggle-form-btn" onclick="toggleForm()">Add Inventory Schedule</button>
+
+    <!-- Add Inventory Schedule Form -->
+    <form id="add-schedule-form">
+      <label for="inventory-date">Date:</label>
+      <input type="date" id="inventory-date" required />
+
+      <label for="item-name">Item Name:</label>
+      <input type="text" id="item-name" placeholder="Enter item name" required />
+
+      <button type="submit">Add Inventory Schedule</button>
+    </form>
+
+    <!-- Show Inventory Schedule List -->
+    <button id="toggle-schedule-btn" onclick="toggleScheduleList()">Show Inventory Schedules</button>
+
+    <!-- Display Added Inventory Schedules -->
+    <div id="schedule-list">
+      <h3>Upcoming Inventory Schedules:</h3>
+      <ul id="schedule-items"></ul>
+    </div>
   </section>
 
   <footer>
-    &copy; 2025 WebPriceList Inc. All rights reserved.
+    <p>&copy; 2025 Pana's Store. All rights reserved.</p>
   </footer>
 
   <script>
-    document.getElementById("view-prices-btn").addEventListener("click", function (e) {
+    // Toggle Form for Adding Inventory Schedule
+    function toggleForm() {
+      const form = document.getElementById('add-schedule-form');
+      form.classList.toggle('show');
+      const button = document.getElementById('toggle-form-btn');
+      if (form.classList.contains('show')) {
+        button.textContent = 'Hide Add Inventory Schedule';
+      } else {
+        button.textContent = 'Add Inventory Schedule';
+      }
+    }
+
+    // Toggle Inventory Schedule List
+    function toggleScheduleList() {
+      const scheduleList = document.getElementById('schedule-list');
+      const toggleButton = document.getElementById('toggle-schedule-btn');
+      scheduleList.classList.toggle('show');
+      if (scheduleList.classList.contains('show')) {
+        toggleButton.textContent = 'Hide Inventory Schedules';
+      } else {
+        toggleButton.textContent = 'Show Inventory Schedules';
+      }
+    }
+
+    // Add Inventory Schedule
+    document.getElementById('add-schedule-form').addEventListener('submit', function (e) {
       e.preventDefault();
-      window.location.href = "pricelist.html"; // 🔗 Change to your actual price list page
+      const date = document.getElementById('inventory-date').value;
+      const itemName = document.getElementById('item-name').value;
+
+      if (date && itemName) {
+        const scheduleList = document.getElementById('schedule-items');
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `Scheduled for ${getDayOfWeek(date)}: ${itemName} <button class="edit-btn" onclick="editSchedule(this)">Edit</button>
+          <button class="delete-btn" onclick="deleteSchedule(this)">Delete</button>`;
+        scheduleList.appendChild(listItem);
+
+        // Clear form fields
+        document.getElementById('inventory-date').value = '';
+        document.getElementById('item-name').value = '';
+      }
     });
 
-    document.getElementById("order-btn").addEventListener("click", function (e) {
+    // Get Day of the Week from Date
+    function getDayOfWeek(dateString) {
+      const date = new Date(dateString);
+      const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      return daysOfWeek[date.getDay()];
+    }
+
+    // Edit Inventory Schedule
+    function editSchedule(button) {
+      const listItem = button.parentElement;
+      const [dateText, itemText] = listItem.innerText.split(':');
+      document.getElementById('inventory-date').value = dateText.replace('Scheduled for ', '').trim();
+      document.getElementById('item-name').value = itemText.split('Edit')[0].trim();
+      listItem.remove();
+    }
+
+    // Delete Inventory Schedule
+    function deleteSchedule(button) {
+      const listItem = button.parentElement;
+      listItem.remove();
+    }
+
+    // Toggle Form for Adding Delivery Schedule
+    function toggleDeliveryForm() {
+      const form = document.getElementById('delivery-schedule-form');
+      form.classList.toggle('show');
+      const button = document.getElementById('toggle-delivery-form-btn');
+      if (form.classList.contains('show')) {
+        button.textContent = 'Hide Add Delivery Schedule';
+      } else {
+        button.textContent = 'Add Delivery Schedule';
+      }
+    }
+
+    // Toggle Delivery Schedule List
+    function toggleDeliveryList() {
+      const deliveryList = document.getElementById('delivery-schedule-list');
+      const toggleButton = document.getElementById('toggle-delivery-list-btn');
+      deliveryList.classList.toggle('show');
+      if (deliveryList.classList.contains('show')) {
+        toggleButton.textContent = 'Hide Delivery Schedules';
+      } else {
+        toggleButton.textContent = 'Show Delivery Schedules';
+      }
+    }
+
+    // Add Delivery Schedule
+    document.getElementById('delivery-schedule-form').addEventListener('submit', function (e) {
       e.preventDefault();
-      window.location.href = "orders.html"; // 🔗 Change to your actual order page
+      const date = document.getElementById('delivery-date').value;
+      const recipient = document.getElementById('recipient').value;
+
+      if (date && recipient) {
+        const deliveryList = document.getElementById('delivery-schedule-items');
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `Scheduled for ${getDayOfWeek(date)} with recipient: ${recipient} 
+          <button class="edit-btn" onclick="editDeliverySchedule(this)">Edit</button>
+          <button class="delete-btn" onclick="deleteDeliverySchedule(this)">Delete</button>`;
+        deliveryList.appendChild(listItem);
+
+        // Clear form fields
+        document.getElementById('delivery-date').value = '';
+        document.getElementById('recipient').value = '';
+      }
     });
+
+    // Edit Delivery Schedule
+    function editDeliverySchedule(button) {
+      const listItem = button.parentElement;
+      const [dateText, recipientText] = listItem.innerText.split('with recipient:');
+      document.getElementById('delivery-date').value = dateText.replace('Scheduled for ', '').trim();
+      document.getElementById('recipient').value = recipientText.trim();
+      listItem.remove();
+    }
+
+    // Delete Delivery Schedule
+    function deleteDeliverySchedule(button) {
+      const listItem = button.parentElement;
+      listItem.remove();
+    }
+
+    // Tab Switching
+    function showTab(tabName) {
+      const tabs = document.querySelectorAll('section');
+      const buttons = document.querySelectorAll('.tab-btn');
+
+      tabs.forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      buttons.forEach(button => {
+        button.classList.remove('active');
+      });
+
+      document.getElementById(tabName).classList.add('active');
+      buttons.forEach(button => {
+        if (button.textContent.toLowerCase().includes(tabName.toLowerCase())) {
+          button.classList.add('active');
+        }
+      });
+    }
   </script>
 
 </body>
