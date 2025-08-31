@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pana's Store - Price List & Schedules</title>
+  <title>Pana's Store – Price List & Schedules</title>
   <style>
     /* --- Color Palette --- */
     :root {
@@ -34,18 +34,30 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
+
     a {
       text-decoration: none;
       color: white;
       font-weight: 600;
       transition: background-color 0.3s ease;
     }
-    a:hover { background-color: var(--primary-dark); }
+    a:hover {
+      background-color: var(--primary-dark);
+    }
+
+    /* --- Animations --- */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     /* --- Header --- */
     header {
       text-align: center;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark)),
+                  url('https://www.transparenttextures.com/patterns/cubes.png');
+      background-size: cover;
+      background-blend-mode: overlay;
       color: white;
       width: 100%;
       max-width: 900px;
@@ -53,6 +65,12 @@
       border-radius: var(--border-radius) var(--border-radius) 0 0;
       box-shadow: 0 8px 24px var(--shadow-strong);
       margin-bottom: 2rem;
+      animation: fadeIn 0.8s ease;
+      position: relative;
+    }
+    header img {
+      max-width: 80px;
+      margin-bottom: 1rem;
     }
     header h1 {
       font-weight: 700;
@@ -92,6 +110,20 @@
       transform: translateY(-3px);
       box-shadow: 0 10px 20px var(--shadow-strong);
     }
+    header button {
+      margin-top: 1.5rem;
+      padding: 0.6rem 1.5rem;
+      background: var(--primary-dark);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    header button:hover {
+      background-color: var(--primary);
+    }
 
     /* --- Tabs --- */
     .tabs {
@@ -120,7 +152,9 @@
       outline-style: solid;
       outline-width: 2px;
     }
-    .tab-btn:hover { background: var(--primary-light, #e6f0fc); }
+    .tab-btn:hover {
+      background: var(--background);
+    }
     .tab-btn.active {
       background-color: var(--primary);
       color: white;
@@ -141,7 +175,10 @@
       margin-bottom: 3rem;
       transition: opacity 0.35s ease;
     }
-    section.active { display: block; }
+    section.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
     section h2 {
       color: var(--primary);
       font-weight: 700;
@@ -156,7 +193,7 @@
       max-width: 650px;
     }
 
-    /* --- Buttons inside sections --- */
+    /* --- Toggle Buttons --- */
     button.toggle-btn {
       background-color: var(--accent);
       border: none;
@@ -236,7 +273,7 @@
       box-shadow: 0 8px 22px rgba(53, 122, 189, 0.6);
     }
 
-    /* --- Schedule lists --- */
+    /* --- Lists --- */
     #schedule-list,
     #delivery-schedule-list {
       background: var(--background);
@@ -250,6 +287,7 @@
     #schedule-list.show,
     #delivery-schedule-list.show {
       display: block;
+      animation: fadeIn 0.4s ease;
     }
     #schedule-list h3,
     #delivery-schedule-list h3 {
@@ -275,8 +313,9 @@
     }
     li {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.4rem;
       background-color: white;
       padding: 0.9rem 1.4rem;
       border-radius: 8px;
@@ -284,13 +323,19 @@
       box-shadow: 0 2px 10px var(--shadow-light);
       font-size: 1rem;
       color: var(--text-primary);
-      transition: background-color 0.2s ease;
+      transition: background-color 0.2s ease, transform 0.2s ease;
     }
-    li:hover { background-color: #f0f7ff; }
+    li:hover {
+      background-color: #f0f7ff;
+      transform: scale(1.01);
+    }
     .bold-highlight {
       font-weight: 700;
       color: var(--primary);
       margin-right: 0.3rem;
+    }
+    li span:last-child {
+      align-self: flex-end;
     }
     li button {
       border: none;
@@ -303,7 +348,9 @@
       padding: 0;
       user-select: none;
     }
-    li button:hover { color: var(--accent); }
+    li button:hover {
+      color: var(--accent);
+    }
 
     /* --- Footer --- */
     footer {
@@ -315,29 +362,182 @@
       max-width: 900px;
       margin-top: auto;
       border-top: 1px solid #e1e6f0;
+      box-shadow: 0 -3px 12px var(--shadow-light);
       user-select: none;
     }
 
+    /* --- Login Overlay --- */
+    #login-screen {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(to right, #eaf1fa, var(--background));
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      animation: fadeIn 0.6s ease;
+      text-align: center;
+      padding: 2rem;
+    }
+    #login-screen h2 {
+      color: var(--text-primary);
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    #login-screen input {
+      padding: 0.75rem 1rem;
+      border: 1.8px solid var(--primary);
+      border-radius: 8px;
+      font-size: 1rem;
+      margin: 1rem 0;
+      box-shadow: 0 2px 10px rgba(74,144,226,0.15);
+      width: 260px;
+    }
+    #login-screen button {
+      padding: 0.7rem 1.5rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    #login-screen button:hover {
+      background: var(--primary-dark);
+    }
+    #login-error {
+      color: red;
+      margin-top: 1rem;
+      min-height: 1em;
+    }
+
     /* --- Responsive --- */
-    @media (max-width: 720px) {
-  header h1 { font-size: 2.3rem; }
-  .cta-buttons a { padding: 0.85rem 1.8rem; font-size: 1rem; }
-  section { padding: 2rem 1.5rem 2.5rem; }
-  .tab-btn { font-size: 1rem; padding: 1rem 0; }
-  #inventory-summary h3 {
-    color: var(--primary);
-    margin-top: 1rem;
+@media (max-width: 720px) {
+  body {
+    padding: 0.75rem;
   }
-  #inventory-summary-list li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center; /* fixed here */
-    padding: 0.85rem 1.2rem;
-    background-color: white;
-    border-radius: 8px;
-    margin-bottom: 0.8rem;
-    box-shadow: 0 2px 10px var(--shadow-light);
+
+  header {
+    padding: 2rem 1rem 3rem;
+  }
+
+  header h1 {
+    font-size: 2rem;
+  }
+
+  header p {
     font-size: 1rem;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .cta-buttons a {
+    width: 100%;
+    text-align: center;
+    padding: 1rem;
+    font-size: 1rem;
+  }
+
+  .tabs {
+    flex-direction: column;
+  }
+
+  .tab-btn {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.9rem;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  section {
+    padding: 1.6rem 1.2rem 2rem;
+  }
+
+  form {
+    padding: 1.2rem;
+  }
+
+  input[type="date"],
+  input[type="text"],
+  input[type="number"] {
+    font-size: 0.95rem;
+    padding: 0.7rem;
+  }
+
+  button[type="submit"],
+  .toggle-btn {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.85rem 1rem;
+    margin-top: 0.8rem;
+  }
+
+  ul li {
+    font-size: 0.95rem;
+    padding: 0.85rem 1rem;
+  }
+
+  li span:last-child {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  #inventory-summary h3 {
+    margin-top: 1.5rem;
+    font-size: 1.2rem;
+  }
+
+  #login-screen input {
+    width: 100%;
+    max-width: 260px;
+  }
+
+  footer {
+    font-size: 0.85rem;
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 1.75rem;
+  }
+
+  .tab-btn {
+    font-size: 0.95rem;
+  }
+
+  .cta-buttons a {
+    font-size: 0.95rem;
+  }
+
+  section h2 {
+    font-size: 1.7rem;
+  }
+
+  section p {
+    font-size: 1rem;
+  }
+
+  form label {
+    font-size: 0.95rem;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="date"] {
+    font-size: 0.95rem;
+  }
+
+  li {
+    font-size: 0.9rem;
   }
 }
   </style>
@@ -345,31 +545,31 @@
 <body>
 
   <!-- Login Overlay -->
-  <div id="login-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#f9fbfd; z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column;">
-    <h2 style="color:#2e3a59;">🔐 Enter Password</h2>
-    <input type="password" id="login-password" placeholder="Enter password" style="padding:0.75rem 1rem; border:1px solid #ccc; border-radius:8px; font-size:1rem; margin:1rem 0;" />
-    <button onclick="checkLogin()" style="padding:0.7rem 1.5rem; background:#4a90e2; color:white; border:none; border-radius:25px; font-weight:600; cursor:pointer;" aria-label="Login">Login</button>
-    <p id="login-error" style="color:red; margin-top:1rem;"></p>
+  <div id="login-screen">
+    <h2>🔐 Enter Password</h2>
+    <input type="password" id="login-password" placeholder="Enter password" aria-label="Password input"/>
+    <button onclick="checkLogin()" aria-label="Login">Login</button>
+    <p id="login-error"></p>
   </div>
 
   <!-- Header -->
   <header>
-    <h1>Pana's Store Price List</h1>
-    <p>Instantly share our latest product or service prices with customers using our mobile-friendly web-based price list.</p>
+    <!-- Optional logo image; place your 'logo.png' or remove if not needed -->
+    <!-- <img src="logo.png" alt="Pana’s Store Logo"/> -->
+    <h1>Pana’s Store Price List</h1>
+    <p>Instantly share our latest product or service prices with customers using our mobile‑friendly web‑based price list.</p>
     <div class="cta-buttons">
       <a href="pricelist.html" aria-label="Add Products">📋 Add Products</a>
       <a href="orders.html" aria-label="Order Here!">🛒 Order Here!</a>
     </div>
-    <div style="margin-top: 1.5rem;">
-      <button onclick="logout()" style="padding:0.6rem 1.5rem; background:#357ABD; color:white; border:none; border-radius:25px; font-weight:600; cursor:pointer;" aria-label="Logout">🚪 Logout</button>
-    </div>
+    <button onclick="logout()" aria-label="Logout">🚪 Logout</button>
   </header>
 
   <!-- Tabs -->
   <div class="tabs" role="tablist" aria-label="Schedule Tabs">
-    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="delivery-schedule" id="tab-delivery" onclick="showTab('delivery-schedule', this)">Delivery Schedule</button>
-    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="inventory-schedule" id="tab-inventory" onclick="showTab('inventory-schedule', this)">Inventory Schedule</button>
-    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="inventory-summary-section" id="tab-summary" onclick="showTab('inventory-summary-section', this)">Product Inventory Summary</button>
+    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="delivery-schedule" id="tab-delivery" onclick="showTab('delivery-schedule', this)">🚚 Delivery Schedule</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="inventory-schedule" id="tab-inventory" onclick="showTab('inventory-schedule', this)">📦 Inventory Schedule</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="inventory-summary-section" id="tab-summary" onclick="showTab('inventory-summary-section', this)">📊 Product Inventory Summary</button>
   </div>
 
   <!-- Delivery Schedule Section -->
@@ -402,9 +602,9 @@
       <label for="item-name">Distributor Name:</label>
       <input type="text" id="item-name" placeholder="Enter Distributor name" required aria-required="true" />
       <label for="product-name">Product Name:</label>
-      <input type="text" id="product-name" placeholder="Enter product name" required aria-required="true" />
+      <input type="text" id="product-name" placeholder="Enter product name" />
       <label for="product-qty">Quantity:</label>
-      <input type="number" id="product-qty" placeholder="Enter quantity" required aria-required="true" min="1" />
+      <input type="number" id="product-qty" placeholder="Enter quantity" />
       <button type="submit">Add Inventory Schedule</button>
     </form>
     <button id="toggle-schedule-btn" class="toggle-btn" onclick="toggleScheduleList()">📅 Show Inventory Schedules</button>
@@ -414,18 +614,20 @@
     </div>
   </section>
 
+  <!-- Inventory Summary Section -->
   <section id="inventory-summary-section" role="tabpanel" aria-labelledby="tab-summary" tabindex="0">
     <h2>Product Inventory Summary</h2>
     <p>View total available stock of each product based on inventory updates.</p>
     <div id="inventory-summary">
       <h3>Available Inventory:</h3>
+      <button class="toggle-btn" onclick="deleteAllInventorySummary()">🗑️ Delete All Inventory Summary</button>
       <ul id="inventory-summary-list"></ul>
     </div>
   </section>
 
   <!-- Footer -->
   <footer>
-    <p>&copy; 2025 Pana's Store. All rights reserved.</p>
+    <p>&copy; 2025 Pana’s Store. All rights reserved.</p>
   </footer>
 
   <!-- Firebase SDKs -->
@@ -433,11 +635,12 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-  <!-- html2canvas Library -->
+  <!-- html2canvas & html2pdf (optional) -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <script>
-    // Firebase setup
+    // Firebase initialization
     const firebaseConfig = {
       apiKey: "AIzaSyDZl9aNGwhvNVt4Td3I04K2VWNnr3QoaZE",
       authDomain: "sched-db.firebaseapp.com",
@@ -453,8 +656,8 @@
 
     function getDayOfWeek(dateString) {
       const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-      const date = new Date(dateString);
-      return isNaN(date) ? '' : days[date.getDay()];
+      const d = new Date(dateString);
+      return isNaN(d) ? '' : days[d.getDay()];
     }
 
     function showTab(id, btn) {
@@ -465,7 +668,7 @@
       btn.classList.add('active');
       btn.setAttribute('aria-selected','true');
 
-      document.querySelectorAll('section[role="tabpanel"]').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('section[role="tabpanel"]').forEach(sec => sec.classList.remove('active'));
       document.getElementById(id).classList.add('active');
     }
 
@@ -497,28 +700,21 @@
       btn.textContent = list.classList.contains('show') ? '📅 Hide Delivery Schedules' : '📅 Show Delivery Schedules';
     }
 
-    // Inventory submit handler
     document.getElementById('add-schedule-form').addEventListener('submit', e => {
       e.preventDefault();
       const date = document.getElementById('inventory-date').value;
-      const itemName = document.getElementById('item-name').value.trim();
-      const productName = document.getElementById('product-name').value.trim();
-      const productQty = parseInt(document.getElementById('product-qty').value.trim(), 10);
+      const distributor = document.getElementById('item-name').value.trim();
+      const product = document.getElementById('product-name').value.trim();
+      const qty = parseInt(document.getElementById('product-qty').value, 10);
 
-      if (!date || !itemName || !productName || isNaN(productQty) || productQty <= 0) {
-        alert('Please fill in all fields with valid values (quantity must be > 0).');
-        return;
-      }
-
-      const itemRef = database.ref('inventorySchedules').push();
-      itemRef.set({ date, itemName, productName, productQty, day: getDayOfWeek(date) });
-      updateInventoryQty(itemName, productName, productQty);
+      const ref = database.ref('inventorySchedules').push();
+      ref.set({ date, itemName: distributor, productName: product, productQty: qty, day: getDayOfWeek(date) });
+      updateInventoryQty(distributor, product, qty);
 
       e.target.reset();
       toggleForm();
     });
 
-    // Delivery submit handler
     document.getElementById('delivery-schedule-form').addEventListener('submit', e => {
       e.preventDefault();
       const date = document.getElementById('delivery-date').value;
@@ -527,6 +723,7 @@
 
       const ref = database.ref('deliverySchedules').push();
       ref.set({ date, recipient, day: getDayOfWeek(date) });
+
       e.target.reset();
       toggleDeliveryForm();
     });
@@ -537,23 +734,23 @@
     }
 
     function editInventory(key, oldDate, oldItem, oldProduct, oldQty) {
-      if (!confirm('Edit inventory schedule?')) return;
+      if (!confirm('Edit this inventory schedule?')) return;
       const newDate = prompt('Date (YYYY‑MM‑DD):', oldDate);
-      const newItem = prompt('Distributor Name:', oldItem);
-      const newProduct = prompt('Product Name:', oldProduct);
+      const newDist = prompt('Distributor Name:', oldItem);
+      const newProd = prompt('Product Name:', oldProduct);
       const newQty = prompt('Quantity:', oldQty);
-      if (!newDate || !newItem || !newProduct || !newQty) return;
+      if (!newDate || !newDist || !newProd || !newQty) return;
 
-      const parsedOld = parseInt(oldQty, 10);
-      const parsedNew = parseInt(newQty, 10);
-      updateInventoryQty(oldItem, oldProduct, -parsedOld);
-      updateInventoryQty(newItem, newProduct, parsedNew);
+      const oldQ = parseInt(oldQty, 10);
+      const newQ = parseInt(newQty, 10);
+      updateInventoryQty(oldItem, oldProduct, -oldQ);
+      updateInventoryQty(newDist, newProd, newQ);
 
       database.ref('inventorySchedules/' + key).set({
         date: newDate,
-        itemName: newItem,
-        productName: newProduct,
-        productQty: parsedNew,
+        itemName: newDist,
+        productName: newProd,
+        productQty: newQ,
         day: getDayOfWeek(newDate)
       });
     }
@@ -569,15 +766,25 @@
       });
     }
 
+    function deleteAllInventorySummary() {
+      if (!confirm('Delete ALL inventory summary AND schedules? This cannot be undone.')) return;
+      database.ref().update({
+        distributorInventory: null,
+        inventorySchedules: null
+      })
+      .then(() => alert('All inventory data and schedules deleted.'))
+      .catch(err => alert('Error deleting data: ' + err.message));
+    }
+
     function editDelivery(key, date, recipient) {
-      if (!confirm('Edit delivery schedule?')) return;
+      if (!confirm('Edit this delivery schedule?')) return;
       const newDate = prompt('Date (YYYY‑MM‑DD):', date);
-      const newRecipient = prompt('Distributor:', recipient);
-      if (!newDate || !newRecipient) return;
+      const newRec = prompt('Distributor Name:', recipient);
+      if (!newDate || !newRec) return;
 
       database.ref('deliverySchedules/' + key).set({
         date: newDate,
-        recipient: newRecipient,
+        recipient: newRec,
         day: getDayOfWeek(newDate)
       });
     }
@@ -591,21 +798,19 @@
     function editDistributorInventory(distributor, product, qty) {
       if (!confirm(`Edit "${product}" for ${distributor}?`)) return;
 
-      const newProduct = prompt("New product name:", product);
-      const newQty = prompt("New quantity:", qty);
+      const newProd = prompt('New product name:', product);
+      const newQty = prompt('New quantity:', qty);
 
-      if (!newProduct || isNaN(newQty)) {
-        alert("Invalid input.");
+      if (!newProd || isNaN(newQty)) {
+        alert('Invalid input.');
         return;
       }
 
       const updates = {};
-      if (newProduct !== product) {
+      if (newProd !== product) {
         updates[`distributorInventory/${distributor}/${product}`] = null;
-        updates[`distributorInventory/${distributor}/${newProduct}`] = parseInt(newQty, 10);
-      } else {
-        updates[`distributorInventory/${distributor}/${product}`] = parseInt(newQty, 10);
       }
+      updates[`distributorInventory/${distributor}/${newProd}`] = parseInt(newQty, 10);
 
       database.ref().update(updates);
     }
@@ -615,7 +820,7 @@
       database.ref(`distributorInventory/${distributor}/${product}`).remove();
     }
 
-    // Render inventory schedules
+    // --- Render Inventory Schedules ---
     database.ref('inventorySchedules').on('value', snap => {
       const list = document.getElementById('schedule-items');
       list.innerHTML = '';
@@ -632,14 +837,14 @@
             <div>Product: <span class="bold-highlight">${d.productName}</span> | Quantity: <span class="bold-highlight">${d.productQty}</span></div>
           </div>
           <span>
-            <button aria-label="Edit" onclick="editInventory('${k}', '${d.date}', '${d.itemName}', '${d.productName}', '${d.productQty}')">✏️</button>
-            <button aria-label="Delete" onclick="deleteInventory('${k}')">🗑️</button>
+            <button aria-label="Edit Inventory" onclick="editInventory('${k}', '${d.date}', '${d.itemName}', '${d.productName}', '${d.productQty}')">✏️</button>
+            <button aria-label="Delete Inventory" onclick="deleteInventory('${k}')">🗑️</button>
           </span>`;
         list.appendChild(li);
       });
     });
 
-    // Render delivery schedules
+    // --- Render Delivery Schedules ---
     database.ref('deliverySchedules').on('value', snap => {
       const list = document.getElementById('delivery-schedule-items');
       list.innerHTML = '';
@@ -653,48 +858,47 @@
         li.innerHTML = `
           <span>Scheduled for <span class="bold-highlight">${d.day}</span>: <span class="bold-highlight">${d.recipient}</span></span>
           <span>
-            <button aria-label="Edit" onclick="editDelivery('${k}', '${d.date}', '${d.recipient}')">✏️</button>
-            <button aria-label="Delete" onclick="deleteDelivery('${k}')">🗑️</button>
+            <button aria-label="Edit Delivery" onclick="editDelivery('${k}', '${d.date}', '${d.recipient}')">✏️</button>
+            <button aria-label="Delete Delivery" onclick="deleteDelivery('${k}')">🗑️</button>
           </span>`;
         list.appendChild(li);
       });
     });
 
-    // Render inventory summary
+    // --- Render Inventory Summary ---
     database.ref('distributorInventory').on('value', snap => {
       const summary = document.getElementById('inventory-summary-list');
       summary.innerHTML = '';
-      if (!snap.exists()) {
+      const data = snap.val();
+      if (!data) {
         summary.innerHTML = '<li>No inventory data available.</li>';
         return;
       }
-      snap.forEach(distSnap => {
-        const distributor = distSnap.key;
-        const products = distSnap.val();
-
-        const distHeader = document.createElement('li');
-        distHeader.innerHTML = `<strong>${distributor}</strong>`;
-        distHeader.style.fontWeight = 'bold';
-        summary.appendChild(distHeader);
-
-        Object.entries(products).forEach(([product, qty]) => {
-          const li = document.createElement('li');
-          li.innerHTML = `
-            <span class="bold-highlight">${product}</span>: ${qty} pcs
-            <span>
-              <button aria-label="Edit distributor inventory" onclick="editDistributorInventory('${distributor}', '${product}', ${qty})">✏️</button>
-              <button aria-label="Delete distributor inventory" onclick="deleteDistributorInventory('${distributor}', '${product}')">🗑️</button>
-            </span>`;
-          summary.appendChild(li);
+      Object.entries(data).forEach(([dist, prods]) => {
+        const distLi = document.createElement('li');
+        distLi.innerHTML = `<strong>${dist}</strong>`;
+        distLi.style.fontWeight = 'bold';
+        summary.appendChild(distLi);
+        Object.entries(prods).forEach(([prod, qty]) => {
+          if (qty !== null && qty !== undefined) {
+            const li = document.createElement('li');
+            li.innerHTML = `
+              <span class="bold-highlight">${prod}</span>: ${qty} boxe(s)
+              <span>
+                <button aria-label="Edit Inventory Summary" onclick="editDistributorInventory('${dist}', '${prod}', ${qty})">✏️</button>
+                <button aria-label="Delete Inventory Summary" onclick="deleteDistributorInventory('${dist}', '${prod}')">🗑️</button>
+              </span>`;
+            summary.appendChild(li);
+          }
         });
       });
     });
 
-    // Login logic
-    const DEFAULT_PASSWORD = "panastore123";
+    // --- Login handling ---
+    const DEFAULT_PASSWORD = 'panastore123';
     function checkLogin() {
-      const input = document.getElementById('login-password').value;
-      if (input === DEFAULT_PASSWORD) {
+      const pass = document.getElementById('login-password').value;
+      if (pass === DEFAULT_PASSWORD) {
         document.getElementById('login-screen').style.display = 'none';
         document.body.style.overflow = 'auto';
       } else {
@@ -705,16 +909,14 @@
     function logout() {
       document.getElementById('login-password').value = '';
       document.getElementById('login-error').textContent = '';
-      document.getElementById('login‑screen').style.display = 'flex';
+      document.getElementById('login-screen').style.display = 'flex';
       document.body.style.overflow = 'hidden';
     }
 
-    // Ensure initial lock
     window.addEventListener('load', () => {
-      document.getElementById('login‑screen').style.display = 'flex';
+      document.getElementById('login-screen').style.display = 'flex';
       document.body.style.overflow = 'hidden';
     });
-
   </script>
 </body>
 </html>
