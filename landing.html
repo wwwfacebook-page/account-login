@@ -320,24 +320,26 @@
 
     /* --- Responsive --- */
     @media (max-width: 720px) {
-      header h1 { font-size: 2.3rem; }
-      .cta-buttons a { padding: 0.85rem 1.8rem; font-size: 1rem; }
-      section { padding: 2rem 1.5rem 2.5rem; }
-      .tab-btn { font-size: 1rem; padding: 1rem 0; }
-      /* Remaining responsive styles applied only once */
-      #inventory-summary h3 {
-        color: var(--primary);
-        margin-top: 1rem;
-      }
-      #inventory-summary-list li {
-        background-color: #fff;
-        margin-bottom: 0.7rem;
-        padding: 0.75rem 1.2rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px var(--shadow-light);
-        font-size: 1rem;
-      }
-    }
+  header h1 { font-size: 2.3rem; }
+  .cta-buttons a { padding: 0.85rem 1.8rem; font-size: 1rem; }
+  section { padding: 2rem 1.5rem 2.5rem; }
+  .tab-btn { font-size: 1rem; padding: 1rem 0; }
+  #inventory-summary h3 {
+    color: var(--primary);
+    margin-top: 1rem;
+  }
+  #inventory-summary-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* fixed here */
+    padding: 0.85rem 1.2rem;
+    background-color: white;
+    border-radius: 8px;
+    margin-bottom: 0.8rem;
+    box-shadow: 0 2px 10px var(--shadow-light);
+    font-size: 1rem;
+  }
+}
   </style>
 </head>
 <body>
@@ -346,7 +348,7 @@
   <div id="login-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#f9fbfd; z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column;">
     <h2 style="color:#2e3a59;">🔐 Enter Password</h2>
     <input type="password" id="login-password" placeholder="Enter password" style="padding:0.75rem 1rem; border:1px solid #ccc; border-radius:8px; font-size:1rem; margin:1rem 0;" />
-    <button onclick="checkLogin()" style="padding:0.7rem 1.5rem; background:#4a90e2; color:white; border:none; border-radius:25px; font-weight:600; cursor:pointer;">Login</button>
+    <button onclick="checkLogin()" style="padding:0.7rem 1.5rem; background:#4a90e2; color:white; border:none; border-radius:25px; font-weight:600; cursor:pointer;" aria-label="Login">Login</button>
     <p id="login-error" style="color:red; margin-top:1rem;"></p>
   </div>
 
@@ -359,7 +361,7 @@
       <a href="orders.html" aria-label="Order Here!">🛒 Order Here!</a>
     </div>
     <div style="margin-top: 1.5rem;">
-      <button onclick="logout()" style="padding:0.6rem 1.5rem; background:#357ABD; color:white; border:none; border-radius:25px; font-weight:600; cursor:pointer;">🚪 Logout</button>
+      <button onclick="logout()" style="padding:0.6rem 1.5rem; background:#357ABD; color:white; border:none; border-radius:25px; font-weight:600; cursor:pointer;" aria-label="Logout">🚪 Logout</button>
     </div>
   </header>
 
@@ -412,7 +414,6 @@
     </div>
   </section>
 
-  <!-- Inventory Summary Section -->
   <section id="inventory-summary-section" role="tabpanel" aria-labelledby="tab-summary" tabindex="0">
     <h2>Product Inventory Summary</h2>
     <p>View total available stock of each product based on inventory updates.</p>
@@ -431,6 +432,9 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <!-- html2canvas Library -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script>
     // Firebase setup
@@ -493,7 +497,7 @@
       btn.textContent = list.classList.contains('show') ? '📅 Hide Delivery Schedules' : '📅 Show Delivery Schedules';
     }
 
-    // Inventory submit handler (now unified)
+    // Inventory submit handler
     document.getElementById('add-schedule-form').addEventListener('submit', e => {
       e.preventDefault();
       const date = document.getElementById('inventory-date').value;
@@ -508,7 +512,7 @@
 
       const itemRef = database.ref('inventorySchedules').push();
       itemRef.set({ date, itemName, productName, productQty, day: getDayOfWeek(date) });
-      updateInventoryQty(productName, productQty);
+      updateInventoryQty(itemName, productName, productQty);
 
       e.target.reset();
       toggleForm();
@@ -527,22 +531,23 @@
       toggleDeliveryForm();
     });
 
-    function updateInventoryQty(name, change) {
-      const ref = database.ref('productInventory/' + name);
+    function updateInventoryQty(distributor, product, change) {
+      const ref = database.ref(`distributorInventory/${distributor}/${product}`);
       ref.transaction(qty => (qty || 0) + change);
     }
 
     function editInventory(key, oldDate, oldItem, oldProduct, oldQty) {
       if (!confirm('Edit inventory schedule?')) return;
-      const newDate = prompt('Date (YYYY-MM-DD):', oldDate);
+      const newDate = prompt('Date (YYYY‑MM‑DD):', oldDate);
       const newItem = prompt('Distributor Name:', oldItem);
       const newProduct = prompt('Product Name:', oldProduct);
       const newQty = prompt('Quantity:', oldQty);
       if (!newDate || !newItem || !newProduct || !newQty) return;
 
-      const parsedOld = parseInt(oldQty,10), parsedNew = parseInt(newQty,10);
-      updateInventoryQty(oldProduct, -parsedOld);
-      updateInventoryQty(newProduct, parsedNew);
+      const parsedOld = parseInt(oldQty, 10);
+      const parsedNew = parseInt(newQty, 10);
+      updateInventoryQty(oldItem, oldProduct, -parsedOld);
+      updateInventoryQty(newItem, newProduct, parsedNew);
 
       database.ref('inventorySchedules/' + key).set({
         date: newDate,
@@ -558,7 +563,7 @@
       database.ref('inventorySchedules/' + key).once('value', snap => {
         const data = snap.val();
         if (data && data.productName && data.productQty) {
-          updateInventoryQty(data.productName, -parseInt(data.productQty,10));
+          updateInventoryQty(data.itemName, data.productName, -parseInt(data.productQty, 10));
         }
         database.ref('inventorySchedules/' + key).remove();
       });
@@ -566,7 +571,7 @@
 
     function editDelivery(key, date, recipient) {
       if (!confirm('Edit delivery schedule?')) return;
-      const newDate = prompt('Date (YYYY-MM-DD):', date);
+      const newDate = prompt('Date (YYYY‑MM‑DD):', date);
       const newRecipient = prompt('Distributor:', recipient);
       if (!newDate || !newRecipient) return;
 
@@ -581,6 +586,33 @@
       if (confirm('Delete this delivery schedule?')) {
         database.ref('deliverySchedules/' + key).remove();
       }
+    }
+
+    function editDistributorInventory(distributor, product, qty) {
+      if (!confirm(`Edit "${product}" for ${distributor}?`)) return;
+
+      const newProduct = prompt("New product name:", product);
+      const newQty = prompt("New quantity:", qty);
+
+      if (!newProduct || isNaN(newQty)) {
+        alert("Invalid input.");
+        return;
+      }
+
+      const updates = {};
+      if (newProduct !== product) {
+        updates[`distributorInventory/${distributor}/${product}`] = null;
+        updates[`distributorInventory/${distributor}/${newProduct}`] = parseInt(newQty, 10);
+      } else {
+        updates[`distributorInventory/${distributor}/${product}`] = parseInt(newQty, 10);
+      }
+
+      database.ref().update(updates);
+    }
+
+    function deleteDistributorInventory(distributor, product) {
+      if (!confirm(`Delete "${product}" from ${distributor}?`)) return;
+      database.ref(`distributorInventory/${distributor}/${product}`).remove();
     }
 
     // Render inventory schedules
@@ -629,18 +661,32 @@
     });
 
     // Render inventory summary
-    database.ref('productInventory').on('value', snap => {
+    database.ref('distributorInventory').on('value', snap => {
       const summary = document.getElementById('inventory-summary-list');
       summary.innerHTML = '';
       if (!snap.exists()) {
         summary.innerHTML = '<li>No inventory data available.</li>';
         return;
       }
-      snap.forEach(child => {
-        const product = child.key, qty = child.val();
-        const li = document.createElement('li');
-        li.innerHTML = `<span class="bold-highlight">${product}</span>: ${qty} pcs`;
-        summary.appendChild(li);
+      snap.forEach(distSnap => {
+        const distributor = distSnap.key;
+        const products = distSnap.val();
+
+        const distHeader = document.createElement('li');
+        distHeader.innerHTML = `<strong>${distributor}</strong>`;
+        distHeader.style.fontWeight = 'bold';
+        summary.appendChild(distHeader);
+
+        Object.entries(products).forEach(([product, qty]) => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <span class="bold-highlight">${product}</span>: ${qty} pcs
+            <span>
+              <button aria-label="Edit distributor inventory" onclick="editDistributorInventory('${distributor}', '${product}', ${qty})">✏️</button>
+              <button aria-label="Delete distributor inventory" onclick="deleteDistributorInventory('${distributor}', '${product}')">🗑️</button>
+            </span>`;
+          summary.appendChild(li);
+        });
       });
     });
 
@@ -655,18 +701,20 @@
         document.getElementById('login-error').textContent = 'Incorrect password. Please try again.';
       }
     }
+
     function logout() {
       document.getElementById('login-password').value = '';
       document.getElementById('login-error').textContent = '';
-      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('login‑screen').style.display = 'flex';
       document.body.style.overflow = 'hidden';
     }
 
-    // Initial lock
-    document.body.style.overflow = 'hidden';
+    // Ensure initial lock
     window.addEventListener('load', () => {
-      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('login‑screen').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
     });
+
   </script>
 </body>
 </html>
