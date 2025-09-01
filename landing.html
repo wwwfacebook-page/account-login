@@ -636,7 +636,6 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
   <!-- html2canvas & html2pdf (optional) -->
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <script>
@@ -820,8 +819,28 @@
       database.ref(`distributorInventory/${distributor}/${product}`).remove();
     }
 
+    function prefillInventoryForm(distributorName, date) {
+  const form = document.getElementById('add-schedule-form');
+  const distributorInput = document.getElementById('item-name');
+  const dateInput = document.getElementById('inventory-date');
+
+  // Pre-fill distributor & date
+  distributorInput.value = distributorName;
+  if (date) {
+    dateInput.value = date;
+    dateInput.disabled = true; // lock date so it stays consistent
+  }
+
+  // Show form if hidden
+  if (!form.classList.contains('show')) {
+    toggleForm();
+  }
+
+  document.getElementById('product-name').focus();
+}
+
     // --- Render Inventory Schedules ---
-   database.ref('inventorySchedules').on('value', snap => {
+database.ref('inventorySchedules').on('value', snap => {
   const list = document.getElementById('schedule-items');
   list.innerHTML = '';
   if (!snap.exists()) {
@@ -833,14 +852,23 @@
     const li = document.createElement('li');
     li.innerHTML = `
       <div>
-        <div><strong>${d.itemName}</strong> on <strong>${d.day}</strong></div>
-        <div>Product: <span class="bold-highlight">${d.productName}</span> | Quantity: <span class="bold-highlight">${d.productQty}</span></div>
+        <div>
+          <strong>${d.itemName}</strong> on <strong>${d.day}</strong>
+          <button class="toggle-btn" style="padding: 4px 12px; font-size: 0.85rem; margin-left: 8px;"
+          onclick="prefillInventoryForm('${d.itemName}', '${d.date}')">➕ Add Inventory</button>
+        </div>
+        <div>
+          Product: <span class="bold-highlight">${d.productName}</span> |
+          Quantity: <span class="bold-highlight">${d.productQty}</span>
+        </div>
       </div>
       <span>
         <button aria-label="Edit Inventory" onclick="editInventory('${k}', '${d.date}', '${d.itemName}', '${d.productName}', '${d.productQty}')">✏️</button>
         <button aria-label="Delete Inventory" onclick="deleteInventory('${k}')">🗑️</button>
       </span>`;
-    list.appendChild(li); // ✅ This is the key line!
+    
+    // ✅ ADD THIS LINE BELOW
+    list.appendChild(li);
   });
 });
 
@@ -875,24 +903,163 @@
         return;
       }
       Object.entries(data).forEach(([dist, prods]) => {
-        const distLi = document.createElement('li');
-        distLi.innerHTML = `<strong>${dist}</strong>`;
-        distLi.style.fontWeight = 'bold';
-        summary.appendChild(distLi);
-        Object.entries(prods).forEach(([prod, qty]) => {
-          if (qty !== null && qty !== undefined) {
-            const li = document.createElement('li');
-            li.innerHTML = `
-              <span class="bold-highlight">${prod}</span>: ${qty} boxe(s)
-              <span>
-                <button aria-label="Edit Inventory Summary" onclick="editDistributorInventory('${dist}', '${prod}', ${qty})">✏️</button>
-                <button aria-label="Delete Inventory Summary" onclick="deleteDistributorInventory('${dist}', '${prod}')">🗑️</button>
-              </span>`;
-            summary.appendChild(li);
-          }
-        });
+      const distLi = document.createElement('li');
+      distLi.innerHTML = `
+        <div style="display: flex; justify-content: space-between; width: 100%;">
+          <strong>${dist}</strong>
+          <button class="toggle-btn" style="font-size: 0.85rem; padding: 0.5rem 1rem;" onclick="downloadDistributorPDF('${dist}')">📥 Download PDF</button>
+        </div>
+      `;
+      summary.appendChild(distLi);
+      
+      const prodList = document.createElement('ul');
+      prodList.style.marginLeft = '1.2rem';
+      Object.entries(prods).forEach(([prod, qty]) => {
+        const prodLi = document.createElement('li');
+        prodLi.textContent = `${prod} — ${qty}`;
+        prodList.appendChild(prodLi);
       });
+    
+      distLi.appendChild(prodList);
     });
+  });
+
+    async function generateDistributorReport(distributorName) {
+    // Pull data in parallel
+    const invSummaryRef = database.ref(`distributorInventory/${distributorName}`).once('value');
+    const invSchedRef   = database.ref('inventorySchedules').orderByChild('itemName').equalTo(distributorName).once('value');
+    const delivSchedRef = database.ref('deliverySchedules').orderByChild('recipient').equalTo(distributorName).once('value');
+
+    const [invSummarySnap, invSchedSnap, delivSchedSnap] = await Promise.all([invSummaryRef, invSchedRef, delivSchedRef]);
+
+    const invSummary = invSummarySnap.val() || {};
+    const invSchedules = invSchedSnap.exists() ? Object.values(invSchedSnap.val()) : [];
+    const delivSchedules = delivSchedSnap.exists() ? Object.values(delivSchedSnap.val()) : [];
+
+    // Build a printable container
+    const container = document.createElement('div');
+    container.style.padding = '1.25rem 1.5rem';
+    container.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+    container.style.color = "#2e3a59";
+    container.style.width = "800px"; // consistent width on PDF
+
+    // Header
+    const h1 = document.createElement('h1');
+    h1.textContent = "Pana’s Store — Distributor Report";
+    h1.style.color = "#4a90e2";
+    h1.style.margin = "0 0 4px 0";
+    container.appendChild(h1);
+
+    const h2 = document.createElement('h2');
+    h2.textContent = distributorName;
+    h2.style.color = "#357ABD";
+    h2.style.margin = "0 0 8px 0";
+    h2.style.fontSize = "1.35rem";
+    container.appendChild(h2);
+
+    const ts = document.createElement('p');
+    ts.textContent = `Generated on: ${new Date().toLocaleString()}`;
+    ts.style.color = "#6b7a99";
+    ts.style.margin = "0 0 16px 0";
+    container.appendChild(ts);
+
+    // Helper: section builder
+    function addSectionTitle(text) {
+      const t = document.createElement('h3');
+      t.textContent = text;
+      t.style.color = "#4a90e2";
+      t.style.margin = "20px 0 8px 0";
+      container.appendChild(t);
+    }
+    function addTable(headers, rows, alignRightIdx = []) {
+      const table = document.createElement('table');
+      table.style.width = "100%";
+      table.style.borderCollapse = "collapse";
+      table.style.fontSize = "0.95rem";
+
+      const trHead = document.createElement('tr');
+      headers.forEach((h, i) => {
+        const th = document.createElement('th');
+        th.textContent = h;
+        th.style.textAlign = alignRightIdx.includes(i) ? 'right' : 'left';
+        th.style.borderBottom = "2px solid #4a90e2";
+        th.style.padding = "8px";
+        trHead.appendChild(th);
+      });
+      table.appendChild(trHead);
+
+      rows.forEach(r => {
+        const tr = document.createElement('tr');
+        r.forEach((cell, i) => {
+          const td = document.createElement('td');
+          td.textContent = (cell ?? '').toString();
+          td.style.padding = "8px";
+          td.style.borderBottom = "1px solid #e5eaf3";
+          td.style.textAlign = alignRightIdx.includes(i) ? 'right' : 'left';
+          tr.appendChild(td);
+        });
+        table.appendChild(tr);
+      });
+
+      container.appendChild(table);
+    }
+
+    // Section 1: Inventory Summary
+    addSectionTitle("Inventory Summary");
+    const invRows = Object.entries(invSummary).map(([prod, qty]) => [prod, qty]);
+    if (invRows.length) {
+      addTable(["Product", "Quantity"], invRows, [1]);
+    } else {
+      const p = document.createElement('p');
+      p.textContent = "No inventory data.";
+      container.appendChild(p);
+    }
+
+    // Section 2: Inventory Schedules
+    addSectionTitle("Inventory Schedules");
+    if (invSchedules.length) {
+      // Sort by date (ascending)
+      invSchedules.sort((a, b) => (a.date||'').localeCompare(b.date||''));
+      const rows = invSchedules.map(s => [
+        s.date || '',
+        s.day || '',
+        s.productName || '',
+        s.productQty ?? ''
+      ]);
+      addTable(["Date", "Day", "Product", "Qty"], rows, [3]);
+    } else {
+      const p = document.createElement('p');
+      p.textContent = "No inventory schedules.";
+      container.appendChild(p);
+    }
+
+    // Section 3: Delivery Schedules
+    addSectionTitle("Delivery Schedules");
+    if (delivSchedules.length) {
+      delivSchedules.sort((a, b) => (a.date||'').localeCompare(b.date||''));
+      const rows = delivSchedules.map(s => [
+        s.date || '',
+        s.day || '',
+        s.recipient || ''
+      ]);
+      addTable(["Date", "Day", "Recipient"], rows);
+    } else {
+      const p = document.createElement('p');
+      p.textContent = "No delivery schedules.";
+      container.appendChild(p);
+    }
+
+    // Generate the PDF
+    html2pdf()
+      .from(container)
+      .set({
+        margin: 0.5,
+        filename: `${distributorName}-report.pdf`,
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      })
+      .save();
+  }
 
     // --- Login handling ---
     const DEFAULT_PASSWORD = 'panastore123';
