@@ -51,7 +51,7 @@
       width: fit-content;
       border-radius: 10px;
       backdrop-filter: blur(6px);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
     #game {
@@ -139,10 +139,9 @@
   <h1>Catch the Emoji 🎯</h1>
 
   <div id="scoreboard">
-  Score: <span id="score">0</span> |
-  Misses: <span id="misses">0</span> / 3
-  <!-- High Score will be added via JS -->
-</div>
+    Score: <span id="score">0</span> |
+    Misses: <span id="misses">0</span> / 3
+  </div>
 
   <div id="game">
     <div id="game-over">
@@ -151,12 +150,16 @@
     </div>
   </div>
 
+  <!-- 🎵 Catch sound -->
+  <audio id="catch-sound" src="catch.mp3" preload="auto"></audio>
+
   <script>
   const game = document.getElementById("game");
   const scoreEl = document.getElementById("score");
   const missesEl = document.getElementById("misses");
   const gameOverScreen = document.getElementById("game-over");
   const restartBtn = document.getElementById("restart-btn");
+  const catchSound = document.getElementById("catch-sound");
 
   const emojis = ["😀", "🍕", "🐱", "👻", "🌟", "🦄", "🎯", "💎", "🍩", "⚽"];
   let score = 0;
@@ -210,6 +213,10 @@
       if (game.contains(emoji)) game.removeChild(emoji);
       score++;
       scoreEl.textContent = score;
+
+      // 🔊 Play catch sound
+      catchSound.currentTime = 0;
+      catchSound.play();
 
       // 🔥 Update high score
       if (score > highScore) {
