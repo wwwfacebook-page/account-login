@@ -821,28 +821,28 @@
     }
 
     // --- Render Inventory Schedules ---
-    database.ref('inventorySchedules').on('value', snap => {
-      const list = document.getElementById('schedule-items');
-      list.innerHTML = '';
-      if (!snap.exists()) {
-        list.innerHTML = '<li>No inventory schedules available.</li>';
-        return;
-      }
-      snap.forEach(child => {
-        const d = child.val(), k = child.key;
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <div>
-            <div><strong>${d.itemName}</strong> on <strong>${d.day}</strong> (${d.date})</div>
-            <div>Product: <span class="bold-highlight">${d.productName}</span> | Quantity: <span class="bold-highlight">${d.productQty}</span></div>
-          </div>
-          <span>
-            <button aria-label="Edit Inventory" onclick="editInventory('${k}', '${d.date}', '${d.itemName}', '${d.productName}', '${d.productQty}')">✏️</button>
-            <button aria-label="Delete Inventory" onclick="deleteInventory('${k}')">🗑️</button>
-          </span>`;
-        list.appendChild(li);
-      });
-    });
+   database.ref('inventorySchedules').on('value', snap => {
+  const list = document.getElementById('schedule-items');
+  list.innerHTML = '';
+  if (!snap.exists()) {
+    list.innerHTML = '<li>No inventory schedules available.</li>';
+    return;
+  }
+  snap.forEach(child => {
+    const d = child.val(), k = child.key;
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <div>
+        <div><strong>${d.itemName}</strong> on <strong>${d.day}</strong></div>
+        <div>Product: <span class="bold-highlight">${d.productName}</span> | Quantity: <span class="bold-highlight">${d.productQty}</span></div>
+      </div>
+      <span>
+        <button aria-label="Edit Inventory" onclick="editInventory('${k}', '${d.date}', '${d.itemName}', '${d.productName}', '${d.productQty}')">✏️</button>
+        <button aria-label="Delete Inventory" onclick="deleteInventory('${k}')">🗑️</button>
+      </span>`;
+    list.appendChild(li); // ✅ This is the key line!
+  });
+});
 
     // --- Render Delivery Schedules ---
     database.ref('deliverySchedules').on('value', snap => {
