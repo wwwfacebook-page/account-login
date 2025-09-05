@@ -34,21 +34,22 @@
     }
 
     .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        background-color: rgba(73, 70, 70, 0.575);
-        color: white;
-        padding: 20px;
-        border-radius: 0 0 10px 0;
-        width: 200px;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-        z-index: 1000;
-    }
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(73, 70, 70, 0.575);
+    color: white;
+    padding: 20px;
+    border-radius: 0 0 10px 0;
+    width: 200px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    overflow: hidden; /* Prevents sidebar itself from scrolling */
+}
 
     .profile {
         display: flex;
@@ -74,15 +75,14 @@
         width: 100%;
     }
 
-    .option {
-        padding: 10px;
-        margin: 5px 0;
-        width: 100%;
-        text-align: left;
-        cursor: pointer;
-        border-radius: 5px;
-        transition: background-color 0.3s ease;
-    }
+    .options {
+    flex: 1; /* Take up remaining space below profile */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Makes options scrollable */
+    padding-right: 5px; /* Add little space for scrollbar */
+}
 
     .option:hover {
         background-color: rgba(58, 108, 214, 0.5);

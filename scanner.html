@@ -2,314 +2,38 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Web Scanner App — QR & Barcode</title>
-  <meta name="theme-color" content="#111827" />
-  <style>
-    :root{
-      --bg:#0b1220; --card:#111827; --accent:#60a5fa; --text:#e5e7eb; --muted:#9ca3af; --good:#22c55e; --bad:#ef4444;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:linear-gradient(180deg,#0b1220,#0e172a);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;}
-    .container{max-width:980px;margin:0 auto;padding:16px}
-    .app{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:20px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-    header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08);backdrop-filter:blur(8px)}
-    header h1{font-size:18px;margin:0;letter-spacing:.2px}
-    header .badge{font-size:12px;color:var(--muted)}
-    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;padding:16px}
-    @media (max-width: 900px){.grid{grid-template-columns:1fr}}
-    .pane{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;overflow:hidden}
-    .pane h2{margin:0;padding:12px 14px;font-size:14px;border-bottom:1px solid rgba(255,255,255,.06);color:#cbd5e1}
-    .video-wrap{position:relative;aspect-ratio:3/4;background:#000}
-    video{width:100%;height:100%;object-fit:cover}
-    .overlay{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
-    .frame{width:min(75%,420px);aspect-ratio:1;border:2px dashed rgba(255,255,255,.55);border-radius:16px;box-shadow:inset 0 0 0 999px rgba(0,0,0,.25)}
-    .controls{display:flex;flex-wrap:wrap;gap:8px;padding:10px;border-top:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.25)}
-    .controls > *{flex:1}
-    .row{display:flex;gap:8px}
-    button, select, input[type=file]{appearance:none;background:#0f172a;border:1px solid rgba(255,255,255,.12);color:var(--text);padding:10px 12px;border-radius:10px;font:inherit;cursor:pointer}
-    button:hover{border-color:rgba(255,255,255,.25)}
-    button:disabled{opacity:.5;cursor:not-allowed}
-    .btn-accent{background:linear-gradient(180deg,#1e293b,#0f172a);border-color:#1f2937}
-    .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px}
-    .kpis div{background:#0b1220;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:10px;text-align:center}
-    .kpis .value{font-weight:700;font-size:18px}
-    .result{padding:12px;border-top:1px solid rgba(255,255,255,.08);font-size:14px}
-    .result .label{color:var(--muted);font-size:12px}
-    .result pre{white-space:pre-wrap;word-break:break-word;margin:6px 0 0;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#0b1220;border:1px solid rgba(255,255,255,.06);padding:10px;border-radius:8px}
-    .history{max-height:420px;overflow:auto}
-    .history .item{display:grid;gap:6px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.06)}
-    .history .meta{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:12px}
-    .badge-ok{color:#10b981}
-    .badge-err{color:#ef4444}
-    .small{font-size:12px;color:var(--muted)}
-  </style>
-  <!-- ZXing library for QR + many 1D barcodes -->
+  <title>Simple QR Scanner</title>
   <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0"></script>
 </head>
 <body>
-  <div class="container">
-    <div class="app">
-      <header>
-        <h1>Web Scanner App <span class="badge">QR + Barcode</span></h1>
-        <div class="small">Uses your camera • Works offline</div>
-      </header>
-
-      <div class="grid">
-        <!-- Left: Live scanner -->
-        <section class="pane">
-          <h2>Live Camera</h2>
-          <div class="video-wrap">
-            <video id="preview" muted playsinline></video>
-            <div class="overlay"><div class="frame" aria-hidden="true"></div></div>
-          </div>
-          <div class="kpis">
-            <div><div class="value" id="kpiTotal">0</div><div class="small">Total Scans</div></div>
-            <div><div class="value" id="kpiUnique">0</div><div class="small">Unique Codes</div></div>
-            <div><div class="value" id="kpiErrors">0</div><div class="small">Errors</div></div>
-          </div>
-          <div class="controls">
-            <div class="row">
-              <select id="cameraSelect" title="Select camera"></select>
-              <button id="btnStart" class="btn-accent">Start</button>
-              <button id="btnPause">Pause</button>
-              <button id="btnTorch" disabled>Torch</button>
-            </div>
-            <div class="row">
-              <input type="file" id="fileInput" accept="image/*" />
-              <button id="btnPick" onclick="document.getElementById('fileInput').click()">Scan Image</button>
-              <button id="btnCopy" disabled>Copy Result</button>
-              <button id="btnClear">Clear History</button>
-            </div>
-          </div>
-          <div class="result">
-            <div class="label">Last result</div>
-            <pre id="lastResult">—</pre>
-          </div>
-        </section>
-
-        <!-- Right: History -->
-        <section class="pane">
-          <h2>Scan History</h2>
-          <div id="history" class="history" role="log" aria-live="polite"></div>
-        </section>
-      </div>
-    </div>
-  </div>
-
-  <audio id="beep" preload="auto">
-    <!-- tiny base64 beep to avoid external files -->
-    <source src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQAAABhBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUf/2wBDAAIBAQIBAQICAgICAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQICAgMDAwYDAwYQCQgJCBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCABQAFADASIAAhEBAxEB/8QAGwABAAIDAQEAAAAAAAAAAAAABgQFAgMHAQj/xAAxEAACAQMDBAIBAwUAAAAAAAABAgMABBEFIRIxQVEGEyJhcYGxMkJSYYHB8P/EABoBAQADAQEBAAAAAAAAAAAAAAABAgMEBQb/xAAtEQEAAgEDAgQFBQAAAAAAAAABAhEDBBIhMUFRYRMicYGh8BQiQpHw/9oADAMBAAIRAxEAPwD8jK1b8QO2V2r0s0lQyQm3M2Qe9Z8X7qv2FZ2V2Xq8d5Rlv8Aq3Zrj3Wm3vSgkWzj3y8G3S0HqLqf5h6Ww7e7iT7Y0rZzQ1I3u7KJq5Vh3k2mT65HfQ3s2x4l2cCk8Uu2I0r0v3p4rQxV7nS1KkO8h1Y1qfQ8f1gK3H4d8vV0Z4nQf6T8O0o8P6m2z9l1n3pRkzq9yT2k3m0Z9b3C9PjKq2b2tOq0oV3dQ0n2qZs8Hj2b0Z9c7m0b0lYk9d4+g6a0o4L1l2b9C9c9G9e9P/2Q==" type="audio/mp3" />
-  </audio>
+  <h2>QR Scanner Test</h2>
+  <video id="preview" style="width:100%;max-width:400px;border:1px solid #ccc;" autoplay></video>
+  <p><strong>Result:</strong> <span id="result">—</span></p>
 
   <script>
-    const ZX = ZXing; // alias
+    const codeReader = new ZXing.BrowserMultiFormatReader();
     const video = document.getElementById('preview');
-    const cameraSelect = document.getElementById('cameraSelect');
-    const btnStart = document.getElementById('btnStart');
-    const btnPause = document.getElementById('btnPause');
-    const btnTorch = document.getElementById('btnTorch');
-    const btnCopy = document.getElementById('btnCopy');
-    const btnClear = document.getElementById('btnClear');
-    const fileInput = document.getElementById('fileInput');
-    const hist = document.getElementById('history');
-    const lastResultEl = document.getElementById('lastResult');
-    const beep = document.getElementById('beep');
+    const resultSpan = document.getElementById('result');
 
-    const reader = new ZX.BrowserMultiFormatReader();
-
-    let currentDeviceId = null;
-    let currentStream = null;
-    let scanning = false;
-    let totalScans = 0, uniqueScans = 0, errors = 0;
-    const seen = new Set();
-
-    const updateKPI = () => {
-      document.getElementById('kpiTotal').textContent = totalScans;
-      document.getElementById('kpiUnique').textContent = uniqueScans;
-      document.getElementById('kpiErrors').textContent = errors;
-    }
-
-    async function listCameras(){
-      try{
-        const devices = await ZX.BrowserCodeReader.listVideoInputDevices();
-        cameraSelect.innerHTML = devices.map((d,i)=>`<option value="${d.deviceId}">${d.label||`Camera ${i+1}`}</option>`).join('');
-        if(devices.length){ currentDeviceId = devices[0].deviceId; }
-      }catch(err){
-        console.error(err);
-      }
-    }
-
-    async function start(deviceId){
-      try{
-        scanning = true;
-        btnStart.disabled = true; btnPause.disabled = false; btnCopy.disabled = false;
-        await reader.decodeFromVideoDevice(deviceId ?? undefined, 'preview', onResult);
-        currentDeviceId = reader.videoInputDevices?.find?.(d=>d.deviceId===deviceId)?.deviceId || deviceId || null;
-        await tryEnableTorchSupport();
-      }catch(err){
-        console.error(err);
-        errors++; updateKPI();
-        alert('Unable to access camera. Please allow permission or choose a different device.');
-        btnStart.disabled = false;
-      }
-    }
-
-    async function stop(){
-      scanning = false;
-      reader.reset();
-      if(currentStream){
-        currentStream.getTracks().forEach(t=>t.stop());
-        currentStream = null;
-      }
-      btnStart.disabled = false; btnPause.disabled = true;
-    }
-
-    async function onResult(result, err){
-      if(result){
-        const text = result.text?.trim?.() || '';
-        const format = result.getBarcodeFormat?.() || 'UNKNOWN';
-        totalScans++; if(!seen.has(text)){ seen.add(text); uniqueScans++; }
-        updateKPI();
-        lastResultEl.textContent = `${text}\n\n[Format: ${format}]`;
-        addHistoryItem(text, format, true);
-        // haptics + beep
-        try{ if('vibrate' in navigator) navigator.vibrate(40); }catch(_){}
-        try{ beep.currentTime=0; beep.play().catch(()=>{}); }catch(_){ }
-        // optional: auto-copy on first time
-        // copyToClipboard(text);
-      } else if(err && !(err instanceof ZX.NotFoundException)){
-        errors++; updateKPI();
-      }
-    }
-
-    function addHistoryItem(text, format, ok){
-      const div = document.createElement('div');
-      div.className = 'item';
-      const when = new Date().toLocaleString();
-      div.innerHTML = `
-        <div class="meta">
-          <span class="${ok?'badge-ok':'badge-err'}">${ok?'✓':'×'}</span>
-          <span>${when}</span>
-          <span>•</span>
-          <span>${format}</span>
-          <button style="margin-left:auto" onclick="copyText(this)" data-text="${encodeURIComponent(text)}">Copy</button>
-        </div>
-        <div class="text">${escapeHTML(text) || '<em>(empty)</em>'}</div>`;
-      hist.prepend(div);
-    }
-
-    function escapeHTML(str){
-      return str.replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[s]));
-    }
-
-    async function copyToClipboard(text){
-      try{ await navigator.clipboard.writeText(text); }catch(_){ /* ignore */ }
-    }
-
-    window.copyText = async (btn)=>{
-      const text = decodeURIComponent(btn.getAttribute('data-text'));
-      await copyToClipboard(text);
-      btn.textContent = 'Copied!';
-      setTimeout(()=>btn.textContent='Copy',1000);
-    }
-
-    async function tryEnableTorchSupport(){
-      // Toggle enabled if the current track supports torch
-      try{
-        const stream = video.srcObject || (video.srcObject = video.captureStream?.());
-        let track = stream && stream.getVideoTracks ? stream.getVideoTracks()[0] : null;
-        if(!track && video.srcObject){ track = video.srcObject.getVideoTracks()[0]; }
-        currentStream = video.srcObject || null;
-        const caps = track?.getCapabilities?.();
-        if(caps && 'torch' in caps){
-          btnTorch.disabled = false;
-        } else {
-          btnTorch.disabled = true;
+    async function startScanner() {
+      try {
+        const devices = await ZXing.BrowserCodeReader.listVideoInputDevices();
+        const firstDeviceId = devices[0]?.deviceId;
+        if (!firstDeviceId) {
+          resultSpan.textContent = "No camera found.";
+          return;
         }
-      }catch(e){ btnTorch.disabled = true; }
+        await codeReader.decodeFromVideoDevice(firstDeviceId, video, (res, err) => {
+          if (res) {
+            resultSpan.textContent = res.text;
+          }
+        });
+      } catch (e) {
+        resultSpan.textContent = "Error: " + e;
+      }
     }
 
-    async function toggleTorch(){
-      try{
-        const track = (video.srcObject && video.srcObject.getVideoTracks()[0]) || null;
-        if(!track) return;
-        const settings = track.getSettings();
-        const enabled = settings.torch === true;
-        await track.applyConstraints({ advanced: [{ torch: !enabled }] });
-        btnTorch.textContent = settings.torch ? 'Torch' : (enabled ? 'Torch' : 'Torch');
-      }catch(e){ console.warn('Torch not supported', e); alert('Torch not supported on this device/browser.'); }
-    }
-
-    // UI events
-    cameraSelect.addEventListener('change', async (e)=>{
-      currentDeviceId = e.target.value;
-      await stop();
-      await start(currentDeviceId);
-    });
-    btnStart.addEventListener('click', ()=> start(currentDeviceId));
-    btnPause.addEventListener('click', stop);
-    btnTorch.addEventListener('click', toggleTorch);
-    btnClear.addEventListener('click', ()=>{ hist.innerHTML=''; seen.clear(); totalScans=uniqueScans=errors=0; updateKPI(); lastResultEl.textContent='—'; });
-    btnCopy.addEventListener('click', ()=>{
-      const txt = lastResultEl.textContent.replace(/\n\n\[.*$/,'');
-      copyToClipboard(txt);
-    });
-
-    // Image file scanning
-    fileInput.addEventListener('change', async (e)=>{
-      const file = e.target.files?.[0]; if(!file) return;
-      const img = new Image();
-      img.onload = async ()=>{
-        try{
-          const luminanceSource = new ZX.HTMLCanvasElementLuminanceSource(imageToCanvas(img));
-          const hybridBinarizer = new ZX.HybridBinarizer(luminanceSource);
-          const binaryBitmap = new ZX.BinaryBitmap(hybridBinarizer);
-          const hints = new Map();
-          const formats = [
-            ZX.BarcodeFormat.QR_CODE,
-            ZX.BarcodeFormat.DATA_MATRIX,
-            ZX.BarcodeFormat.AZTEC,
-            ZX.BarcodeFormat.PDF_417,
-            ZX.BarcodeFormat.CODE_128,
-            ZX.BarcodeFormat.CODE_39,
-            ZX.BarcodeFormat.EAN_13,
-            ZX.BarcodeFormat.EAN_8,
-            ZX.BarcodeFormat.UPC_A,
-            ZX.BarcodeFormat.ITF
-          ];
-          hints.set(ZX.DecodeHintType.POSSIBLE_FORMATS, formats);
-          const result = new ZX.MultiFormatReader().decode(binaryBitmap, hints);
-          onResult(result, null);
-        }catch(err){
-          errors++; updateKPI();
-          addHistoryItem('No code found in image', 'IMAGE', false);
-        }
-      };
-      img.onerror = ()=>{ errors++; updateKPI(); addHistoryItem('Failed to load image', 'IMAGE', false); };
-      img.src = URL.createObjectURL(file);
-      // reset input so same file can be reselected
-      e.target.value = '';
-    });
-
-    function imageToCanvas(img){
-      const c = document.createElement('canvas');
-      const m = 0; // margin crop
-      c.width = img.naturalWidth; c.height = img.naturalHeight;
-      const ctx = c.getContext('2d');
-      ctx.drawImage(img, m, m, c.width - m*2, c.height - m*2, 0, 0, c.width, c.height);
-      return c;
-    }
-
-    // Kick off: prompt for permission and list cameras
-    (async ()=>{
-      try{
-        // Warm up permission so labels populate
-        await navigator.mediaDevices.getUserMedia({video:true});
-      }catch(_){}
-      await listCameras();
-    })();
+    startScanner();
   </script>
 </body>
 </html>
