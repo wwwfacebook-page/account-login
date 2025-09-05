@@ -544,14 +544,6 @@
 </head>
 <body>
 
-  <!-- Login Overlay -->
-  <div id="login-screen">
-    <h2>🔐 Enter Password</h2>
-    <input type="password" id="login-password" placeholder="Enter password" aria-label="Password input"/>
-    <button onclick="checkLogin()" aria-label="Login">Login</button>
-    <p id="login-error"></p>
-  </div>
-
   <!-- Header -->
   <header>
     <!-- Optional logo image; place your 'logo.png' or remove if not needed -->
@@ -562,7 +554,6 @@
       <a href="pricelist.html" aria-label="Add Products">📋 Add Products</a>
       <a href="orders.html" aria-label="Order Here!">🛒 Order Here!</a>
     </div>
-    <button onclick="logout()" aria-label="Logout">🚪 Logout</button>
   </header>
 
   <!-- Tabs -->
@@ -1060,30 +1051,6 @@ database.ref('inventorySchedules').on('value', snap => {
       })
       .save();
   }
-
-    // --- Login handling ---
-    const DEFAULT_PASSWORD = 'panastore123';
-    function checkLogin() {
-      const pass = document.getElementById('login-password').value;
-      if (pass === DEFAULT_PASSWORD) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.body.style.overflow = 'auto';
-      } else {
-        document.getElementById('login-error').textContent = 'Incorrect password. Please try again.';
-      }
-    }
-
-    function logout() {
-      document.getElementById('login-password').value = '';
-      document.getElementById('login-error').textContent = '';
-      document.getElementById('login-screen').style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    }
-
-    window.addEventListener('load', () => {
-      document.getElementById('login-screen').style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    });
   </script>
 </body>
 </html>
